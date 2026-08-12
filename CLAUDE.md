@@ -320,8 +320,17 @@ make week      # snapshot → diff → enrich → publish
 make site      # web/out/ 정적 빌드
 ```
 
-**데이터는 `data/snapshots/2026-W33/` 하나뿐이다.** 이것이 기준선이고, 여기에 소스를
-추가로 얹는 중이다. 발행물(`data/weeks/`)은 아직 없다 — W34를 떠서 첫 diff가 나와야 생긴다.
+**기준선은 `data/snapshots/2026-W33/`이고 소스 3개가 들어 있다.** 발행물(`data/weeks/`)은
+아직 없다 — W34를 떠서 첫 diff가 나와야 생긴다.
+
+| 소스 | 채널 | 건수 | 요청 | 비고 |
+|---|---|---|---|---|
+| cu | convenience | 5,082 | 131 | 이름이 12자로 잘려 온다 |
+| starbucks | cafe | 326 | 18 | 설명문 326/326. 가격 없음. MD는 요청하지 않는다 |
+| orion | fmcg | 115 | 15 | 가격 없음. 동명이인 2건 |
+
+홈플러스(mart)는 목록 API까지 뚫었으나 상세가 클라이언트 렌더링이라 `source_url`·`image_url`을
+검증하지 못해 보류했다. 브라우저 확인 1회가 필요하다(`sources/targets.yml` 참조).
 
 W34를 돌린 뒤 `data/weeks/<week>.report.json`의 세 지표를 보고 판단한다:
 
@@ -329,7 +338,7 @@ W34를 돌린 뒤 `data/weeks/<week>.report.json`의 세 지표를 보고 판단
 |---|---|
 | `added` | 주당 수십~수백이면 정상. 수천이면 매칭이 깨진 것 |
 | `source_new_label.added_not_labelled` | **신상이라고 판정했는데 소스는 NEW라 안 한 건수 = 오탐 후보** |
-| `gd_idx_monotonic.added_below_previous_max` | 등록 순서를 거스르는 신상 = 오탐 후보 |
+| `monotonic_id.added_below_previous_max` | 등록 순서를 거스르는 신상 = 오탐 후보. **단조 증가 키가 확인된 소스에만 실린다** |
 
 **판단 기준은 added 건수가 아니라 오탐 비율이다.** 소스의 NEW 라벨은 판정에 쓰지 않지만
 (2.1) 채점표로는 쓴다 — 이것이 원칙을 지키면서 diff 품질을 수치화하는 유일한 방법이다.

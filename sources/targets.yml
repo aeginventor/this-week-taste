@@ -184,10 +184,27 @@ mart:
     catalog: full          # 단, 온라인 배송 가능 품목만. 오프라인 매장 카탈로그가 아니다
     pb_brands: [홈플러스시그니처, 심플러스]
     hint: >
-      GET /category/item.json?categoryDepth=&categoryId=&page=1&perPage=100&sort=RANK
+      🚧 구현 보류. 목록 API는 뚫었으나 source_url·image_url을 확인하지 못했다(아래).
+      실측 2026-08-12: 식품 2,748건 / 127요청 / 약 2분.
+      GET /category/item.json?categoryDepth=2&categoryId=<M레벨 cateCd>&page=1&perPage=100&sort=RANK
       ★ sort=RANK 가 없으면 SUCCESS + totalCount:0 이 온다(무음 실패).
-      카테고리 트리는 /category/mobile/getMap.json 1회로 전부(리프 359, 식품 116).
-      cateDepth 문자(L/M/S) → categoryDepth 숫자(1/2/3) 변환 필요. perPage 상한 100.
+      ★ **categoryDepth는 항상 2이고 categoryId는 M 레벨 cateCd(2xxxxx)다.**
+        L 레벨 id나 다른 depth를 넣으면 역시 SUCCESS + totalCount:0 이다. 이것도 무음 실패다.
+      카테고리 트리는 /category/mobile/getMap.json 1회. 구조는 R(22) → L(31) → M(203)이고
+      **M이 리프**다. 정찰이 적은 L/M/S 359개는 다른 키를 이중으로 센 결과였다.
+      식품 대분류 17개(과일·쌀/잡곡·채소·견과·수산물/건어물·정육/계란·델리/치킨/초밥·
+      우유/유제품·냉장/냉동·두부/김치/반찬·커피/차·생수/음료·과자/시리얼·베이커리/잼·
+      라면/즉석식품/통조림·장류/양념/제빵·건강식품) → M 리프 127개, 그중 103개가 비어있지 않다.
+      응답: data.dataList / data.totalCount / pagination.totalPage. returnCode는 문자열 "SUCCESS".
+      필드: itemNo(주키), itemNm(절삭 없음), salePrice, dcPrice, rcateNm>lcateNm>mcateNm>scateNm>dcateNm
+      (5단계 카테고리를 응답이 직접 준다 → 4장의 `>` 연결 그대로 쓸 수 있다).
+      ⛔ **막힌 지점**: 이미지 URL 필드가 없고(imgChgDt·imgDispYn만 있다) 상세 페이지가
+        클라이언트 렌더링이라 /item?itemNo=… 이 9,535바이트 SPA 껍데기를 준다.
+        source_url·image_url을 서버에서 검증할 수 없다. **브라우저 Network 탭 확인 1회 필요**
+        (CLAUDE.md 5장이 권하는 절차). 그 전에는 구현하지 않는다 — 동작하는지 모르는 링크를
+        발행하면 7장의 "요약 + 원문 링크" 요건을 지켰는지 알 수 없다.
+      ⚠️ brandNm은 전 항목 null이라 PB 식별에 못 쓴다. itemNm 접두사로 봐야 한다.
+      ⚠️ 신선식품은 거의 비어 있다(사과/배 1건). 가공식품만 채워져 있다.
       세션·토큰·storeId 불필요. robots.txt는 /favorite,/mypage만 금지.
       필드: itemNm(절삭 없음), salePrice/dcPrice(할인 분리됨), itemNo, lcateNm/mcateNm/scateNm.
       brandNm은 전 항목 빈 문자열이라 PB는 itemNm 접두사로 식별.
