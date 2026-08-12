@@ -200,3 +200,74 @@ def test_matching_is_strictly_one_to_one():
     assert result["counts"]["matched"] == 1
     assert result["counts"]["added"] == 1
     assert result["counts"]["removed"] == 0
+
+
+# ── 소스마다 다른 키 이름 ────────────────────────────────────────────
+#
+# CU는 barcode와 gd_idx를 주지만 오리온은 goodsno 하나뿐이고 가격이 없다.
+# 키 이름을 하드코딩하면 오리온 항목은 매칭 키가 하나도 안 잡혀서
+# (이름, 가격) 계층까지 떨어지는데, 가격이 전부 null이라 동명이인이 섞인다.
+# 실제로 오리온 카탈로그 115건에 같은 이름이 2건 있다(`후레쉬베리`).
+
+
+def orion(name, goodsno, *, category="파이"):
+    return {
+        "source_id": "orion",
+        "external_id": goodsno,
+        "alt_ids": {"goodsno": goodsno},
+        "name": name,
+        "price": None,                      # 오리온은 가격을 주지 않는다
+        "category_raw": category,
+        "image_url": f"https://www.orionworld.com/upload/goods/{goodsno}.png",
+        "source_url": f"https://www.orionworld.com/goods/view/26?goodsno={goodsno}",
+        "scraped_at": "2026-08-12T09:00:00+09:00",
+    }
+
+
+def test_모르는_키_이름으로도_매칭된다():
+    previous = [orion("오뜨 애플파이", "175")]
+    current = [orion("오뜨 애플파이", "175")]
+    result = diff_items(previous, current)
+
+    assert result["counts"]["matched"] == 1
+    assert result["counts"]["added"] == 0
+    assert result["counts"]["removed"] == 0
+
+
+def test_이름이_같아도_키가_다르면_다른_제품이다():
+    """오리온 실측: `후레쉬베리`가 goodsno 6과 137로 두 번 있다. 가격은 둘 다 null.
+
+    키 이름을 하드코딩하던 시절에는 둘 다 (이름, None)으로 떨어졌다. 목록 순서가
+    그대로면 우연히 짝이 맞아 들키지 않지만, **순서가 바뀌면 서로 뒤바뀐다.**
+    소스가 목록 순서를 보장할 이유는 없으므로 순서를 섞어서 확인한다.
+    """
+    previous = [orion("후레쉬베리", "6"), orion("후레쉬베리", "137")]
+    current = [orion("후레쉬베리", "137"), orion("후레쉬베리", "6")]  # 순서가 뒤집혔다
+    result = diff_items(previous, current)
+
+    assert result["counts"]["matched"] == 2
+    assert result["counts"]["review"] == 0      # 보류로 새지 않는다
+    # 뒤바뀌지 않았는지 — 각자 자기 goodsno끼리 이어져야 한다
+    for pair in result["changed"]:
+        assert pair["item"]["external_id"] == pair["previous"]["external_id"]
+
+
+def test_alt_ids가_비어도_external_id로_매칭된다():
+    """alt_ids를 안 주는 소스가 나와도 주키로 이어져야 한다."""
+    previous = [{**orion("한끼바 초코", "201"), "alt_ids": {}}]
+    current = [{**orion("한끼바 초코", "201"), "alt_ids": {}}]
+    result = diff_items(previous, current)
+
+    assert result["counts"]["matched"] == 1
+    assert result["changed"] == []
+
+
+def test_이름이_바뀌어도_키로_이어진다():
+    previous = [orion("오뜨", "175")]
+    current = [orion("오뜨 애플파이", "175")]
+    result = diff_items(previous, current)
+
+    assert result["counts"]["added"] == 0        # 신상 아님
+    assert result["counts"]["removed"] == 0      # 단종도 아님
+    assert result["changed"][0]["matched_by"] == "goodsno"
+    assert result["changed"][0]["fields"]["name"] == {"from": "오뜨", "to": "오뜨 애플파이"}

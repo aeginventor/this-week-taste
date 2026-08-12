@@ -50,14 +50,29 @@ L4_PAIR_LIMIT = 2_000_000
 TRACKED_FIELDS = ("name", "price", "image_url", "category_raw")
 
 
+# 소스 간 대조가 가능한 키. 여러 소스에 같은 제품이 있어도 이 값은 같으므로 가장 믿을 만하다.
+CROSS_SOURCE_KEYS = ("barcode",)
+
+
 def _keys(item: dict) -> list[tuple[str, str]]:
-    """이 항목이 가진 매칭 키를 신뢰 순으로 돌려준다."""
-    alt = item.get("alt_ids") or {}
-    found = []
-    if alt.get("barcode"):
-        found.append(("barcode", alt["barcode"]))
-    if alt.get("gd_idx"):
-        found.append(("gd_idx", alt["gd_idx"]))
+    """이 항목이 가진 매칭 키를 신뢰 순으로 돌려준다.
+
+    소스마다 주는 키가 다르다 — CU는 barcode와 gd_idx, 오리온은 goodsno뿐이다.
+    그래서 키 이름을 하드코딩하지 않고 `alt_ids`에 있는 것을 전부 쓴다.
+    순서는 소스 간 대조가 되는 키 → 소스 내부 키(이름순) → `external_id` 순이다.
+
+    `external_id`를 마지막에 넣는 이유: `alt_ids`가 비어 있는 소스에서도 매칭이
+    되어야 하는데, `external_id`는 소스 카탈로그에서 유일함이 보장된다(4장).
+    CU처럼 `external_id`가 `alt_ids`의 값과 같은 소스에서는 앞 계층에서 이미
+    매칭되므로 이 항목까지 내려오지 않는다.
+    """
+    alt = {k: v for k, v in (item.get("alt_ids") or {}).items() if v}
+    ordered = [k for k in CROSS_SOURCE_KEYS if k in alt]
+    ordered += [k for k in sorted(alt) if k not in CROSS_SOURCE_KEYS]
+
+    found = [(name, str(alt[name])) for name in ordered]
+    if item.get("external_id"):
+        found.append(("external_id", str(item["external_id"])))
     return found
 
 

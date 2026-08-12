@@ -37,6 +37,9 @@ def _detail_fetcher(source_id: str):
     if source_id == "cu":
         from scrapers import cu
         return cu.fetch_detail
+    if source_id == "orion":
+        from scrapers import orion
+        return orion.fetch_detail
     raise ValueError(f"상세 조회를 지원하지 않는 소스: {source_id!r}")
 
 
@@ -58,22 +61,25 @@ def run(source_id: str, week: str | None = None) -> Path:
     failures = 0
 
     for index, item in enumerate(added, start=1):
-        gd_idx = (item.get("alt_ids") or {}).get("gd_idx")
-        if not gd_idx:
-            log.warning("gd_idx가 없어 건너뛴다: %s", item["name"])
+        # 소스마다 상세 조회 키가 다르다(CU는 gd_idx, 오리온은 goodsno). 그런데 어느
+        # 소스든 `external_id`가 그 키이므로(4장) 이것 하나로 통일한다. 키 이름을
+        # 하드코딩하면 새 소스의 항목이 통째로 건너뛰어진다.
+        key = item.get("external_id")
+        if not key:
+            log.warning("external_id가 없어 건너뛴다: %s", item["name"])
             continue
         try:
-            detail = fetch_detail(session, gd_idx, week=week)
+            detail = fetch_detail(session, key, week=week)
         except base.FetchError as exc:
             # 보강 실패는 발행을 막지 않는다. 다만 조용히 넘기지도 않는다.
             failures += 1
-            log.error("상세 조회 실패 (%s / %s): %s", item["name"], gd_idx, exc)
+            log.error("상세 조회 실패 (%s / %s): %s", item["name"], key, exc)
             continue
 
         if detail["name"] and detail["name"] != item["name"]:
-            # 목록과 상세의 이름이 다르면 gd_idx 매핑이 틀렸다는 뜻이다.
-            log.error("이름 불일치 — 목록 %r vs 상세 %r (gdIdx=%s). 이 항목은 보강하지 않는다.",
-                      item["name"], detail["name"], gd_idx)
+            # 목록과 상세의 이름이 다르면 키 매핑이 틀렸다는 뜻이다.
+            log.error("이름 불일치 — 목록 %r vs 상세 %r (키=%s). 이 항목은 보강하지 않는다.",
+                      item["name"], detail["name"], key)
             failures += 1
             continue
 
