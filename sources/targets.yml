@@ -1,0 +1,729 @@
+# 이번주맛 (this-week-taste) — 수집 대상 브랜드 정의
+#
+# 이 파일이 단일 진실 공급원(single source of truth)이다.
+# 스크래퍼를 추가하기 전에 반드시 여기에 항목을 먼저 정의한다.
+#
+# priority:
+#   P0 — v1 출시에 반드시 포함. 커버리지 대비 난이도가 가장 좋은 조합
+#   P1 — 안정화 후 추가
+#   P2 — 여력이 되면. 또는 자동화 난이도가 높아 별도 접근이 필요
+#
+# status:
+#   unverified — 아직 정찰하지 않음 (초기값)
+#   verified   — 접근 방법 확인 완료
+#   blocked    — 봇 차단/회원제/앱 전용 등으로 자동화 불가
+#
+# method: (정찰 후 채움)
+#   static | xhr | playwright | press | manual
+#
+# catalog: (정찰 후 채움. 신상 판별 방식이 여기서 갈린다)
+#   full    — 전체 카탈로그를 준다. 차집합 diff 그대로 적용 (CLAUDE.md 2.1)
+#   partial — 행사/PB 등 부분 목록만 준다. 차집합은 "목록 진입/이탈"이지 "신상/단종"이 아니다
+#   (press 소스는 catalog 자체가 없다. post id/date 기준 증분 피드로 다룬다)
+#
+# 정찰 완료 2026-08-11. url 필드는 이제 홈페이지가 아니라 **확인된 목록 엔드포인트**다.
+# 상세 근거: docs/RECON_REPORT.md. 원본 샘플은 scratch/samples/ (180개, 커밋하지 않음)
+
+# ─────────────────────────────────────────────
+# 편의점 — 신상 밀도가 가장 높고 구조가 정형화됨. 최우선.
+# ─────────────────────────────────────────────
+convenience:
+  # 정찰 2026-08-11 (RECON_convenience.md): 4사 전부 접근 가능.
+  # 단 전체 카탈로그를 주는 곳은 CU 하나뿐이고 나머지 3사는 행사/PB 목록만 공개한다.
+  - id: cu
+    name: CU
+    company: BGF리테일
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://cu.bgfretail.com/product/productAjax.do
+    catalog: full          # 전 카테고리 카탈로그 → 차집합 diff 그대로 적용
+    hint: >
+      ★ v1 수직 관통 대상. 4사 중 유일하게 전 카테고리 카탈로그를 주고,
+      세션·토큰이 없고, 바코드 ID가 있고, 행사 노이즈가 없다.
+      POST form: pageIndex=1&searchMainCategory=10&codeParent=10&listType=0
+      Referer: https://cu.bgfretail.com/product/product.do?category=product&depth2=4
+      응답은 JSON이 아니라 HTML 조각(`<li class="prod_list">`).
+      카테고리 7종(10 간편식사/20 즉석조리/30 과자류/40 아이스크림/50 식품/60 음료/70 생활용품).
+      페이지당 40개 고정(변경 불가) → 전체 131요청 / 약 5,100건.
+      ID: 이미지 파일명이 바코드, `view(17620)`이 내부 gdIdx. 둘 다 확보 가능.
+      ⚠️ 제품명이 소스 단계에서 12자쯤에서 잘려 있다(`샐)오리지널닭가슴살샐러`).
+         CU의 POS 명칭 그대로이므로 LLM에 복원시키지 말 것(6장: 없는 정보 생성 금지).
+      robots.txt는 HTTP 404(파일 없음) → 명시적 금지 규칙 없음.
+    also_check:
+      - https://cu.bgfretail.com/brand_info/news_list.do   # 보도자료 (미조사)
+
+  - id: gs25
+    name: GS25
+    company: GS리테일
+    priority: P0
+    status: verified
+    method: xhr
+    url: http://gs25.gsretail.com/gscvs/ko/products/youus-freshfoodDetail-search
+    catalog: partial       # PB + 차별화 + 행사만. 일반 매입 상품은 목록이 없다
+    hint: >
+      세션 + CSRF 토큰 필요. 첫 요청 403은 봇 차단이 아니라 CSRF 보호였다.
+      1) GET /gscvs/ko/products/youus-freshfood → JSESSIONID + <input name="CSRFToken">
+      2) POST <위 url>?CSRFToken=<토큰> (같은 쿠키 유지)
+         pageNum=1&pageSize=500&searchSrvFoodCK=FreshFoodKey&searchSort=searchALLSort
+      응답 JSON을 json.loads() **두 번** 해야 한다(문자열 안에 JSON).
+      pageSize 500까지 서버가 존중 → 전체 6요청이면 끝. 4사 중 가장 효율적.
+      목록: FreshFoodKey 203 / DifferentServiceKey 584 / 행사 1,723(별도 엔드포인트
+      /gscvs/ko/products/event-goods-search, parameterList=TOTAL).
+      필드: goodsNm(절삭 없음), price, attFileNm, code(=바코드), goodsStat(단종 판정에 유용).
+      ⚠️ 행사상품 응답에는 code가 없다 → 이미지 URL `GD_<바코드>_001.jpg`에서 추출.
+      ⚠️ 행사 1,723건은 diff 노이즈가 크다. PB+차별화 787건을 주 대상으로 두고 행사는 보조로.
+      ⚠️ robots.txt: Crawl-delay 10, Visit-time 0400-0845 UTC(=KST 13:00~17:45).
+         → GitHub Actions cron을 KST 13~17시 사이로 잡아야 한다.
+
+  - id: seven_eleven
+    name: 세븐일레븐
+    company: 코리아세븐
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://www.7-eleven.co.kr/product/listMoreAjax.asp
+    catalog: partial       # 목록의 91%가 월간 행사 상품
+    hint: >
+      MEDIUM 판정. 기술 장벽이 아니라 유지비가 높다(페이지네이션 변칙 + 이미지 플레이스홀더
+      + 구형 ASP 인코딩 혼재).
+      POST form: intPageSize=100&intCurrPage=2&pTab=2
+      pTab: 1=1+1(752) 2=2+1(1,067) 3=증정(2) 4=할인(540) 5=7-Select PB(82) 8=신상품(77)
+      Fresh Food는 별도: POST /product/dosirakNewMoreAjax.asp (intPageSize=200&pTab= → 135건 일괄)
+      ⚠️ intCurrPage=1은 intPageSize를 무시하고 항상 13건.
+         offset = 13 + (intCurrPage-2) × intPageSize  (page ≥ 2). 실측 검증 완료.
+      ⚠️ intPageSize=1067(전량)은 읽기 타임아웃. 100~200 권장. 전체 약 35요청.
+      ID는 6자리 내부 코드(fncGoView). 바코드는 Fresh Food 이미지 경로에서만 복원 가능.
+      ⚠️ diff 궁합이 4사 중 가장 나쁘다. 월간 행사가 목록의 91%라 월 경계에서 전량 교체된다.
+         2주 검증 단계에서 반드시 확인할 것. pTab=8(신상품 라벨) 예외 적용이 필요해지면
+         코드가 아니라 CLAUDE.md 2.1을 먼저 고칠 것.
+      robots.txt: /product/ 허용. /front/ /upload/ 금지이나 이미지 경로일 뿐이고
+      우리는 이미지를 가져오지 않으므로(7장) 충돌 없음.
+
+  - id: emart24
+    name: 이마트24
+    company: 이마트24
+    priority: P0
+    status: verified
+    method: static
+    url: https://www.emart24.co.kr/goods/pl
+    catalog: partial       # 행사 + PB + FF만. /goods/all은 404(존재하지 않음)
+    hint: >
+      XHR이 아니라 서버 렌더링이다. GET /goods/pl?page=2 로 HTML에 상품 20개가 이미 들어있다.
+      경로: /goods/event 행사 2,363(119p) · /goods/pl PB 538(27p) · /goods/ff FF 178(9p).
+      전체 155요청 / 약 3,080건 — 4사 중 요청 수가 가장 많다(그래도 3분 이내).
+      ⚠️ 페이지당 20개 고정. pageLength=100을 넘겨도 서버가 무시한다.
+      전체 수는 인라인 스크립트 `const totalCount = "538";`에서 읽는다.
+      ID 필드가 없다 → 이미지 파일명의 바코드(`/500x500/5413216993472.JPG`) 사용, 실패 시 이름 해시.
+      ⚠️ 상품 상세 링크가 href="#none"이라 **개별 상품 URL이 없다.**
+         source_url을 목록 URL로 대체해야 하며, CLAUDE.md 7장의 "요약+원문 링크" 요건을
+         목록 URL로 충족시킬 수 있는지 판단이 필요하다.
+      보도자료는 shinsegae_newsroom(family=3)에서 얻을 수 있다.
+      robots.txt: 상품 경로 전면 허용.
+
+# ─────────────────────────────────────────────
+# 마트 — PB 신상이 핵심. 온라인몰 '할인'과 '신상'을 혼동하지 말 것.
+# ─────────────────────────────────────────────
+mart:
+  # 정찰 2026-08-11: 마트 채널은 대부분 막혔다. 정상 접근 가능한 곳은 홈플러스뿐.
+  - id: emart
+    name: 이마트
+    priority: P0
+    status: blocked          # 온라인몰 기준. 뉴스룸 대체 경로는 shinsegae_newsroom 항목 참조
+    method: press
+    url: https://www.shinsegaegroupnewsroom.com
+    blocked_url: https://emart.ssg.com
+    pb_brands: [노브랜드, 피코크]
+    hint: >
+      emart.ssg.com / www.ssg.com 모두 robots.txt에 `User-agent: * → Disallow: /`.
+      지정 검색엔진 봇에만 상품 경로를 허용한다. CLAUDE.md 5장에 따라 크롤링 제외.
+      노브랜드·피코크 전용 도메인은 DNS 미해결로 존재하지 않음.
+      → 신세계그룹 뉴스룸 WP REST API(family=2)로만 접근한다.
+      주의: 보도자료 21건 중 신제품은 3건(14%)이고 나머지는 할인 행사다.
+
+  - id: traders
+    name: 트레이더스 홀세일 클럽
+    priority: P1
+    status: blocked
+    method: press
+    url: https://www.shinsegaegroupnewsroom.com
+    hint: 이마트와 동일 도메인(SSG)이라 동일하게 차단. 뉴스룸 기사에 트레이더스 건이 섞여 나온다.
+
+  - id: shinsegae_newsroom
+    name: 신세계그룹 뉴스룸
+    priority: P1
+    status: verified
+    method: xhr
+    url: https://www.shinsegaegroupnewsroom.com/wp-json/wp/v2/posts
+    hint: >
+      워드프레스 REST API가 인증 없이 열려 있다. robots.txt는 `Allow: /`.
+      family 택소노미: 이마트=2, 이마트24=3, 신세계푸드=91, 이마트에브리데이=97.
+      categories: 보도자료=11, 언론기사=12.
+      `after=<ISO시각>`으로 주간 증분 수집. 응답 헤더 X-WP-Total로 총건수 확인.
+      diff가 아니라 증분 피드로 다뤄야 한다.
+
+  - id: lottemart
+    name: 롯데마트
+    priority: P2            # P1 → P2 강등: 접근 경로가 전무함
+    status: blocked
+    url: https://lottemartzetta.com
+    pb_brands: [오늘좋은, 요리하다]
+    hint: >
+      lottemart.com → lottemartzetta.com 리브랜딩("롯데마트 제타").
+      3중 차단: ①롯데온 robots.txt `Disallow: /` ②zetta robots가 /api/ 금지
+      ③zetta /products는 CloudFront WAF가 HTTP 403.
+      롯데지주 뉴스룸(lotte.co.kr/pr/newsList.do)은 그룹 경영 기사뿐이라 신제품 없음.
+      → v1 제외 권장.
+
+  - id: homeplus
+    name: 홈플러스
+    priority: P0            # P1 → P0 승격: 마트 채널 유일 생존자
+    status: verified
+    method: xhr
+    url: https://mfront.homeplus.co.kr
+    catalog: full          # 단, 온라인 배송 가능 품목만. 오프라인 매장 카탈로그가 아니다
+    pb_brands: [홈플러스시그니처, 심플러스]
+    hint: >
+      GET /category/item.json?categoryDepth=&categoryId=&page=1&perPage=100&sort=RANK
+      ★ sort=RANK 가 없으면 SUCCESS + totalCount:0 이 온다(무음 실패).
+      카테고리 트리는 /category/mobile/getMap.json 1회로 전부(리프 359, 식품 116).
+      cateDepth 문자(L/M/S) → categoryDepth 숫자(1/2/3) 변환 필요. perPage 상한 100.
+      세션·토큰·storeId 불필요. robots.txt는 /favorite,/mypage만 금지.
+      필드: itemNm(절삭 없음), salePrice/dcPrice(할인 분리됨), itemNo, lcateNm/mcateNm/scateNm.
+      brandNm은 전 항목 빈 문자열이라 PB는 itemNm 접두사로 식별.
+      주의: 신선식품은 거의 비어 있고(사과/배 0건) 가공식품만 채워져 있다.
+      온라인 배송 가능 품목만 노출되므로 오프라인 매장 카탈로그가 아니다.
+      심플러스 기획전 = dspCateTheme.json의 linkInfo 18930 (EXH). 목록 API 파라미터 미확정.
+
+  - id: costco_kr
+    name: 코스트코 코리아
+    priority: P2
+    status: verified        # 접근 가능하나 Playwright 필요
+    method: playwright
+    url: https://www.costco.co.kr
+    hint: >
+      회원제는 장벽이 아니었다. 상품 상세는 비로그인으로 이름·가격 전부 공개되고
+      홈페이지는 프리렌더링된다. 문제는 카테고리 목록이 클라이언트 렌더링이라
+      카탈로그를 열거할 수 없다는 점(=SAP Spartacus/Angular).
+      robots.txt·sitemap 모두 없음(어떤 경로든 SPA 셸 반환).
+      식품 카테고리 경로는 확보: /Foods/c/cos_10 이하.
+      CLAUDE.md 5장이 Playwright를 최후 수단으로 두므로 P2 유지.
+
+  - id: hanaro
+    name: 농협몰 (e-하나로마트)
+    priority: P2
+    status: unverified
+    url: https://www.nonghyupmall.com
+    hint: >
+      기존 URL(nhhanaromart.co.kr)은 DNS 미해결로 존재하지 않았고,
+      hanaromart.co.kr은 무관한 회사(CNKiSoft) 사이트다. 실제 몰은 nonghyupmall.com.
+      다만 산지직송 농축산물 중심이라 가공 식음료 신상과 성격이 다르다.
+      우선순위를 더 낮추는 것을 검토할 것.
+
+# ─────────────────────────────────────────────
+# 카페 — 시즌 음료 교체 주기가 뚜렷해 diff가 잘 통함
+# ─────────────────────────────────────────────
+cafe:
+  # 정찰 2026-08-11 (RECON_franchise.md): P0 5곳만 조사. P1/P2 15곳은 미조사.
+  # 프랜차이즈 공통: 가격을 주지 않는 대신 공식 제품 설명문이 딸려온다.
+  - id: starbucks
+    name: 스타벅스
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://www.starbucks.co.kr/menu/productListAjax.do
+    catalog: full
+    hint: >
+      ★ 이 채널 최고 수확. POST `CATE_CD=0` **1요청에 전 카탈로그 1,179건**.
+      Referer: https://www.starbucks.co.kr/menu/drink_list.do. 세션·토큰 불필요.
+      카테고리별로 받으려면 CATE_CD에 W코드(cold_brew=W0000171, espresso=W0000003 …).
+      필드: product_NM(절삭 없음), product_CD(13자리), content(공식 설명문),
+      img_UPLOAD_PATH+file_PATH, cate_NAME, 영양정보(kcal/sugars/caffeine…).
+      ⚠️ price 필드는 존재하지만 **1,179건 전부 빈 문자열**(실측 확인). 항상 null로 둘 것.
+      ⚠️ 식음료가 아닌 MD가 절반 가까이 섞여 있다(텀블러 40, 머그 36, 에코백 21 …).
+         **MD 카테고리 제외 목록을 반드시 관리할 것.**
+      ⚠️ product_CD 중복: 1,179건 중 고유 977개(이름 기준 954개). **저장 전 dedup 필수.**
+      ⚠️ 페이지 JS의 `/upload/json/menu/<코드>.js`는 전부 에러페이지를 준다. 죽은 코드.
+      새소식: POST /whats_new/newsListAjax.do (pageIndex=1) — 출시 공지가 그대로 올라온다.
+      robots.txt 없음(302 → 에러페이지).
+
+  - id: twosome
+    name: 투썸플레이스
+    priority: P0
+    status: blocked
+    url: https://www.twosome.co.kr
+    hint: >
+      사이트 전체가 HTTP 403(CloudFront "Request blocked"). robots.txt조차 읽을 수 없어
+      크롤링 정책 확인이 불가능하다. 이번 정찰에서 유일한 **진짜 기술적 봇 차단**이다.
+      우회 시도하지 않았다. → v1 제외.
+
+  - id: mega
+    name: 메가MGC커피
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://mega-mgccoffee.com/menu/menu.php
+    catalog: full
+    hint: >
+      ★ 기존 targets.yml URL(www.mgccoffee.com)은 **NXDOMAIN**이었다. 도메인 수정 완료.
+      GET /menu/menu.php?page=1&menu_category1=1&menu_category2=1&list_checkbox_all=on
+      Referer: https://mega-mgccoffee.com/menu/?menu_category1=1&menu_category2=1
+      ⚠️ **`list_checkbox_all=on`이 없으면 0건**이 온다(366바이트 빈 껍데기). 이 한 글자가 함정.
+      menu_category1 = 1(9p) / 2(2p) / 3(2p) → 13요청 / 약 230건. 20개씩 HTML 조각.
+      ⚠️ **고유 ID가 없다. 이름 해시 100% 의존** → 시즌 접두사 변경에 취약(리스크 항목).
+      가격 없음. 설명문·ICE/HOT 라벨은 있음.
+      공지/이벤트: /bbs/?bbs_category=1|3 (서버 렌더링, 상세 링크는 base64 쿼리스트링).
+      robots.txt는 `Allow: /` 하나뿐.
+
+  - id: compose
+    name: 컴포즈커피
+    priority: P0
+    status: verified
+    method: static
+    url: https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryList
+    catalog: full
+    hint: >
+      Rhymix CMS, 서버 렌더링. 루트는 스플래시이고 실제 콘텐츠는 /index1.
+      `&page=N`으로 20개씩 10페이지 = 약 200건. `&category_srl=`로 카테고리 필터
+      (커피·콜드브루 303364, 베버리지 303365, 푸드·디저트 308857 …).
+      ID는 item_srl. 가격 없음.
+      뉴스/이벤트: /news/<id>, /event/<id> (Rhymix 표준 게시판, 서버 렌더링).
+      robots.txt: 메뉴 경로 허용, 게시판 일부만 Disallow.
+
+  - id: ediya
+    name: 이디야커피
+    priority: P0
+    status: blocked
+    url: https://www.ediya.com
+    hint: >
+      **robots.txt가 막는다.** 메뉴 목록이 전부 `/inc/ajax_brand.php`로 채워지는데
+      `/inc/`가 Disallow다. Playwright로 렌더링해도 결국 같은 금지 경로를 치므로 HARD.
+      허용 경로인 /contents/notice.html은 서버 렌더링이지만 운영 공지 위주라 신메뉴가 없고,
+      보도자료 게시판(cnews)은 최신 글이 2020년이다. → v1 제외.
+
+  - { id: paikdabang,  name: 빽다방,        priority: P1, status: unverified, url: "https://paikdabang.com" }
+  - { id: theventi,    name: 더벤티,        priority: P1, status: unverified, url: "https://theventi.co.kr" }
+  - { id: mammoth,     name: 매머드커피,    priority: P1, status: unverified, url: "https://mmthcoffee.com" }
+  # ↓ P0 결원(투썸·이디야) 보충 후보. 승격하려면 재정찰이 선행되어야 한다.
+  - { id: hollys,      name: 할리스,        priority: P1, status: unverified, url: "https://www.hollys.co.kr" }
+  - { id: coffeebean,  name: 커피빈,        priority: P1, status: unverified, url: "https://www.coffeebeankorea.com" }
+  - { id: pascucci,    name: 파스쿠찌,      priority: P1, status: unverified, url: "https://www.caffe-pascucci.co.kr" }
+  - { id: paulbassett, name: 폴바셋,        priority: P1, status: unverified, url: "https://www.paulbassett.co.kr" }
+  - { id: tomntoms,    name: 탐앤탐스,      priority: P1, status: unverified, url: "https://www.tomntoms.com" }
+  - { id: angelinus,   name: 엔제리너스,    priority: P1, status: unverified, url: "https://www.angelinus.com" }
+  - { id: bluebottle,  name: 블루보틀 코리아, priority: P2, status: unverified, url: "https://bluebottlecoffee.kr" }
+  - { id: tenpercent,  name: 텐퍼센트커피,  priority: P2, status: unverified, url: "https://www.10percent.co.kr" }
+  - { id: hasamdong,   name: 하삼동커피,    priority: P2, status: unverified }
+  - { id: gamsung,     name: 감성커피,      priority: P2, status: unverified }
+  - { id: banapresso,  name: 바나프레소,    priority: P2, status: unverified }
+  - { id: theliter,    name: 더리터,        priority: P2, status: unverified }
+
+# ─────────────────────────────────────────────
+# 디저트 / 베이커리 / 아이스크림
+# ─────────────────────────────────────────────
+dessert:
+  # 정찰 2026-08-11 (RECON_franchise.md): P0 4곳만 조사. P1/P2 14곳은 미조사.
+  - id: parisbaguette
+    name: 파리바게뜨
+    priority: P0
+    status: verified
+    method: static
+    url: https://www.paris.co.kr/products/
+    catalog: full
+    hint: >
+      WordPress, 완전 서버 렌더링. /products/ 한 장에 56개가 이미 들어있고
+      ?cat1=<카테고리>로 8종(브레드/케이크/디저트-스낵/샌드위치-샐러드/커피-음료/
+      퍼스트클래스키친/선물) 순회 → 8요청 / 약 250건.
+      각 블록에 `<ul data-total-count="45">`로 전체 건수가 박혀 있다.
+      필드: h3.product-name, img.product-tb, 상세 URL 슬러그(=ID). 가격 없음.
+      ⚠️ 슬러그에 한글 퍼센트 인코딩이 섞여 있다
+         (/product/%ed%95%ab%eb%8f%84%ea%b7%b8%eb%8f%84%eb%84%9b/ = 핫도그도넛).
+         ID로 쓰기 전에 디코딩 후 정규화할 것.
+      ⚠️ diff 궁합 '보통' — 카탈로그가 크고 시즌 회전이 빨라 diff 건수가 과다해질 수 있다.
+      공지: /notice/ (운영 공지 위주). robots.txt는 /wp-admin/만 금지.
+
+  - id: tourlesjours
+    name: 뚜레쥬르
+    priority: P0
+    status: blocked
+    url: https://www.tlj.co.kr
+    hint: >
+      robots.txt가 `User-agent: * → Disallow: /`로 **사이트 전체를 금지**하고
+      Googlebot/NaverBot/Yeti/Bingbot 등 6종만 개별 허용한다.
+      우리 크롤러는 금지 대상이므로 **사이트에 요청 자체를 하지 않았다.**
+      검색엔진 봇 UA 사칭은 명백한 우회이므로 검토 대상이 아니다. → v1 제외.
+      베이커리 채널은 파리바게뜨(허용)로 커버한다.
+
+  - id: baskinrobbins
+    name: 배스킨라빈스
+    priority: P0
+    status: verified
+    method: static
+    url: https://www.baskinrobbins.co.kr/menu/list.php
+    catalog: full
+    hint: >
+      ★ diff 궁합 최상. '이달의 맛'이 매달 교체되는 구조라 차집합이 정확히 잡아낸다.
+      7요청이면 전 카탈로그(페이지네이션 없음):
+      /menu/list.php?category=A|F|B|E, /menu/list_subcategory.php?category=C|D, /menu/fom.php
+      필드: strong.menu-list__title, img.menu-list__image, view.php?seq=1124(=ID),
+      **span.menu-list__hash → `#크림치즈 #조청카라멜`**
+      ⚠️ 이 채널에서 유일하게 **소스가 태그를 준다.** CLAUDE.md 4장 tags를 LLM 없이 채울 수 있다.
+      ⚠️ 제품명에 HTML 엔티티가 그대로 들어있다(`&#40;Lessly Edition&#41;`). html.unescape() 필수.
+      가격 없음. 보도자료: /information-center/press/list.php (신제품 출시 기사가 올라온다).
+      robots.txt는 HTTP 404(파일 없음).
+
+  - id: dunkin
+    name: 던킨
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://www.dunkindonuts.co.kr/menu
+    catalog: full
+    hint: >
+      Laravel + Inertia.js. HTML의 `<div id="app" data-page="{...}">`에 JSON이 통째로 들어있다
+      (html.unescape() → json.loads()). `X-Inertia: true` + `X-Inertia-Version: <version>`
+      헤더를 붙이면 순수 JSON이 온다(version은 같은 data-page의 version 키).
+      GET /menu?cat=1&page=1 — cat: 1 DONUT(88건/8p) 2 FOOD 3 COFFEE 5 BEVERAGE 6 SNACK&MORE.
+      전체 수 props.products.meta.total, 마지막 페이지 meta.last_page. 약 25요청 / 300건.
+      필드: TITLE, id, MAIN_IMG_FILE(상대경로), PRODUCT_CAT1_NM. 가격 없음.
+      ⚠️ `/menu/all`은 카테고리당 4건 미리보기다. **스냅샷용으로 쓰면 안 된다.**
+      뉴스: /brand/news/list — 파라미터 없이 호출하면 목록이 비어 온다. 카테고리 지정 필요.
+      robots.txt는 `Allow: /`.
+
+  # ↓ P0 결원(뚜레쥬르) 보충 후보. 승격하려면 재정찰이 선행되어야 한다.
+  - { id: krispykreme,   name: 크리스피크림도넛, priority: P1, status: unverified, url: "https://www.krispykreme.co.kr" }
+  - { id: sulbing,       name: 설빙,             priority: P1, status: unverified, url: "https://sulbing.com" }
+  - { id: gongcha,       name: 공차,             priority: P1, status: unverified, url: "https://www.gong-cha.co.kr" }
+  - { id: knotted,       name: 노티드,           priority: P1, status: unverified, url: "https://www.cafeknotted.com" }
+  - { id: smoothieking,  name: 스무디킹,         priority: P1, status: unverified }
+  - { id: natuur,        name: 나뚜루,           priority: P1, status: unverified }
+  - { id: londonbagel,   name: 런던베이글뮤지엄, priority: P2, status: unverified, hint: 인스타 중심일 가능성 높음 }
+  - { id: ourbakery,     name: 아우어베이커리,   priority: P2, status: unverified }
+  - { id: yoajeong,      name: 요아정,           priority: P2, status: unverified, hint: 요거트아이스크림의정석 }
+  - { id: randys,        name: 랜디스도넛,       priority: P2, status: unverified }
+  - { id: sungsimdang,   name: 성심당,           priority: P2, status: unverified, hint: 지역 브랜드, 인스타 중심 }
+  - { id: haagendazs,    name: 하겐다즈,         priority: P2, status: unverified }
+  - { id: jamjaru,       name: 잠바주스,         priority: P2, status: unverified }
+  - { id: bhcbakery,     name: 브레드가든,       priority: P2, status: unverified }
+
+# ─────────────────────────────────────────────
+# 프랜차이즈 음식점 — 버거 / 치킨 / 피자 / 기타
+# ─────────────────────────────────────────────
+restaurant:
+  # 정찰 2026-08-11 (RECON_franchise.md): P0 9곳만 조사. P1/P2 18곳은 미조사.
+  # 버거
+  - id: mcdonalds
+    name: 맥도날드
+    sub: burger
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://www.mcdonalds.co.kr/api/v1/kor/product/product/list
+    catalog: full
+    hint: >
+      이 채널에서 가장 깔끔한 REST(Nuxt SPA, apiBase는 window.__NUXT__에 노출).
+      GET ?page=1&view_rows=500&mainCategory=1&subCategory=16 — view_rows 500까지 존중.
+      카테고리 7종: 버거(1) 맥런치(7) 해피스낵(8) 사이드&디저트(4) 맥모닝(2) 해피밀(3) 맥카페&음료(5).
+      subCategory는 /kor/category/list에는 비어 오고 product/list 응답의 subCategory 키에 있다.
+      ⚠️ mainCategory를 비워도 전체가 오지 않는다(직전 조합 결과가 그대로 온다). 순회할 것. 약 9요청.
+      응답 봉투 {resultCode, resultObject:{totalCount, list}}.
+      필드: korName, korContent(설명), pcImageUrl, seq(=ID), calorie 등. **가격 필드 자체가 없다.**
+      ⚠️ regDate가 "2026-August-4th" 형태다. 파싱하지 말 것(신상 판정은 2.1 차집합으로).
+      보도자료: /kor/press/list — ⚠️ 목록 API인데 **응답이 3.2MB**다. view_rows를 작게 유지할 것.
+      robots.txt는 `Allow: /`.
+
+  - id: burgerking
+    name: 버거킹
+    sub: burger
+    priority: P0
+    status: unverified      # 접근 경로는 찾았으나 요청 봉투 미확정
+    method: playwright
+    url: https://www.burgerking.co.kr/burgerking/BKR0632.json
+    hint: >
+      Vue SPA + bizMOB 프레임워크. /menu/main 진입 시 BKR0632.json / BKR0633.json에 POST한다.
+      빈 body({})로 POST하면 HTTP 400. bizMOB 고유의 요청 봉투(header/body 래핑)를
+      이번 조사에서 확정하지 못했다(DevTools 네트워크 로그가 요청 본문까지는 안 보여줌).
+      ★ 브라우저에서 /menu/main을 열고 BKR0632.json 요청의 **Payload 탭을 1회 캡처**하면
+        EASY로 내려온다. 봉투만 알면 그 뒤는 순수 JSON POST다. 그때까지 playwright로 둔다.
+      robots.txt는 `Allow: /`.
+
+  - id: lotteria
+    name: 롯데리아
+    sub: burger
+    priority: P0
+    status: blocked
+    url: https://www.lotteeatz.com
+    hint: >
+      robots.txt가 `Disallow: /hsv/products/*/*/menu/`, `/qsv/products/*/*/menu/`인데
+      **하필 이 두 패턴이 메뉴 페이지 경로다.** 5장에 따라 요청하지 않았다.
+      공지 게시판(/board/notice)은 허용이지만 롯데GRS 통합 사이트라 브랜드 구분이 필요하다.
+      → 메뉴 스냅샷 불가. 버거 채널은 맥도날드·맘스터치로 커버한다.
+
+  - id: momstouch
+    name: 맘스터치
+    sub: burger
+    priority: P0
+    status: verified
+    method: static
+    url: https://momstouch.co.kr/menu/new.php
+    catalog: full
+    hint: >
+      순수 서버 렌더링. 브라우저 네트워크 로그로 **XHR이 단 한 건도 발생하지 않는 것**을 확인했다.
+      루트는 인트로 스플래시이고 실제 사이트는 /home.php.
+      GET /menu/new.php?s_sect1=CG0001 — s_sect1: new(New!) CG0045(또잇) CG0005(버거)
+      CG0004(치킨) CG0003(맘스세트) CG0002(사이드) CG0001(음료) CG0046(피자). 8요청 / 약 100건.
+      ⚠️ 제품명 구조가 특이하다: `<h3><span>Cider</span>사이다</h3>` — 영문명이 span, 한글명이 그 뒤 텍스트.
+      ⚠️ 이미지가 `<img src>`가 아니라 인라인 CSS `background-image: url(...)`이다. 일반 파서로 못 잡는다.
+      ID는 `go_view('5')`. 가격 없음. 공지: /brand/notice-list.php. robots.txt 없음.
+
+  # ↓ P0 결원(롯데리아) 보충 후보. 승격하려면 재정찰이 선행되어야 한다.
+  - { id: kfc,        name: KFC,          sub: burger, priority: P1, status: unverified, url: "https://www.kfckorea.com" }
+  - { id: nobrand_bg, name: 노브랜드버거, sub: burger, priority: P1, status: unverified }
+  - { id: shakeshack, name: 쉐이크쉑,     sub: burger, priority: P2, status: unverified }
+  - { id: frankburger,name: 프랭크버거,   sub: burger, priority: P2, status: unverified }
+
+  # 치킨
+  - id: bbq
+    name: BBQ
+    sub: chicken
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://bbq.co.kr/api/delivery/menu
+    catalog: full
+    hint: >
+      ★ 이 채널에서 유일하게 가격·영양·알레르기·원산지까지 전부 준다.
+      Next.js SPA이지만 API가 같은 도메인에 인증 없이 노출된다.
+      GET /api/delivery/menu/category → GET /api/delivery/menu/{categoryId} (약 11요청 / 120건)
+      응답은 봉투 없는 **최상위 배열**.
+      필드: menuName, **menuPrice(정수)**, description, menuImageUrl, id,
+      nutrient{calorie,sugars,protein,natrium}, allergy, origin[], isSoldOut.
+      ⚠️ menuName에 ™·® 기호가 들어간다(`황금올리브치킨™`). 동일성 판정 시 정규화 대상.
+      이벤트: /events (SPA). 보도자료 전용 페이지는 확인하지 못했다.
+      robots.txt는 `Allow: /`.
+
+  - id: bhc
+    name: bhc치킨
+    sub: chicken
+    priority: P0
+    status: verified
+    method: xhr
+    url: https://www.bhc.co.kr/api/v1/web/categories
+    catalog: full
+    hint: >
+      GET /api/v1/web/categories/{id}/products — 카테고리 ID는 1, 23, 47, 50, 74 (5요청 / 120건).
+      (/api/v1/web/categories 목록 엔드포인트는 404. ID는 /menu/{id} 페이지 HTML에서 긁어야 한다.)
+      응답 봉투 {status, code, body:[...]}. 필드: productNm, description, mainImg,
+      productCd(=ID), cateNm[], isNew/isBest/isLimited. 가격은 options[]에 있을 가능성(샘플은 빈 배열).
+      ⚠️⚠️ robots.txt에 `ClaudeBot / GPTBot / CCBot / Google-Extended → Disallow: /`가 있다.
+         우리 UA는 `ThisWeekTaste/1.0`이라 `User-agent: *` 그룹(=Allow)에 해당한다.
+         **스크래퍼 UA에 `Claude`나 `ClaudeBot` 문자열을 넣지 말 것** — 넣는 순간 금지 대상이 된다.
+      ⚠️ `Content-Signal: ai-train=no, use=reference` 명시. 우리 용도(요약+원문 링크)는
+         7장이 이미 강제하는 형태와 일치하나, 수집 데이터를 학습에 쓰면 이 소스는 재검토 대상이다.
+
+  - id: kyochon
+    name: 교촌치킨
+    sub: chicken
+    priority: P0
+    status: verified
+    method: static
+    url: https://www.kyochon.com/menu/chicken.asp
+    catalog: full
+    hint: >
+      ★ **1요청에 69건 + 가격까지.** 파라미터 없이 부르면 탭 전체가 한 HTML에 들어온다
+      (?code=1..21로 시리즈 필터도 가능하나 불필요). /menu/burger.asp 등도 동일 구조. 총 2요청.
+      필드: dl.txt>dt(이름), dl.txt>dd(설명), **p.money>strong(권장소비자가격)**,
+      p.img>img, view.asp?id=41363(=ID).
+      루트는 meta refresh로 /main/으로 넘어간다.
+      공지(/cs/notice.asp)는 약관·개인정보 개정 안내뿐이라 **신제품 소식이 없다.** 메뉴 diff에만 의존할 것.
+      robots.txt에 `User-agent: *` 그룹이 아예 없다(Yeti만 명시) → 우리에게 적용될 규칙 없음.
+  - { id: goobne,     name: 굽네치킨,     sub: chicken, priority: P1, status: unverified, url: "https://www.goobne.co.kr" }
+  - { id: puradak,    name: 푸라닭,       sub: chicken, priority: P1, status: unverified }
+  - { id: nene,       name: 네네치킨,     sub: chicken, priority: P1, status: unverified }
+  - { id: cheogajip,  name: 처갓집양념치킨, sub: chicken, priority: P2, status: unverified }
+  - { id: sixtychick, name: 60계치킨,     sub: chicken, priority: P2, status: unverified }
+
+  # 피자
+  - id: dominos
+    name: 도미노피자
+    sub: pizza
+    priority: P0
+    status: verified
+    method: static
+    url: https://web.dominos.co.kr/goods/list
+    catalog: full
+    hint: >
+      ⚠️⚠️ **인코딩이 EUC-KR이다**(robots.txt까지). 이 채널 18곳 중 유일하다.
+         `.decode('euc-kr')`을 명시하지 않으면 전부 깨진다.
+      www.dominos.co.kr → web.dominos.co.kr/gate → /main 2단 리다이렉트.
+      GET /goods/list?dsp_ctgr=C0101 (서버 렌더링). 확인된 코드: C0101(피자) C0201 C0202.
+      전체 카테고리 코드 목록은 /main 네비게이션에서 추가로 긁어야 한다. 약 6요청 / 80건.
+      필드: div.subject, **div.price-box>span.price**, div.hashtag, code_01=RPZ001SL(=ID).
+      ⚠️ 이미지가 lazyload라 `src`는 플레이스홀더 bg.gif다. **`data-src`를 읽을 것.**
+      ⚠️ 가격이 `L 28,900원~ / M 21,500원~` 범위 표기다. CLAUDE.md 4장의 정수 price에 넣으려면
+         "M 사이즈 최저가" 같은 정규화 규칙을 먼저 정해야 한다.
+      보도자료: /bbs/newsList?type=P. robots.txt가 /goods/와 /bbs/를 **명시적으로 허용**한다.
+
+  - id: pizzahut
+    name: 피자헛
+    sub: pizza
+    priority: P0
+    status: unverified      # 메뉴 XHR을 찾지 못함
+    method: playwright
+    url: https://www.pizzahut.co.kr
+    hint: >
+      Angular SPA. /menu, /menu/pizza 등을 curl로 받으면 전부 홈페이지와 동일한 SPA 껍데기(13KB)다.
+      브라우저로 각 메뉴 URL을 열고 네트워크를 관찰했으나 **상품 관련 XHR이 한 건도 관측되지 않았다**
+      (GA·광고 픽셀만 발생). /menu/pizza는 /menu/pizza/best로 자동 리다이렉트된다.
+      추정 원인: 주문 방식(배달/포장) + 매장 선택이 끝나야 메뉴 API를 호출하는 구조.
+      ★ 다음 단계: 브라우저에서 배달/포장 선택 → 매장 지정까지 진행한 뒤 네트워크 재캡처.
+      같은 pizza 채널의 도미노가 EASY이므로 우선순위는 낮다. robots.txt는 404.
+  - { id: papajohns,  name: 파파존스,     sub: pizza, priority: P1, status: unverified }
+  - { id: mrpizza,    name: 미스터피자,   sub: pizza, priority: P2, status: unverified }
+  - { id: alvolo,     name: 피자알볼로,   sub: pizza, priority: P2, status: unverified }
+  - { id: banolim,    name: 반올림피자,   sub: pizza, priority: P2, status: unverified }
+
+  # 기타
+  - { id: subway,     name: 서브웨이,     sub: etc, priority: P1, status: unverified, url: "https://www.subway.co.kr" }
+  - { id: hansot,     name: 한솥도시락,   sub: etc, priority: P1, status: unverified, url: "https://www.hsd.co.kr" }
+  - { id: bondosirak, name: 본도시락,     sub: etc, priority: P2, status: unverified }
+  - { id: isaac,      name: 이삭토스트,   sub: etc, priority: P2, status: unverified }
+  - { id: theborn,    name: 더본코리아,   sub: etc, priority: P2, status: unverified,
+      hint: 홍콩반점·빽보이피자 등 다수 브랜드 보유. 통합 뉴스룸 확인 }
+
+# ─────────────────────────────────────────────
+# 식품 대기업 — 정찰 2026-08-11 결과: 가설대로 '뉴스룸/보도자료'가 옳다.
+# 단 이유가 다르다. 뉴스룸이 더 빨라서가 아니라 자사몰이 선택지가 아니어서다
+# (남양몰은 운영 종료, 대형 자사몰은 커머스 플랫폼이라 차단 위험 동일).
+# 보도자료 제목에 "출시"가 그대로 들어 있어 신제품 판별이 자명하다.
+#
+# ⚠️ 보도자료 소스는 diff(차집합)가 아니라 '증분 피드'다. post id/date 기준으로
+#    지난주 이후 새 글만 가져온다. 대신 산문에서 제품을 추출하는 단계가 필요하고,
+#    이는 CLAUDE.md 6장이 규정한 LLM 역할 4가지에 없다. 코드보다 6장을 먼저 고칠 것.
+# ─────────────────────────────────────────────
+fmcg:
+  # ── EASY: 서버 렌더링, 즉시 착수 가능 ──
+  - id: orion
+    name: 오리온
+    priority: P0            # P2 → P0 승격. 이번 정찰 최대 수확
+    status: verified
+    method: static
+    url: https://www.orionworld.com
+    catalog: full
+    hint: >
+      FMCG 유일의 구조화된 제품 카탈로그. 서버 렌더링 HTML.
+      /goods/list/25?badge=new        신제품 목록(실측 8건)
+      /goods/list/26?category=0101    카테고리별 전체 카탈로그
+      제품명 절삭·POS 접두사 없음, goodsno 정수 ID 안정적.
+      ★ 전체 카탈로그 diff를 정본으로 하고 badge=new는 검증용 대조군으로만 쓸 것
+        (CLAUDE.md 2.1: 소스의 신상 라벨을 신뢰하지 않는다).
+
+  - { id: sempio,    name: 샘표,       priority: P1, status: verified, method: press,
+      url: "https://www.sempio.com/news/press-release",
+      hint: "신제품 밀도 최고(25건 중 5건). 서버 렌더링, 최신 2026-07-31" }
+  - { id: lottewell, name: 롯데웰푸드, priority: P1, status: verified, method: press,
+      url: "https://www.lottewellfood.com/prcenter/news", hint: "서버 렌더링, 최신 2026-07-27" }
+  - { id: ob,        name: 오비맥주,   priority: P1, status: verified, method: press,
+      url: "https://www.ob.co.kr/newsroom/list.php", hint: "활발. 최신 2026-08-10" }
+  - { id: cj,        name: CJ제일제당, priority: P1, status: verified, method: press,
+      url: "https://www.cj.co.kr/kr/newsroom/pressreleases", shop: CJ더마켓,
+      hint: "서버 렌더링, 최신 2026-08-10. 자사몰(CJ더마켓)은 미조사" }
+  - { id: dongwon,   name: 동원F&B,    priority: P1, status: verified, method: press,
+      url: "https://www.dongwonfnb.com/services/Customer/News/News_List", shop: 동원몰,
+      hint: "최신 2026-08-11" }
+  - { id: hitejinro, name: 하이트진로, priority: P1, status: verified, method: press,
+      url: "https://www.hitejinro.com/socialmedia/press_list.asp", hint: "출시 기사 확인" }
+  - { id: crown,     name: 크라운제과, priority: P1, status: verified, method: press, catalog: full,
+      url: "https://www.crown.co.kr/sns/news",
+      hint: "최신 2026-07-31. 제품 카탈로그 /product/index 도 서버 렌더링 → 카탈로그 diff 검토 가능" }
+  - { id: binggrae,  name: 빙그레,     priority: P1, status: verified, method: press,
+      url: "https://www.bing.co.kr/news/news_announced",
+      hint: "최신 2026-08-11. /news/news_new(신제품)는 2026-06-02로 갱신이 느리니 보도 쪽을 쓸 것" }
+
+  # ── MEDIUM: JS 렌더링. Playwright 또는 내부 XHR 추가 조사 필요 ──
+  - { id: ottogi,   name: 오뚜기, priority: P2, status: verified, method: playwright,
+      url: "https://www.otoki.com/pr/news", shop: 오뚜기몰,
+      hint: "★ 도메인 변경: ottogi.co.kr → otoki.com. 목록이 HTML에 없음" }
+  - { id: daesang,  name: 대상 청정원, priority: P2, status: verified, method: playwright,
+      url: "https://www.daesang.com/kr/pr/news.jsp", shop: 정원e샵, hint: "목록이 HTML에 없음" }
+  - id: nongshim
+    name: 농심
+    priority: P2
+    status: verified
+    method: playwright
+    url: https://www.nongshim.com/promotion/news_list
+    shop: 농심몰
+    hint: >
+      목록이 HTML에 없음(JS 렌더링).
+      ⚠️ TLS: 기본 설정으로 SSLV3_ALERT_HANDSHAKE_FAILURE. DEFAULT@SECLEVEL=1 필요.
+      봇 차단이 아니라 서버 노후 문제. 소스별 TLS 예외가 필요하다.
+
+  # ── 저가치: 갱신이 멈춘 소스 ──
+  - { id: seoulmilk, name: 서울우유, priority: P2, status: verified, method: press,
+      url: "https://www.seoulmilk.co.kr/enterprise/company/jnews_list.sm",
+      hint: "최신 2026-04-02. 4개월째 정지 — 주간 수집 가치 낮음" }
+  - { id: haitai,    name: 해태제과, priority: P2, status: verified, method: press,
+      url: "https://www.ht.co.kr/sweet/news",
+      hint: "최신 2024-04-21. 2년 이상 정지 — 사실상 사용 불가" }
+
+  # ── HARD ──
+  - { id: namyang, name: 남양유업, priority: P2, status: blocked,
+      hint: "자사몰(shopping.namyangi.com) 운영 종료. 보도자료 경로 미발견 → v1 제외 권장" }
+
+  # ── 미확인: 경로를 찾지 못함. 재정찰 필요 ──
+  - { id: samyang,      name: 삼양식품,     priority: P2, status: unverified, shop: 삼양맛샵,
+      url: "https://www.samyangfoods.com", hint: "홈이 게이트 페이지. 보도자료 경로 미발견" }
+  - { id: pulmuone,     name: 풀무원,       priority: P2, status: unverified, shop: 풀무원샵,
+      url: "https://www.pulmuone.co.kr", hint: "HTTP 417 Expectation Failed — 요청 헤더 조정 후 재시도" }
+  - { id: maeil,        name: 매일유업,     priority: P2, status: unverified,
+      url: "https://www.maeil.com/news/press.jsp", hint: "응답은 오나 목록 구조 미확인" }
+  - { id: lottechilsung, name: 롯데칠성음료, priority: P2, status: unverified,
+      url: "https://company.lottechilsung.co.kr", hint: "홈에서 뉴스 링크 미발견" }
+  - { id: donga_otsuka, name: 동아오츠카,   priority: P2, status: unverified,
+      url: "https://www.donga-otsuka.co.kr/sub4/sub1.asp?t_name=BOARD11", hint: "게시판 구조, 판별 불가" }
+
+# ─────────────────────────────────────────────
+# 요약 (0단계 정찰 완료 — 2026-08-11)
+#   P0 = 25개  ← v1 출시 목표였으나 아래처럼 6곳이 빠졌다
+#   P1 = 33개
+#   P2 = 38개
+#
+# 채널별 status:
+#   convenience  4  verified 4
+#   mart         7  verified 3 / blocked 3 / unverified 1
+#   cafe        20  verified 3 / blocked 2 / unverified 15  ← P0 5곳만 조사
+#   dessert     18  verified 3 / blocked 1 / unverified 14  ← P0 4곳만 조사
+#   restaurant  27  verified 6 / blocked 1 / unverified 20  ← P0 9곳만 조사
+#   fmcg        20  verified 14 / blocked 1 / unverified 5
+#   ─ 합계 96: verified 33 / blocked 8 / unverified 55(대부분 P1·P2로 미조사)
+#
+# ⚠️ P0 25개 중 7곳을 확보하지 못했다:
+#   blocked 5 — 이마트 · 투썸플레이스 · 이디야 · 뚜레쥬르 · 롯데리아
+#               (전부 robots.txt·봇 차단. 기술이 아니라 정책이라 노력으로 해결되지 않는다)
+#   unverified 2 — 버거킹 · 피자헛 (브라우저 캡처 1회면 살릴 수 있다)
+#   그 밖에 롯데마트가 3중 차단으로 P1 → P2 강등됐다.
+#   → P1 승격(크리스피크림·설빙 / KFC·노브랜드버거 / 할리스·커피빈)을 검토해야 하나,
+#     후보들이 전부 unverified이므로 **승격 전 재정찰이 선행**되어야 한다.
+#     이번 정찰에서는 임의로 priority를 바꾸지 않고 각 채널에 주석으로만 남겼다.
+#
+# ⚠️ 소스가 세 유형으로 갈렸다 (catalog 필드 참조):
+#   (a) catalog: full    → 차집합 diff (CLAUDE.md 2.1 그대로)
+#       CU · 오리온 · 크라운 · 홈플러스 · 프랜차이즈 12곳
+#   (b) catalog: partial → 차집합이되 "목록 진입/이탈"이지 "신상/단종"이 아니다
+#       GS25 · 세븐일레븐 · 이마트24. 특히 세븐일레븐은 목록의 91%가 월간 행사라 궁합이 나쁘다
+#   (c) method: press    → post id/date 기준 증분 피드. **diff.py 적용 대상이 아니며**
+#       본문에서 제품을 추출하는 LLM 역할이 추가로 필요하다(CLAUDE.md 6장 개정 선행).
+#       신세계 뉴스룸 + FMCG 보도자료 8곳. v1 범위에서 제외하는 쪽을 권한다.
+#
+# 정찰로 바로잡은 사실:
+#   - 메가MGC www.mgccoffee.com → mega-mgccoffee.com (기존 URL은 NXDOMAIN)
+#   - 오뚜기 ottogi.co.kr → otoki.com / 롯데마트 → lottemartzetta.com
+#   - 하나로마트 nhhanaromart.co.kr(DNS 없음) → nonghyupmall.com
+#   - 홈플러스 P1 → P0 승격 (마트 채널 유일 생존자)
+#   - 오리온 P2 → P0 승격 (구조화된 신제품 카탈로그 확보)
+#   - shinsegae_newsroom 신규 추가 (이마트+이마트24 보도자료를 한 API로)
+#
+# 스냅샷 1회 비용: 28개 소스 / 약 653요청 / 순차 약 12분 / 약 27,000항목.
+#   v1(CU 단독)은 131요청 / 2.2분 / 5,100항목.
+#   ⚠️ GS25만 Crawl-delay 10 + Visit-time 0400-0845 UTC → cron을 KST 13:00~17:45로 잡을 것.
+# ─────────────────────────────────────────────
