@@ -174,6 +174,17 @@ def run(source_id: str, week: str | None = None) -> Path | None:
     return path
 
 
+def _monotonic_key(source_id: str) -> str | None:
+    """단조 증가하는 정수 키를 주는 소스만 지표 3을 계산할 수 있다.
+
+    CU의 `gd_idx`는 자동 증가라 "신상은 지난주 최댓값보다 크다"가 성립한다.
+    오리온의 `goodsno`도 정수지만 목록이 오름차순이 아니라 확인이 더 필요하고,
+    스타벅스의 `product_cd`는 13자리 상품코드라 증가 순서가 아니다.
+    확인되지 않은 소스는 넣지 않는다 — 틀린 지표는 없는 지표보다 나쁘다.
+    """
+    return {"cu": "gd_idx"}.get(source_id)
+
+
 def _write_report(week: str, source_id: str, result: dict, items: list[dict]) -> None:
     """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
 
@@ -189,13 +200,19 @@ def _write_report(week: str, source_id: str, result: dict, items: list[dict]) ->
     labelled_new = {k for k, v in control.items() if (v.get("labels") or {}).get("new")}
     added_ids = {i["external_id"] for i in added}
 
+    # 지표 3은 **단조 증가하는 정수 키를 주는 소스에만** 성립한다. CU의 gd_idx가 그렇다.
+    # 그런 키가 없는 소스에서 이 지표를 그대로 계산하면 previous_max가 0이 되어
+    # 전량이 "등록 순서를 거스름"으로 보고된다 — 없는 오탐을 만들어낸다.
     previous = snapshot.load_snapshot(weeks.previous_week(week), source_id)
-    previous_max_gd = max(
-        (int(i["alt_ids"]["gd_idx"]) for i in (previous or {}).get("items", [])
-         if (i.get("alt_ids") or {}).get("gd_idx")), default=0)
-    above_previous_max = sum(
-        1 for i in added
-        if (i.get("alt_ids") or {}).get("gd_idx") and int(i["alt_ids"]["gd_idx"]) > previous_max_gd)
+    monotonic_key = _monotonic_key(source_id)
+    if monotonic_key:
+        previous_max_gd = max(
+            (int(i["alt_ids"][monotonic_key]) for i in (previous or {}).get("items", [])
+             if str((i.get("alt_ids") or {}).get(monotonic_key, "")).isdigit()), default=0)
+        above_previous_max = sum(
+            1 for i in added
+            if str((i.get("alt_ids") or {}).get(monotonic_key, "")).isdigit()
+            and int(i["alt_ids"][monotonic_key]) > previous_max_gd)
 
     report = {
         "week": week,
@@ -210,15 +227,19 @@ def _write_report(week: str, source_id: str, result: dict, items: list[dict]) ->
             "labelled_not_added": len(labelled_new - added_ids),
             "added_not_labelled": len(added_ids - labelled_new),
         },
-        # 지표 3: gdIdx 단조성. 목록이 오름차순이므로 신상은 지난주 최댓값보다 커야 한다.
-        "gd_idx_monotonic": {
+    }
+    # 지표 3: 단조 증가 키. 목록이 오름차순이면 신상은 지난주 최댓값보다 커야 한다.
+    # 그런 키가 없는 소스에서는 아예 싣지 않는다 — 빈 값을 실으면 0을 오탐으로 읽는다.
+    if monotonic_key:
+        report["monotonic_id"] = {
+            "key": monotonic_key,
             "previous_max": previous_max_gd,
             "added_above_previous_max": above_previous_max,
             "added_below_previous_max": len(added) - above_previous_max,
-        },
-        "published": {"total": len(items),
-                      "with_blurb": sum(1 for i in items if i.get("blurb"))},
-    }
+        }
+    report["published"] = {"total": len(items),
+                           "with_blurb": sum(1 for i in items if i.get("blurb"))}
+
     path = WEEKS_DIR / f"{week}.report.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     log.info("검증 지표: %s", path)
