@@ -134,6 +134,7 @@ def parse_list(markup: str, category_code: str, *, scraped_at: str) -> tuple[lis
             "name": name,
             "price": None,                      # 오리온은 가격을 주지 않는다 (주의 1번)
             "category_raw": CATEGORIES[category_code],
+            "description": None,        # 오리온도 상세에만 있다. enrich가 채운다
             "image_url": image_url,
             "source_url": DETAIL_URL.format(
                 list_no=LIST_IDS[category_code], goodsno=goodsno,

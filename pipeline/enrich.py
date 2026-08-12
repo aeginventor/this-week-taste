@@ -1,8 +1,12 @@
 """diff가 걸러낸 신상만 상세 페이지로 보강한다 (CLAUDE.md 3장).
 
-목록 페이지는 이름·가격·이미지까지만 준다. 설명문과 태그는 상세 페이지에만 있다.
+CU는 목록이 이름·가격·이미지까지만 준다. 설명문과 태그는 상세 페이지에만 있다.
 전체 카탈로그의 상세를 매주 긁으면 5,100요청이라 불가능하지만, **신상 수십~수백 건만은
 감당 가능하다.** 이 단계가 있어야 `curate.py`가 blurb를 창작하지 않고 요약만 하게 된다(6장).
+
+**소스가 목록에서 이미 설명문을 주면 상세를 긁지 않는다.** 스냅샷의 `description`이
+차 있으면 그대로 쓴다(4장). 스타벅스가 그런 소스다 — 목록 응답이 326건 전부에
+설명문을 준다. 이미 가진 것을 버리고 다시 긁는 것은 소스 서버에 대한 예의도 아니다.
 
 출력: `data/enriched/<week>/<source_id>.json` — {external_id: {description, tags}}
 실패한 항목은 그냥 빠진다. 보강은 있으면 좋은 것이지 발행을 막을 이유가 아니다.
@@ -33,6 +37,17 @@ def load_enriched(week: str, source_id: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 
+def _write(week: str, source_id: str, enriched: dict, *, failures: int, total: int) -> Path:
+    path = enriched_path(week, source_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(enriched, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    with_description = sum(1 for v in enriched.values() if v["description"])
+    log.info("보강 완료: 신상 %d건 중 %d건 (설명문 확보 %d건, 실패 %d건) → %s",
+             total, len(enriched), with_description, failures, path)
+    return path
+
+
 def _detail_fetcher(source_id: str):
     if source_id == "cu":
         from scrapers import cu
@@ -55,9 +70,22 @@ def run(source_id: str, week: str | None = None) -> Path:
     if not added:
         log.info("신상이 없어 보강할 것이 없다.")
 
+    # 목록이 이미 설명문을 준 항목은 상세를 긁지 않는다 (4장 `description`).
+    enriched: dict[str, dict] = {}
+    from_list = [i for i in added if (i.get("description") or "").strip()]
+    for item in from_list:
+        enriched[item["external_id"]] = {"description": item["description"], "tags": []}
+    if from_list:
+        log.info("목록에 설명문이 있어 상세를 긁지 않는 항목: %d/%d건",
+                 len(from_list), len(added))
+
+    total = len(added)
+    added = [i for i in added if i["external_id"] not in enriched]
+    if not added:
+        return _write(week, source_id, enriched, failures=0, total=total)
+
     fetch_detail = _detail_fetcher(source_id)
     session = base.Session()
-    enriched: dict[str, dict] = {}
     failures = 0
 
     for index, item in enumerate(added, start=1):
@@ -90,14 +118,7 @@ def run(source_id: str, week: str | None = None) -> Path:
         log.info("  [%d/%d] %s — 설명 %s / 태그 %d개", index, len(added), item["name"],
                  "있음" if detail["description"] else "없음", len(detail["tags"]))
 
-    path = enriched_path(week, source_id)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(enriched, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    with_description = sum(1 for v in enriched.values() if v["description"])
-    log.info("보강 완료: 신상 %d건 중 %d건 (설명문 확보 %d건, 실패 %d건) → %s",
-             len(added), len(enriched), with_description, failures, path)
-    return path
+    return _write(week, source_id, enriched, failures=failures, total=total)
 
 
 def main(argv: list[str] | None = None) -> int:

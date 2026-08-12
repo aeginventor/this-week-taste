@@ -156,6 +156,7 @@ def parse_list(markup: str, category_code: str, *, scraped_at: str) -> tuple[lis
             "name": name,
             "price": _parse_price(block.select_one("div.price > strong")),
             "category_raw": CATEGORIES[category_code],
+            "description": None,        # CU는 상세 페이지에만 있다. enrich가 채운다
             "image_url": image_url,
             "source_url": DETAIL_URL.format(gd_idx=gd_idx) if gd_idx else None,
             "scraped_at": scraped_at,
