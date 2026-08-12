@@ -1,0 +1,27 @@
+# 의존성 / 빌드 산출물
+node_modules/
+.next/
+web/out/
+web/next-env.d.ts
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 비밀값
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# 정찰 단계 원본 응답 (180개 / 16MB). 조사 *결론*은 docs/RECON*.md 로 커밋하고
+# 원본은 로컬에만 둔다. 골든 테스트가 쓰는 것만 tests/fixtures/ 로 옮겨 커밋한다.
+scratch/
+
+# 학습 기록: 대화 원문은 보관만 하고 커밋하지 않는다.
+# 가공한 til/ 과 sessions/ 는 커밋한다.
+learning/raw/
+
+# data/ 는 커밋한다. JSON 파일이 곧 데이터베이스이고 git 히스토리가 곧 아카이브다
+# (CLAUDE.md 2.2, 2.5). 용량은 90일 정리 잡으로 관리한다 (make clean-raw).
