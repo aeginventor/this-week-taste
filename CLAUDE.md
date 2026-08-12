@@ -308,6 +308,9 @@ W34를 돌린 뒤 `data/weeks/<week>.report.json`의 세 지표를 보고 판단
 
 ```
 ANTHROPIC_API_KEY    # curate 단계용. 없으면 LLM 없이 원본 그대로 발행한다(6장)
+THIS_WEEK_TASTE_LLM  # api(기본) | cli | off. cli는 `claude -p`로 구독 인증을 쓴다.
+                     # cli는 로컬 전용이라 Actions에서 안 되고, 구독 사용량을 소모한다.
+                     # 자동으로 cli로 넘어가지 않는다 — 명시적으로 켜야 한다
 GH_TOKEN             # 실패 시 Issue 생성용 (Actions 기본 토큰으로 대체 가능)
 GITHUB_REPOSITORY    # 〃 (owner/repo). GH_TOKEN과 둘 다 있어야 Issue를 만든다
 THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
@@ -326,7 +329,7 @@ THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
 
 | 코드 | 상태 | 검증 방법 |
 |---|---|---|
-| `curate.py` 전체 | **한 번도 실행 안 됨.** API 키가 없어 폴백 경로만 탔다 | `ANTHROPIC_API_KEY`를 넣고 `make publish`. 6장 규칙(이름 불변, 근거 없는 blurb 금지)이 실제로 걸리는지 확인 |
+| `curate.py`의 **api 경로** | 미검증. `ANTHROPIC_API_KEY`가 없어 아직 못 돌렸다 | 키를 넣고 `make publish`. cli 경로는 2026-08-12에 실측 검증했다(아래) |
 | `alert.py`의 Issue 생성 | **한 번도 실행 안 됨.** 로그 대체 경로만 탔다 | `GH_TOKEN` + `GITHUB_REPOSITORY`로 일부러 이상 상황을 만들어 확인 |
 | `snapshot.py`의 `_hold_previous` | **한 번도 실행 안 됨** | 이상 상황을 인위적으로 만들어 지난주 이월이 되는지 확인 |
 | 급증(+200%) 탐지 | 한 번도 걸린 적 없음 | 〃 |
@@ -340,3 +343,12 @@ THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
 > 위 검증은 전부 **합성 '지난주'**로 돌린 것이다(8장 참조). 진짜 한 주가 지났을 때
 > 나타나는 것들 — 가격 변경, 이름 변경, 실제 단종, 상품 코드 재발급 — 은 그 안에
 > 하나도 없었다. `changed`와 `review` 경로는 사실상 미검증에 가깝다.
+
+**2026-08-12 추가 검증** — `curate.py`의 cli 경로를 실제 스냅샷 20건으로 돌렸다.
+상세 20/20 확보, blurb 20/20 생성(전부 40자 이내, 전부 원문 근거), 자체 분류 18/20,
+근거 없는 blurb 0건. 5회 반복해 결과가 일관됨을 확인했다. 이 과정에서 **조용히 실패하는
+경로 세 개**를 찾아 고쳤다 — 응답이 맨 배열일 때 `AttributeError`로 발행 전체가 죽던 것,
+빈 결과를 성공으로 취급해 전량이 조용히 원본으로 나가던 것, 일부 항목 누락이 무기록이던 것.
+
+> ⚠️ `curate.py`의 카테고리 17종은 편의점 **식품** 기준이라, 마스크팩·염색약 같은
+> 생활용품과 복숭아·거봉 같은 신선식품이 전부 `기타`로 떨어진다. 위 20건에서 8건이 그랬다.
