@@ -38,7 +38,10 @@ log = logging.getLogger(__name__)
 WEEKS_DIR = Path(__file__).resolve().parent.parent / "data" / "weeks"
 WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 
-BRANDS = {"cu": {"brand": "CU", "channel": "convenience"}}
+BRANDS = {
+    "cu": {"brand": "CU", "channel": "convenience"},
+    "orion": {"brand": "오리온", "channel": "fmcg"},
+}
 REQUIRED_FIELDS = ("id", "week", "brand", "channel", "name", "source_url",
                    "first_seen", "last_seen", "status")
 
