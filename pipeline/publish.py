@@ -45,6 +45,7 @@ WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 BRANDS = {
     "cu": {"brand": "CU", "channel": "convenience"},
     "orion": {"brand": "오리온", "channel": "fmcg"},
+    "starbucks": {"brand": "스타벅스", "channel": "cafe"},
 }
 REQUIRED_FIELDS = ("id", "week", "brand", "channel", "name", "source_url",
                    "first_seen", "last_seen", "status")

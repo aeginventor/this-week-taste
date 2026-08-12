@@ -234,7 +234,12 @@ cafe:
     url: https://www.starbucks.co.kr/menu/productListAjax.do
     catalog: full
     hint: >
-      ★ 이 채널 최고 수확. POST `CATE_CD=0` **1요청에 전 카탈로그 1,179건**.
+      ✅ 구현 완료 (scrapers/starbucks.py). 실측 2026-08-12: 326건 / 18요청 / 약 19초.
+      ⚠️ CATE_CD=0으로 한 번에 받지 않는다. MD가 절반 섞이고 product_CD가 202건 중복된다.
+         카테고리별 18요청이면 326건에 중복 0건, MD 0건. 요청을 늘려 문제를 없앴다.
+      ⚠️ 설명문이 목록에 이미 326/326 있다 → enrich가 이 소스 상세를 긁지 않는다(4장).
+      ⚠️ cate_CD가 응답에 전부 빈 값이라 카테고리는 요청값에서 역산한다.
+      ⚠️ 원두·시럽은 MD 섹션이라 제외했다. 필요하면 FOOD_CATEGORIES에 추가.
       Referer: https://www.starbucks.co.kr/menu/drink_list.do. 세션·토큰 불필요.
       카테고리별로 받으려면 CATE_CD에 W코드(cold_brew=W0000171, espresso=W0000003 …).
       필드: product_NM(절삭 없음), product_CD(13자리), content(공식 설명문),
