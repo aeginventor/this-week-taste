@@ -41,3 +41,4 @@
 | [0003](0003-storage-boundary.md) | 수집 데이터는 파일에, DB는 서빙 계층에만 | 채택 |
 | [0004](0004-source-expansion-gate.md) | 2주 검증은 발행의 게이트이지 수집의 게이트가 아니다 | 채택 |
 | [0005](0005-backend-stack.md) | 서비스 백엔드는 FastAPI로 시작한다 | 채택 |
+| [0006](0006-category-taxonomy-per-channel.md) | 자체 분류 목록은 채널 단위로 둔다 | 채택 |

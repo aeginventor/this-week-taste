@@ -123,7 +123,8 @@ def run(source_id: str, week: str | None = None) -> Path | None:
 
     enriched = enrich.load_enriched(week, source_id)
     added = result["added"]
-    curated = curate.curate(added, enriched)
+    # 자체 분류 목록은 채널마다 다르다 (curate.CATEGORIES_BY_CHANNEL).
+    curated = curate.curate(added, enriched, channel=sources.meta(source_id)["channel"])
 
     previous_week = weeks.previous_week(week)
     previous_publication = load_week(previous_week) or {"items": []}

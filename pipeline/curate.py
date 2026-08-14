@@ -48,13 +48,55 @@ MAX_BLURB_CHARS = 40
 BATCH_SIZE = 20          # 한 요청에 담을 항목 수
 MAX_ATTEMPTS = 2         # 최초 1회 + 재시도 1회 (6장)
 
-SYSTEM_PROMPT = """\
-너는 한국 편의점 신상품 데이터를 정리하는 편집자다.
+# 자체 분류 목록. **채널마다 다르다.**
+#
+# 처음에는 편의점 식품 기준 17종 하나로 전 소스를 분류했다. 2026-08-12 실측에서
+# 20건 중 8건이 `기타`로 떨어졌다 — 마스크팩·염색약 같은 생활용품과 복숭아·거봉 같은
+# 신선식품이 목록에 아예 없었기 때문이다. 마트(홈플러스)가 붙으면서 그 비중이 커졌다.
+#
+# 목록이 소스가 아니라 **채널** 단위인 이유: 분류는 *우리* 어휘이지 소스의 어휘가
+# 아니다(7장). 같은 채널의 소스는 같은 목록으로 분류돼야 사이트에서 필터가 성립한다.
+# CU와 GS25가 서로 다른 분류 체계를 갖는 순간 편의점 필터는 의미를 잃는다.
+#
+# 아직 소스가 없는 채널(dessert, restaurant)은 넣지 않는다. 그 채널의 소스를 붙일 때
+# 실제 카탈로그를 보고 만든다. 지금 상상해서 쓰면 7장의 추상화 선행 구축이다.
+# 빠뜨린 채널은 `tests/test_curate_categories.py`가 소스 추가 시점에 잡는다.
+CATEGORIES_BY_CHANNEL = {
+    "convenience": (
+        "도시락", "김밥/주먹밥", "샌드위치/버거", "샐러드", "면류", "즉석조리",
+        "디저트/베이커리", "과자", "아이스크림", "음료", "커피/차", "유제품",
+        "주류", "안주", "가공식품/조미료", "생활용품", "기타",
+    ),
+    "mart": (
+        "과일", "채소", "쌀/잡곡", "견과", "수산물", "정육/계란", "델리/즉석식품",
+        "유제품", "냉장/냉동식품", "반찬/김치", "커피/차", "음료", "과자",
+        "베이커리", "면류/통조림", "조미료/양념", "건강식품", "기타",
+    ),
+    "cafe": (
+        "커피", "논커피 음료", "차", "주스/스무디", "블렌디드", "베이커리",
+        "케이크/디저트", "샌드위치/샐러드", "기타",
+    ),
+    "fmcg": (
+        "파이", "스낵", "비스킷/쿠키", "초콜릿", "캔디/젤리", "껌",
+        "시리얼/그래놀라", "바", "음료", "기타",
+    ),
+}
+
+# 프롬프트 첫 줄의 화자 설정. 분류 목록만 바꾸고 이 줄을 편의점으로 두면
+# 모델이 마트 신선식품을 편의점 매대 기준으로 읽는다.
+CHANNEL_LABEL = {
+    "convenience": "편의점",
+    "mart": "대형마트",
+    "cafe": "카페",
+    "fmcg": "식품 브랜드",
+}
+
+SYSTEM_PROMPT_TEMPLATE = """\
+너는 한국 {channel_label} 신상품 데이터를 정리하는 편집자다.
 
 각 항목에 대해 두 가지만 한다:
 1. category: 아래 목록에서 하나를 고른다.
-   도시락, 김밥, 삼각김밥, 샌드위치, 버거, 샐러드, 면류, 즉석조리, 디저트,
-   과자, 아이스크림, 음료, 커피, 유제품, 주류, 안주, 기타
+   {categories}
 2. blurb: 주어진 description을 40자 이내 한 줄로 줄인다.
 
 절대 규칙:
@@ -63,6 +105,24 @@ SYSTEM_PROMPT = """\
 - name은 입력 그대로 돌려준다. 잘려 있어도 복원하지 마라. 그것이 원본이다.
 - ref는 입력에 있는 문자열을 그대로 돌려준다. 숫자로 바꾸지 마라.
 - 설명이나 마크다운 없이 JSON만 반환한다."""
+
+
+class UnknownChannel(ValueError):
+    """분류 목록이 없는 채널. 그 채널의 소스를 붙일 때 목록을 만들어야 한다."""
+
+
+def system_prompt(channel: str) -> str:
+    try:
+        categories = CATEGORIES_BY_CHANNEL[channel]
+        label = CHANNEL_LABEL[channel]
+    except KeyError:
+        raise UnknownChannel(
+            f"채널 {channel!r}의 분류 목록이 없다. "
+            f"pipeline/curate.py의 CATEGORIES_BY_CHANNEL에 추가할 것. "
+            f"등록된 채널: {', '.join(CATEGORIES_BY_CHANNEL)}"
+        ) from None
+    return SYSTEM_PROMPT_TEMPLATE.format(
+        channel_label=label, categories=", ".join(categories))
 
 OUTPUT_SCHEMA = {
     "type": "object",
@@ -94,7 +154,7 @@ class _GiveUp(Exception):
     """재시도해도 소용없는 실패. 이 배치는 원본 그대로 간다."""
 
 
-def _complete_api(client, user: str) -> str | None:
+def _complete_api(client, system: str, user: str) -> str | None:
     """성공하면 응답 텍스트, 재시도할 만하면 None, 가망 없으면 _GiveUp."""
     import anthropic
 
@@ -102,7 +162,7 @@ def _complete_api(client, user: str) -> str | None:
         response = client.messages.create(
             model=MODEL,
             max_tokens=4096,
-            system=SYSTEM_PROMPT,
+            system=system,
             output_config={"format": {"type": "json_schema", "schema": OUTPUT_SCHEMA}},
             messages=[{"role": "user", "content": user}],
         )
@@ -121,13 +181,13 @@ def _complete_api(client, user: str) -> str | None:
     return next((b.text for b in response.content if b.type == "text"), "")
 
 
-def _complete_cli(user: str) -> str | None:
+def _complete_cli(system: str, user: str) -> str | None:
     """`claude -p`로 구독 인증을 써서 호출한다. 로컬 전용."""
     command = [
         "claude", "-p", user,
         "--model", MODEL,
         "--output-format", "json",
-        "--system-prompt", SYSTEM_PROMPT,
+        "--system-prompt", system,
         "--allowedTools", "",       # 편집 작업에 도구가 필요 없다
     ]
     try:
@@ -166,8 +226,12 @@ def _strip_fence(text: str) -> str:
     return body.rsplit("```", 1)[0].strip()
 
 
-def _backend():
-    """(이름, complete) 또는 None. complete(user) -> str | None."""
+def _backend(system: str):
+    """(이름, complete) 또는 None. complete(user) -> str | None.
+
+    시스템 프롬프트는 채널마다 다르므로 여기서 묶어 넣는다. 호출부는 채널을
+    다시 신경 쓰지 않는다.
+    """
     choice = os.environ.get("THIS_WEEK_TASTE_LLM", "api").strip().lower()
 
     if choice == "off":
@@ -179,7 +243,7 @@ def _backend():
             log.warning("claude 실행파일이 PATH에 없다. LLM 없이 발행한다 (6장).")
             return None
         log.info("claude -p 로 편집한다. 구독 사용량을 소모하며 로컬에서만 동작한다.")
-        return "cli", _complete_cli
+        return "cli", lambda user: _complete_cli(system, user)
 
     if choice != "api":
         log.warning("THIS_WEEK_TASTE_LLM=%r 는 모르는 값이다. api로 취급한다.", choice)
@@ -190,7 +254,7 @@ def _backend():
 
     import anthropic
     client = anthropic.Anthropic()
-    return "api", lambda user: _complete_api(client, user)
+    return "api", lambda user: _complete_api(client, system, user)
 
 
 def _ref(index: int) -> str:
@@ -329,10 +393,19 @@ def _apply(item: dict, edit: dict | None, enriched_entry: dict | None) -> dict:
     return curated
 
 
-def curate(items: list[dict], enriched: dict) -> dict[str, dict]:
-    """{external_id: {category, tags, blurb}}. 실패해도 예외를 던지지 않는다."""
-    backend = _backend()
+def curate(items: list[dict], enriched: dict, *, channel: str) -> dict[str, dict]:
+    """{external_id: {category, tags, blurb}}. 실패해도 예외를 던지지 않는다.
+
+    `channel`이 분류 목록을 고른다. 목록이 없는 채널이면 LLM을 부르지 않고
+    원본 그대로 간다 — 6장의 "편집 품질보다 발행이 우선"을 여기에도 적용한다.
+    엉뚱한 목록으로 분류하느니 `category_raw`를 그대로 쓰는 편이 낫다.
+    """
     edits: dict[str, dict] = {}
+    try:
+        backend = _backend(system_prompt(channel))
+    except UnknownChannel as exc:
+        log.error("%s 이번 발행은 자체 분류 없이 원본 카테고리로 나간다.", exc)
+        backend = None
 
     if backend and items:
         name, complete = backend
