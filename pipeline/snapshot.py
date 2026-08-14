@@ -18,7 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from pipeline import alert, weeks
+from pipeline import alert, sources, weeks
 
 log = logging.getLogger(__name__)
 
@@ -29,27 +29,15 @@ SNAPSHOT_DIR = DATA_DIR / "snapshots"
 DROP_THRESHOLD = 0.30   # 직전 주의 30% 미만으로 줄면 = 70% 이상 감소
 SPIKE_THRESHOLD = 3.00  # 직전 주의 300%를 넘으면 = 200% 이상 증가
 
-# 정찰 2026-08-11 실측치. **첫 수집 때만 쓰는 부트스트랩 기준이다.**
-#
-# 카탈로그는 계속 변하므로 이 고정값을 매주 기준으로 쓰면 언젠가 반드시 오탐이 난다.
-# 실제로 2026-W33 수집에서 이미 어긋나기 시작했다(간편식사 204/208, 과자류 1146/1154).
-# 직전 주 스냅샷이 있으면 그쪽이 언제나 더 정확한 기준이므로 그것을 쓴다.
-EXPECTED_COUNTS = {
-    "cu": {"10": 208, "20": 101, "30": 1154, "40": 225, "50": 1686, "60": 888, "70": 838},
-    # 오리온 실측 2026-08-12: 총 115건 / 15요청. `0201`(마켓오네이처)은 사이트에
-    # 링크는 있는데 제품이 0건이다. 기대치 0은 검사에서 건너뛰므로 오탐을 내지 않는다.
-    "orion": {"0101": 11, "0102": 24, "0103": 24, "0104": 23, "0105": 3,
-              "0106": 4, "0107": 2, "0201": 0, "0202": 6, "0203": 2,
-              "0204": 1, "0301": 3, "0302": 5, "0303": 6, "0304": 1},
-    # 스타벅스 실측 2026-08-12: 총 326건 / 18요청. MD는 요청 자체를 하지 않는다.
-    # `W0000054`(따뜻한 푸드)와 `W0000123`(푸드 기타)은 실제로 빈 카테고리다.
-    "starbucks": {"W0000171": 24, "W0000060": 5, "W0000003": 54, "W0000004": 18,
-                  "W0000005": 14, "W0000422": 4, "W0000061": 11, "W0000075": 48,
-                  "W0000053": 12, "W0000062": 12, "W0000013": 17, "W0000032": 32,
-                  "W0000033": 23, "W0000054": 0, "W0000055": 6, "W0000056": 42,
-                  "W0000064": 4, "W0000123": 0},
-}
 # 첫 수집: 정찰 실측치 ±10%. 스크래퍼가 제대로 도는지 검증하는 용도라 빡빡하게 잡는다.
+#
+# 실측치 자체는 **각 스크래퍼의 `BOOTSTRAP_COUNTS`에 있다.** 여기 모아두지 않는 이유는
+# 그것이 소스의 *내용*이라 7장이 말하는 누수이기 때문이다. 카테고리 코드는 소스마다
+# 다른 어휘이고(`10` / `0101` / `W0000171` / `200095`), 이 파일은 모든 소스가 쓴다.
+#
+# 이 값은 **첫 수집 때만 쓴다.** 카탈로그는 계속 변하므로 고정값을 매주 기준으로 쓰면
+# 언젠가 반드시 오탐이 난다. 실제로 CU는 2026-W33 수집에서 이미 어긋나기 시작했다
+# (간편식사 204/208, 과자류 1146/1154). 직전 주 스냅샷이 있으면 그쪽이 언제나 기준이다.
 BOOTSTRAP_TOLERANCE = 0.10
 
 
@@ -111,7 +99,7 @@ def _check_category_counts(source_id: str, week: str, items: list[dict]) -> list
         baseline = _category_counts(source_id, previous["items"])
         label, low_ratio, high_ratio = "직전 주", DROP_THRESHOLD, SPIKE_THRESHOLD
     else:
-        baseline = EXPECTED_COUNTS.get(source_id, {})
+        baseline = getattr(module, "BOOTSTRAP_COUNTS", {})
         label = "정찰 실측"
         low_ratio, high_ratio = 1 - BOOTSTRAP_TOLERANCE, 1 + BOOTSTRAP_TOLERANCE
 
@@ -168,17 +156,7 @@ def _check_volume(source_id: str, week: str, count: int) -> None:
 
 
 def _scraper_for(source_id: str):
-    if source_id == "cu":
-        from scrapers import cu
-        return cu
-    if source_id == "orion":
-        from scrapers import orion
-        return orion
-    if source_id == "starbucks":
-        from scrapers import starbucks
-        return starbucks
-    # 소스가 늘면 여기에 추가한다. 7장에 따라 3개까지는 이렇게 둔다.
-    raise ValueError(f"모르는 소스: {source_id!r}")
+    return sources.scraper(source_id)
 
 
 def _hold_previous(week: str, source_id: str) -> bool:
@@ -214,7 +192,8 @@ def take(source_id: str, week: str | None = None) -> Path:
     if problems:
         alert.raise_anomaly(
             f"[{source_id}] {week} 카테고리별 건수가 정찰 실측치와 어긋난다",
-            "\n".join(problems) + "\n\n정찰 실측치는 pipeline/snapshot.py의 EXPECTED_COUNTS에 있다.",
+            "\n".join(problems)
+            + f"\n\n정찰 실측치는 scrapers/{source_id}.py의 BOOTSTRAP_COUNTS에 있다.",
         )
 
     _check_volume(source_id, week, len(items))

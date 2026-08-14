@@ -55,7 +55,7 @@ PAGE_SIZE = 40
 # 폭주 방지. 최대 카테고리(식품)가 43페이지였으므로 넉넉하다.
 MAX_PAGES = 200
 
-# `searchMainCategory` = `codeParent`. 정찰 실측 건수는 snapshot.py의 기대치와 맞춰 둔다.
+# `searchMainCategory` = `codeParent`.
 CATEGORIES = {
     "10": "간편식사",
     "20": "즉석조리",
@@ -64,6 +64,12 @@ CATEGORIES = {
     "50": "식품",
     "60": "음료",
     "70": "생활용품",
+}
+
+# 정찰 2026-08-11 실측. 총 5,082건 / 131요청 / 약 3분.
+# **첫 수집 때만 쓰는 부트스트랩 기준이다** (`pipeline/snapshot.py` 참조).
+BOOTSTRAP_COUNTS = {
+    "10": 208, "20": 101, "30": 1154, "40": 225, "50": 1686, "60": 888, "70": 838,
 }
 
 _GD_IDX_RE = re.compile(r"view\((\d+)\)")

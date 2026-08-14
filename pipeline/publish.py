@@ -35,18 +35,13 @@ import re
 import sys
 from pathlib import Path
 
-from pipeline import alert, curate, diff, enrich, snapshot, weeks
+from pipeline import alert, curate, diff, enrich, snapshot, sources, weeks
 
 log = logging.getLogger(__name__)
 
 WEEKS_DIR = Path(__file__).resolve().parent.parent / "data" / "weeks"
 WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 
-BRANDS = {
-    "cu": {"brand": "CU", "channel": "convenience"},
-    "orion": {"brand": "오리온", "channel": "fmcg"},
-    "starbucks": {"brand": "스타벅스", "channel": "cafe"},
-}
 REQUIRED_FIELDS = ("id", "week", "brand", "channel", "name", "source_url",
                    "first_seen", "last_seen", "status")
 
@@ -66,7 +61,7 @@ def make_id(source_id: str, external_id: str) -> str:
 
 def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
                   previous: dict | None) -> dict:
-    meta = BRANDS[source_id]
+    meta = sources.meta(source_id)
     edit = curated.get(item["external_id"]) or {}
     return {
         # id와 first_seen은 지난주 발행본이 있으면 그것을 이월한다.
@@ -178,12 +173,10 @@ def run(source_id: str, week: str | None = None) -> Path | None:
 def _monotonic_key(source_id: str) -> str | None:
     """단조 증가하는 정수 키를 주는 소스만 지표 3을 계산할 수 있다.
 
-    CU의 `gd_idx`는 자동 증가라 "신상은 지난주 최댓값보다 크다"가 성립한다.
-    오리온의 `goodsno`도 정수지만 목록이 오름차순이 아니라 확인이 더 필요하고,
-    스타벅스의 `product_cd`는 13자리 상품코드라 증가 순서가 아니다.
+    어느 소스가 그런 키를 주는지는 `pipeline/sources.py`의 표에 있다.
     확인되지 않은 소스는 넣지 않는다 — 틀린 지표는 없는 지표보다 나쁘다.
     """
-    return {"cu": "gd_idx"}.get(source_id)
+    return sources.monotonic_key(source_id)
 
 
 def _write_report(week: str, source_id: str, result: dict, items: list[dict]) -> None:

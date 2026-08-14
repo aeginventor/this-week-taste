@@ -8,6 +8,10 @@ CU는 목록이 이름·가격·이미지까지만 준다. 설명문과 태그�
 차 있으면 그대로 쓴다(4장). 스타벅스가 그런 소스다 — 목록 응답이 326건 전부에
 설명문을 준다. 이미 가진 것을 버리고 다시 긁는 것은 소스 서버에 대한 예의도 아니다.
 
+그런 소스는 `pipeline/sources.py`의 `detail`이 False다. 그때 남은 항목이 있어도
+**실패로 세지 않는다** — 설명문이 없는 것은 사고가 아니라 그 소스의 성질이기 때문이다.
+실패로 취급하면 실패 카운트가 신상 건수만큼 쌓여 2.4의 경보가 무의미해진다.
+
 출력: `data/enriched/<week>/<source_id>.json` — {external_id: {description, tags}}
 실패한 항목은 그냥 빠진다. 보강은 있으면 좋은 것이지 발행을 막을 이유가 아니다.
 """
@@ -20,7 +24,7 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import diff, weeks
+from pipeline import diff, sources, weeks
 from scrapers import base
 
 log = logging.getLogger(__name__)
@@ -49,13 +53,8 @@ def _write(week: str, source_id: str, enriched: dict, *, failures: int, total: i
 
 
 def _detail_fetcher(source_id: str):
-    if source_id == "cu":
-        from scrapers import cu
-        return cu.fetch_detail
-    if source_id == "orion":
-        from scrapers import orion
-        return orion.fetch_detail
-    raise ValueError(f"상세 조회를 지원하지 않는 소스: {source_id!r}")
+    """상세 조회 함수. 상세를 긁지 않는 소스는 None이다 (모듈 docstring 참조)."""
+    return sources.detail_fetcher(source_id)
 
 
 def run(source_id: str, week: str | None = None) -> Path:
@@ -85,6 +84,15 @@ def run(source_id: str, week: str | None = None) -> Path:
         return _write(week, source_id, enriched, failures=0, total=total)
 
     fetch_detail = _detail_fetcher(source_id)
+    if fetch_detail is None:
+        # 상세를 긁지 않는 소스다. 실패로 세지 않는다 — 이건 사고가 아니라 성질이다.
+        # 다만 남은 항목이 있다는 것은 기록한다. 스타벅스처럼 "목록이 다 준다"고
+        # 믿었던 소스에서 이 줄이 보이면 그 전제가 깨졌다는 신호다.
+        log.info("상세를 긁지 않는 소스다(sources.py의 detail=False). "
+                 "설명문 없이 남는 항목 %d/%d건 — blurb는 null로 발행된다.",
+                 len(added), total)
+        return _write(week, source_id, enriched, failures=0, total=total)
+
     session = base.Session()
     failures = 0
 
