@@ -184,8 +184,8 @@ mart:
     catalog: full          # 단, 온라인 배송 가능 품목만. 오프라인 매장 카탈로그가 아니다
     pb_brands: [홈플러스시그니처, 심플러스]
     hint: >
-      🚧 구현 보류. 목록 API는 뚫었으나 source_url·image_url을 확인하지 못했다(아래).
-      실측 2026-08-12: 식품 2,748건 / 127요청 / 약 2분.
+      ✅ 구현 완료 (scrapers/homeplus.py). 실측 2026-08-13: 2,966건 / 130요청 / 약 2분.
+      itemNo 중복 0건, 가격 결측 0건, 동명이인 0건.
       GET /category/item.json?categoryDepth=2&categoryId=<M레벨 cateCd>&page=1&perPage=100&sort=RANK
       ★ sort=RANK 가 없으면 SUCCESS + totalCount:0 이 온다(무음 실패).
       ★ **categoryDepth는 항상 2이고 categoryId는 M 레벨 cateCd(2xxxxx)다.**
@@ -196,20 +196,30 @@ mart:
       우유/유제품·냉장/냉동·두부/김치/반찬·커피/차·생수/음료·과자/시리얼·베이커리/잼·
       라면/즉석식품/통조림·장류/양념/제빵·건강식품) → M 리프 127개, 그중 103개가 비어있지 않다.
       응답: data.dataList / data.totalCount / pagination.totalPage. returnCode는 문자열 "SUCCESS".
-      필드: itemNo(주키), itemNm(절삭 없음), salePrice, dcPrice, rcateNm>lcateNm>mcateNm>scateNm>dcateNm
-      (5단계 카테고리를 응답이 직접 준다 → 4장의 `>` 연결 그대로 쓸 수 있다).
-      ⛔ **막힌 지점**: 이미지 URL 필드가 없고(imgChgDt·imgDispYn만 있다) 상세 페이지가
-        클라이언트 렌더링이라 /item?itemNo=… 이 9,535바이트 SPA 껍데기를 준다.
-        source_url·image_url을 서버에서 검증할 수 없다. **브라우저 Network 탭 확인 1회 필요**
-        (CLAUDE.md 5장이 권하는 절차). 그 전에는 구현하지 않는다 — 동작하는지 모르는 링크를
-        발행하면 7장의 "요약 + 원문 링크" 요건을 지켰는지 알 수 없다.
+      필드: itemNo(주키), itemNm(절삭 없음), salePrice(정가)/dcPrice(행사가),
+      rcateNm>lcateNm>mcateNm>scateNm>dcateNm (5단계 카테고리를 응답이 직접 준다).
+      category_raw는 `<R> > <M>`만 쓴다 — 127개 라벨이 전부 유일해서 snapshot.py의
+      이름→코드 역매핑이 성립하기 때문이다. price는 정가를 쓴다(행사가는 매주 바뀌어
+      diff의 changed를 할인 시작·종료로 뒤덮는다).
+      ✅ **2026-08-13 브라우저 확인으로 막힌 두 지점이 풀렸다:**
+        · 상세 URL은 `/item?itemNo=<no>&storeType=HYPER`다. **storeId가 아니다.**
+          storeId를 넣으면 "현재 판매중인 상품이 아닙니다" 껍데기(9.5KB)가 온다 —
+          이전 정찰이 클라이언트 렌더링이라고 판단한 것은 이 오해였다. 실제로는
+          108KB 서버 렌더링이고, 상세 JSON이 <script id="/item/getItemDetail.json">에
+          통째로 박혀 있다(그 엔드포인트는 직접 호출도 된다).
+        · 이미지는 `https://image.homeplus.kr/it/<itemNo>s0640` (0320/1000도 있다).
+          ⚠️ 없는 itemNo도 404가 아니라 200+플레이스홀더를 준다. 존재 근거는 imgDispYn뿐.
+      ⚠️ **설명문이 사실상 없다.** 상세의 itemDesc가 거의 전부 <img> 한 줄이다
+        (표본 51건 중 텍스트 1건). 그래서 enrich를 붙이지 않고 blurb는 null로 발행한다.
+        스타벅스가 "목록이 이미 다 줘서" 건너뛰는 것과 이유가 정반대다.
+      ⚠️ **소스에 신상 라벨이 없다.** labelList는 비어 있고 itemType은 전 항목 "N"이다.
+        → 이 소스는 CLAUDE.md 8장의 source_new_label 채점표를 만들 수 없다.
       ⚠️ brandNm은 전 항목 null이라 PB 식별에 못 쓴다. itemNm 접두사로 봐야 한다.
-      ⚠️ 신선식품은 거의 비어 있다(사과/배 1건). 가공식품만 채워져 있다.
+      ⚠️ 신선식품은 거의 비어 있다(과일 M 14개 중 2개가 0건, 나머지도 한 자릿수).
+        온라인 배송 가능 품목만 노출되므로 오프라인 매장 카탈로그가 아니다.
       세션·토큰·storeId 불필요. robots.txt는 /favorite,/mypage만 금지.
-      필드: itemNm(절삭 없음), salePrice/dcPrice(할인 분리됨), itemNo, lcateNm/mcateNm/scateNm.
-      brandNm은 전 항목 빈 문자열이라 PB는 itemNm 접두사로 식별.
-      주의: 신선식품은 거의 비어 있고(사과/배 0건) 가공식품만 채워져 있다.
-      온라인 배송 가능 품목만 노출되므로 오프라인 매장 카탈로그가 아니다.
+      건강식품 R 아래 마사지·치아관리·한방/의료용품·의약외품 4개 M은 식음료가 아니라 뺐다
+      (그래서 127 → 123 카테고리).
       심플러스 기획전 = dspCateTheme.json의 linkInfo 18930 (EXH). 목록 API 파라미터 미확정.
 
   - id: costco_kr

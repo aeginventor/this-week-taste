@@ -214,11 +214,15 @@
 ```
 sources/targets.yml            status를 verified로, method·url 확정
 scrapers/<id>.py               fetch() + parse_*() (파싱은 네트워크와 분리해 테스트 가능하게)
+                               CATEGORIES + BOOTSTRAP_COUNTS(첫 수집 검증용 실측치)
 tests/test_<id>_parse.py       tests/fixtures/의 저장된 응답으로 골든 테스트
-pipeline/snapshot.py           _scraper_for()에 분기 추가, EXPECTED_COUNTS에 부트스트랩 기준 추가
-pipeline/enrich.py             _detail_fetcher()에 분기 추가 (상세 페이지가 있는 소스만)
-pipeline/publish.py            BRANDS에 brand·channel 추가
+pipeline/sources.py            표에 한 줄: brand·channel·detail·monotonic_key
 ```
+
+`pipeline/`에서 고칠 곳은 **표 한 줄뿐이다.** 소스별 분기는 2026-08-13에
+`pipeline/sources.py` 하나로 모았다. 스크래퍼 모듈은 `scrapers/<source_id>.py`
+규칙으로 찾으므로 등록할 필요가 없다. 표에 없는 값(카테고리 코드, 부트스트랩 건수)은
+소스의 *내용*이라 스크래퍼 파일이 갖는다 — `pipeline/`에 두면 7장이 말하는 누수다.
 
 `external_id`로 쓸 키는 **전체 카탈로그를 한 번 뜬 뒤 유일성을 실측하고 정한다.**
 그럴듯한 키가 실제로는 중복되는 일이 있다(4장 경고 참조).
@@ -309,28 +313,33 @@ pipeline/publish.py            BRANDS에 brand·channel 추가
 
 근거와 버린 대안은 [ADR-0004](docs/adr/0004-source-expansion-gate.md).
 
-### 현재 위치: 2단계 완료. 3단계 발행 대기 + 4단계 기준선 수집 (2026-08-12 기준)
+### 현재 위치: 2단계 완료. 3단계 발행 대기 + 4단계 기준선 수집 (2026-08-13 기준)
 
-CU 하나로 전 구간이 연결되어 실제 데이터로 돌아간다. 스냅샷 5,082건 / 131요청 / 약 3분.
+CU 하나로 전 구간이 연결되어 실제 데이터로 돌아간다.
 
 ```
 make setup     # .venv + npm install (최초 1회)
 make test      # 네트워크 없이 돈다
-make week      # snapshot → diff → enrich → publish
+make week      # snapshot → diff → enrich → publish (소스 1개)
+make week-all  # 등록된 소스 전부. 하나가 실패해도 나머지는 계속 간다 (2.3)
 make site      # web/out/ 정적 빌드
 ```
 
-**기준선은 `data/snapshots/2026-W33/`이고 소스 3개가 들어 있다.** 발행물(`data/weeks/`)은
+**기준선은 `data/snapshots/2026-W33/`이고 소스 4개가 들어 있다.** 발행물(`data/weeks/`)은
 아직 없다 — W34를 떠서 첫 diff가 나와야 생긴다.
 
-| 소스 | 채널 | 건수 | 요청 | 비고 |
-|---|---|---|---|---|
-| cu | convenience | 5,082 | 131 | 이름이 12자로 잘려 온다 |
-| starbucks | cafe | 326 | 18 | 설명문 326/326. 가격 없음. MD는 요청하지 않는다 |
-| orion | fmcg | 115 | 15 | 가격 없음. 동명이인 2건 |
+| 소스 | 채널 | 건수 | 요청 | 설명문 | 비고 |
+|---|---|---|---|---|---|
+| cu | convenience | 5,082 | 131 | 상세 | 이름이 12자로 잘려 온다 |
+| homeplus | mart | 2,966 | 130 | **없음** | 가격 있음. 이름 온전. 신상 라벨 없음 |
+| starbucks | cafe | 326 | 18 | 목록 | 가격 없음. MD는 요청하지 않는다 |
+| orion | fmcg | 115 | 15 | 상세 | 가격 없음. 동명이인 2건 |
 
-홈플러스(mart)는 목록 API까지 뚫었으나 상세가 클라이언트 렌더링이라 `source_url`·`image_url`을
-검증하지 못해 보류했다. 브라우저 확인 1회가 필요하다(`sources/targets.yml` 참조).
+"설명문" 열이 `enrich` 대상을 가른다. **홈플러스는 상세에도 설명문이 없어**(표본 51건 중
+텍스트 1건) 상세를 긁지 않는다 — 스타벅스가 "목록이 이미 다 줘서" 건너뛰는 것과
+이유가 정반대다. 이 소스의 `blurb`는 항상 `null`이다(6장).
+
+소스별 값(brand·channel·detail·monotonic_key)은 `pipeline/sources.py` 표 한 곳에 있다.
 
 W34를 돌린 뒤 `data/weeks/<week>.report.json`의 세 지표를 보고 판단한다:
 
@@ -342,6 +351,10 @@ W34를 돌린 뒤 `data/weeks/<week>.report.json`의 세 지표를 보고 판단
 
 **판단 기준은 added 건수가 아니라 오탐 비율이다.** 소스의 NEW 라벨은 판정에 쓰지 않지만
 (2.1) 채점표로는 쓴다 — 이것이 원칙을 지키면서 diff 품질을 수치화하는 유일한 방법이다.
+
+⚠️ **채점표가 없는 소스가 있다.** 홈플러스는 NEW 라벨도 단조 증가 키도 확인되지 않아
+지표 2·3이 둘 다 비어 있다. 건수가 두 번째로 큰 소스인데 채점을 못 한다는 뜻이므로,
+3단계 판단은 CU를 주된 근거로 삼는다.
 
 > 2026-08-11에는 실제 카탈로그에서 gdIdx 상위 30건을 빼 만든 합성 '지난주'로 배선을
 > 검증했다(신상 30건, 오탐 0). 그 합성 데이터와 파생물은 커밋 전에 지웠다.
@@ -383,6 +396,7 @@ THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
 | `snapshot.py`의 `_hold_previous` | **한 번도 실행 안 됨** | 이상 상황을 인위적으로 만들어 지난주 이월이 되는지 확인 |
 | 급증(+200%) 탐지 | 한 번도 걸린 적 없음 | 〃 |
 | `enrich.py`의 실패 처리 | 30/30 성공이라 실패 경로 미검증 | 〃 |
+| 홈플러스의 diff·발행 | 스냅샷만 떴다. 이 소스로 diff가 돈 적은 없다 | W34 |
 | `curate.py`의 카테고리 17종 | 편의점만 보고 만든 목록이다. 카페·프랜차이즈에는 맞지 않는다 | 4단계에서 채널별로 나누거나 소스에서 받아온다. 지금 일반화하는 것은 7장 위반이다 |
 
 반대로 **실제 데이터로 검증된 것**: 스냅샷 5,082건, diff 항등성(5,052건 매칭 / 오탐 0),
@@ -401,3 +415,8 @@ THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
 
 > ⚠️ `curate.py`의 카테고리 17종은 편의점 **식품** 기준이라, 마스크팩·염색약 같은
 > 생활용품과 복숭아·거봉 같은 신선식품이 전부 `기타`로 떨어진다. 위 20건에서 8건이 그랬다.
+> **홈플러스가 붙으면서 이 문제가 커졌다** — 마트 카탈로그는 신선식품 비중이 높다.
+
+**2026-08-13 추가 검증** — 홈플러스 스냅샷 2,966건(130요청, 108개 카테고리 전부 기준 통과),
+`enrich.py`의 **상세 없는 소스 경로**(3/3건을 실패로 세지 않고 건너뛴 뒤 빈 결과 저장).
+브라우저 확인 1회로 상세 URL과 이미지 URL 규칙을 실측했다(`sources/targets.yml` 참조).

@@ -1,8 +1,8 @@
 """소스별 값을 담는 표. **CLAUDE.md 7장이 허용하는 '표 하나'가 여기다.**
 
 7장은 소스 고유 어휘가 `pipeline/`에 새는 것을 금지하면서, 소스별 값을 담는 표
-하나는 예외로 둔다. 그런데 그 표가 `snapshot.py`·`enrich.py`·`publish.py`에
-하나씩 흩어져 있었다. 4개째 소스를 붙이기 전에 한 곳으로 모은다.
+하나는 예외로 둔다. 소스가 3개일 때는 그 표가 `snapshot.py`·`enrich.py`·
+`publish.py`에 하나씩 흩어져 있었다. 4개째(홈플러스)를 붙이면서 한 곳으로 모은다.
 
 **여기에 들어오는 것과 안 들어오는 것**
 
@@ -51,6 +51,16 @@ SOURCES: dict[str, dict] = {
         # 목록이 326/326 전부에 설명문을 준다. 이미 가진 것을 버리고 다시 긁지 않는다.
         "detail": False,
         # product_cd는 13자리 상품코드라 증가 순서가 아니다.
+        "monotonic_key": None,
+    },
+    "homeplus": {
+        "brand": "홈플러스",
+        "channel": "mart",
+        # 상세의 itemDesc가 거의 전부 <img> 한 줄이다(표본 51건 중 텍스트 1건).
+        # 스타벅스와 정반대 이유로 상세를 긁지 않는다 — 목록이 줘서가 아니라
+        # 상세에도 없어서다. blurb는 null로 발행된다 (6장).
+        "detail": False,
+        # itemNo가 등록 순서인지 확인하지 않았다.
         "monotonic_key": None,
     },
 }
