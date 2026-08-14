@@ -61,6 +61,7 @@ SYSTEM_PROMPT = """\
 - description이 비어 있으면 blurb는 반드시 null이다. 이름만 보고 짐작해서 쓰지 마라.
 - description에 없는 사실(맛 평가, 후기, 출시 배경, 재료 추측)을 절대 넣지 마라.
 - name은 입력 그대로 돌려준다. 잘려 있어도 복원하지 마라. 그것이 원본이다.
+- ref는 입력에 있는 문자열을 그대로 돌려준다. 숫자로 바꾸지 마라.
 - 설명이나 마크다운 없이 JSON만 반환한다."""
 
 OUTPUT_SCHEMA = {
@@ -71,12 +72,12 @@ OUTPUT_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "external_id": {"type": "string"},
+                    "ref": {"type": "string"},
                     "name": {"type": "string"},
                     "category": {"type": "string"},
                     "blurb": {"type": ["string", "null"]},
                 },
-                "required": ["external_id", "name", "category", "blurb"],
+                "required": ["ref", "name", "category", "blurb"],
                 "additionalProperties": False,
             },
         }
@@ -192,21 +193,38 @@ def _backend():
     return "api", lambda user: _complete_api(client, user)
 
 
+def _ref(index: int) -> str:
+    """배치 안에서만 유효한 참조. **상품 키를 LLM에 보내지 않기 위한 것이다.**
+
+    예전에는 `external_id`를 그대로 주고받았는데, 홈플러스를 붙이면서 깨졌다.
+    이 소스의 itemNo는 앞자리가 0인 9자리 문자열이라(`070234705`), 모델이 JSON으로
+    되돌려줄 때 두 가지로 망가진다:
+
+      숫자로 해석      `70234705` (int)  → `_entries`가 통째로 버려 배치 전량 실패
+      앞자리 0 소실    `"70234705"`      → 키가 어긋나 전량이 "응답에서 빠짐" 처리
+
+    둘 다 발행을 막지는 않지만(원본으로 폴백) **그 소스는 영영 편집되지 않는다.**
+    `r0` 같은 토큰은 숫자로 읽힐 여지가 없어서 이 문제가 생기지 않는다.
+    상품 키를 모델에 노출할 이유도 없었다 — 모델이 할 일은 입출력을 짝짓는 것뿐이다.
+    """
+    return f"r{index}"
+
+
 def _payload(items: list[dict], enriched: dict) -> list[dict]:
     return [
         {
-            "external_id": item["external_id"],
+            "ref": _ref(index),
             "name": item["name"],
             "category_raw": item.get("category_raw"),
             "price": item.get("price"),
             "description": (enriched.get(item["external_id"]) or {}).get("description"),
         }
-        for item in items
+        for index, item in enumerate(items)
     ]
 
 
 def _entries(parsed: object) -> dict[str, dict] | None:
-    """응답에서 {external_id: 항목}을 뽑는다. 모양이 틀리면 None.
+    """응답에서 {ref: 항목}을 뽑는다. 모양이 틀리면 None.
 
     api 경로는 OUTPUT_SCHEMA가 `{"items": [...]}`를 강제하지만 cli 경로는 스키마를
     쓸 수 없다. 실측(2026-08-12)에서 모델이 맨 배열 `[...]`을 돌려줘 여기서 터졌다.
@@ -220,8 +238,8 @@ def _entries(parsed: object) -> dict[str, dict] | None:
 
     entries = {}
     for entry in parsed:
-        if isinstance(entry, dict) and isinstance(entry.get("external_id"), str):
-            entries[entry["external_id"]] = entry
+        if isinstance(entry, dict) and isinstance(entry.get("ref"), str):
+            entries[entry["ref"]] = entry
     return entries
 
 
@@ -259,12 +277,21 @@ def _curate_batch(complete, batch: list[dict], enriched: dict) -> dict[str, dict
                         len(batch), attempt, MAX_ATTEMPTS)
             continue
 
-        missing = {item["external_id"] for item in batch} - set(entries)
+        # ref를 상품 키로 되돌린다. 모르는 ref는 버린다 — 모델이 지어낸 것이다.
+        by_external = {
+            item["external_id"]: entries[_ref(index)]
+            for index, item in enumerate(batch)
+            if _ref(index) in entries
+        }
+
+        missing = len(batch) - len(by_external)
         if missing:
             log.warning("응답에서 %d건이 빠졌다. 이 항목들은 원본을 쓴다: %s",
-                        len(missing), sorted(missing)[:5])
+                        missing,
+                        [i["name"] for n, i in enumerate(batch)
+                         if _ref(n) not in entries][:5])
 
-        return entries
+        return by_external
 
     log.error("%d회 시도 후 실패. 이 배치 %d건은 LLM 없이 원본 그대로 발행한다.",
               MAX_ATTEMPTS, len(batch))

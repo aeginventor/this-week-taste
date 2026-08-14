@@ -19,9 +19,9 @@ from pipeline import curate
 # ── _entries: 모양 판별 ──────────────────────────────────────────────
 
 def test_스키마대로_온_응답():
-    parsed = {"items": [{"external_id": "27989", "name": "온세)떠먹는패션피치케익"}]}
+    parsed = {"items": [{"ref": "r0", "name": "온세)떠먹는패션피치케익"}]}
     assert curate._entries(parsed) == {
-        "27989": {"external_id": "27989", "name": "온세)떠먹는패션피치케익"}}
+        "r0": {"ref": "r0", "name": "온세)떠먹는패션피치케익"}}
 
 
 def test_맨_배열로_온_응답도_받는다():
@@ -29,9 +29,9 @@ def test_맨_배열로_온_응답도_받는다():
 
     이때 `parsed.get("items")`가 AttributeError를 내면서 발행 전체가 죽었다.
     """
-    parsed = [{"external_id": "27989", "name": "온세)떠먹는패션피치케익"}]
+    parsed = [{"ref": "r0", "name": "온세)떠먹는패션피치케익"}]
     assert curate._entries(parsed) == {
-        "27989": {"external_id": "27989", "name": "온세)떠먹는패션피치케익"}}
+        "r0": {"ref": "r0", "name": "온세)떠먹는패션피치케익"}}
 
 
 @pytest.mark.parametrize("parsed", [
@@ -46,14 +46,37 @@ def test_모르는_모양은_None(parsed):
     assert curate._entries(parsed) is None
 
 
-def test_external_id_없는_항목은_버린다():
+def test_ref_없는_항목은_버린다():
     parsed = [
-        {"external_id": "a", "name": "제품A"},
-        {"name": "external_id가 없다"},
-        {"external_id": 123, "name": "숫자라 키로 못 쓴다"},
+        {"ref": "r0", "name": "제품A"},
+        {"name": "ref가 없다"},
+        {"ref": 123, "name": "숫자라 키로 못 쓴다"},
         None,
     ]
-    assert list(curate._entries(parsed)) == ["a"]
+    assert list(curate._entries(parsed)) == ["r0"]
+
+
+def test_상품_키를_LLM에_보내지_않는다():
+    """홈플러스 itemNo(`070234705`)가 숫자로 해석되어 배치 전량이 버려졌다.
+
+    앞자리 0이 있는 키를 주고받는 한 이 문제는 프롬프트로 못 막는다.
+    그래서 통신에는 `r0` 같은 배치 지역 참조만 쓴다.
+    """
+    items = [{"external_id": "070234705", "name": "청도 감 말랭이 300G(팩)"}]
+    payload = curate._payload(items, {})
+
+    assert payload[0]["ref"] == "r0"
+    assert "070234705" not in json.dumps(payload, ensure_ascii=False)
+
+
+def test_앞자리_0이_있는_키도_되돌아온다():
+    """모델이 ref만 제대로 돌려주면 원래 키는 우리가 갖고 있으므로 온전하다."""
+    batch = [{"external_id": "070234705", "name": "청도 감 말랭이 300G(팩)"}]
+    answer = json.dumps([{"ref": "r0", "name": "청도 감 말랭이 300G(팩)",
+                          "category": "과일", "blurb": None}])
+
+    result = curate._curate_batch(_responder(answer), batch, {})
+    assert list(result) == ["070234705"]
 
 
 # ── _curate_batch: 실패했을 때 조용하지 않은가 ────────────────────────
@@ -80,15 +103,16 @@ def test_빈_결과는_성공이_아니다(caplog):
 
 
 def test_일부만_온_응답은_기록에_남는다(caplog):
-    partial = json.dumps([{"external_id": "a", "name": "제품A", "category": "과자"}])
+    partial = json.dumps([{"ref": "r0", "name": "제품A", "category": "과자"}])
     result = curate._curate_batch(_responder(partial), BATCH, {})
 
     assert list(result) == ["a"]
     assert "빠졌다" in caplog.text          # b가 빠졌다는 사실이 남아야 한다
+    assert "제품B" in caplog.text           # 무엇이 빠졌는지도 남아야 한다
 
 
 def test_모양이_틀리면_재시도한다():
-    good = json.dumps([{"external_id": "a", "name": "제품A"}])
+    good = json.dumps([{"ref": "r0", "name": "제품A"}])
     result = curate._curate_batch(_responder("이건 JSON이 아니다", good), BATCH, {})
 
     assert list(result) == ["a"]           # 1회차 실패, 2회차 성공
