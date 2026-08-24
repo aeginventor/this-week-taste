@@ -12,11 +12,17 @@ help:
 	@echo "make setup      의존성 설치 (.venv)"
 	@echo "make test       테스트 (네트워크 없이 동작)"
 	@echo "make week       전 구간: 스냅샷 → diff → 보강 → 발행 (소스 1개)"
-	@echo "make week-all   등록된 소스 전부. 하나가 실패해도 나머지는 계속 간다"
+	@echo "make week-all   등록된 소스 전부 + 병합. 하나가 실패해도 나머지는 계속 간다"
+	@echo "make merge      소스별 부분 산출물을 사이트가 읽는 파일로 합친다"
 	@echo "make site       web 정적 빌드"
 	@echo ""
 	@echo "  SOURCE=cu     소스 지정 (기본 cu)"
 	@echo "  WEEK=2026-W33 주차 지정 (기본 이번 주)"
+	@echo ""
+	@echo "  THIS_WEEK_TASTE_DATA_DIR  수집 데이터 위치 (기본 ./data)"
+	@echo "  THIS_WEEK_TASTE_LLM       api(기본) | cli | off"
+	@echo ""
+	@echo "  ※ make week 는 부분 산출물까지만 만든다. 사이트용 파일은 make merge."
 
 setup:
 	python3 -m venv .venv
