@@ -1,6 +1,6 @@
 {
   "week": "2026-W35",
-  "generated_at": "2026-08-24T13:51:18+09:00",
+  "generated_at": "2026-08-24T14:24:41+09:00",
   "sources": [
     "cu",
     "homeplus",
@@ -5595,8 +5595,8 @@
       "price": null,
       "category": "시리얼/그래놀라",
       "tags": [],
-      "blurb": "미쯔 쿠키, 마시멜로, 그래놀라의 조합",
-      "image_url": "https://www.orionworld.com/upload/goods/6d177c7873cf4cd1065ee72dce5b59d3.png",
+      "blurb": "달콤바삭 미쯔 쿠키에 마시멜로와 그래놀라를 더한 스모어",
+      "image_url": null,
       "source_url": "https://www.orionworld.com/goods/view/36?goodsno=181&category=0202",
       "source_id": "orion",
       "external_id": "181",
