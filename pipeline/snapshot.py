@@ -42,6 +42,27 @@ SPIKE_THRESHOLD = 3.00  # 직전 주의 300%를 넘으면 = 200% 이상 증가
 BOOTSTRAP_TOLERANCE = 0.10
 
 
+# 직전 주 스냅샷이 없을 때 몇 주까지 되짚는가.
+# 한 주를 건너뛰는 일은 반드시 생긴다(장애, 공휴일, 그냥 못 돌림). 직전 주만 보면
+# 그때마다 "첫 수집"으로 오인해 정찰 실측치 ±10%로 검증하게 되고, 작은 카테고리는
+# 한 건만 바뀌어도 그 문턱을 넘어 정상 변동이 이상으로 잡힌다.
+MAX_LOOKBACK_WEEKS = 4
+
+
+def previous_available(source_id: str, week: str) -> tuple[str | None, dict | None]:
+    """있는 것 중 **가장 최근 이전 주차** 스냅샷. 없으면 (None, None).
+
+    검증·이월·diff가 모두 "지난주"를 필요로 하는데, 그 지난주가 늘 직전 주는 아니다.
+    셋이 서로 다른 주차를 보면 안 되므로 여기 하나로 모은다.
+    """
+    for back in range(1, MAX_LOOKBACK_WEEKS + 1):
+        candidate = weeks.shift(week, -back)
+        found = load_snapshot(candidate, source_id)
+        if found is not None:
+            return candidate, found
+    return None, None
+
+
 def snapshot_path(week: str, source_id: str) -> Path:
     return SNAPSHOT_DIR / week / f"{source_id}.json"
 
@@ -95,10 +116,10 @@ def _check_category_counts(source_id: str, week: str, items: list[dict]) -> list
     module = _scraper_for(source_id)
     actual = _category_counts(source_id, items)
 
-    previous = load_snapshot(weeks.previous_week(week), source_id)
+    previous_week, previous = previous_available(source_id, week)
     if previous:
         baseline = _category_counts(source_id, previous["items"])
-        label, low_ratio, high_ratio = "직전 주", DROP_THRESHOLD, SPIKE_THRESHOLD
+        label, low_ratio, high_ratio = previous_week, DROP_THRESHOLD, SPIKE_THRESHOLD
     else:
         baseline = getattr(module, "BOOTSTRAP_COUNTS", {})
         label = "정찰 실측"
@@ -131,10 +152,14 @@ def _check_volume(source_id: str, week: str, count: int) -> None:
             "크롤러가 항목을 하나도 가져오지 못했다. 지난주 스냅샷을 유지한다.",
         )
 
-    previous = load_snapshot(weeks.previous_week(week), source_id)
+    previous_week, previous = previous_available(source_id, week)
     if not previous:
-        log.info("직전 주 스냅샷이 없어 증감 판정을 건너뛴다 (첫 수집)")
+        log.info("이전 %d주 안에 스냅샷이 없어 증감 판정을 건너뛴다 (첫 수집)",
+                 MAX_LOOKBACK_WEEKS)
         return
+    if previous_week != weeks.previous_week(week):
+        log.warning("직전 주 스냅샷이 없어 %s와 비교한다. 여러 주치 변동이 한 번에 잡힌다.",
+                    previous_week)
 
     before = previous["count"]
     if before == 0:
@@ -162,18 +187,18 @@ def _scraper_for(source_id: str):
 
 def _hold_previous(week: str, source_id: str) -> bool:
     """이상 상황일 때 지난주 스냅샷을 이번 주로 이월한다 (2.4)."""
-    previous = load_snapshot(weeks.previous_week(week), source_id)
+    previous_week, previous = previous_available(source_id, week)
     if not previous:
         log.error("이월할 지난주 스냅샷도 없다. %s %s는 이번 주 데이터가 없다.", source_id, week)
         return False
 
     previous["week"] = week
-    previous["held_from"] = previous.get("held_from") or weeks.previous_week(week)
+    previous["held_from"] = previous.get("held_from") or previous_week
     path = snapshot_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    src_control = control_path(weeks.previous_week(week), source_id)
+    src_control = control_path(previous_week, source_id)
     if src_control.exists():
         shutil.copyfile(src_control, control_path(week, source_id))
     log.warning("지난주(%s) 스냅샷을 %s로 이월했다. 이번 주 diff는 변화 없음으로 나온다.",
