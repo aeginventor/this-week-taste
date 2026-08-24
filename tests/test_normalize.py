@@ -51,3 +51,58 @@ def test_two_character_change_falls_below_threshold():
     score = similarity(normalize_name("샐)오리지널닭가슴살샐러"),
                        normalize_name("샐)오리지날닭가슴살샐푸"))
     assert score < SIMILARITY_THRESHOLD
+
+
+# --- User-Agent (CLAUDE.md 5장). 틀리면 익명으로 요청이 나가고 아무 예외도 안 난다.
+
+def test_빈_환경변수는_기본값으로_돌아간다(monkeypatch):
+    """CI에서 변수를 정의만 하고 값을 안 채우면 빈 문자열이 온다.
+
+    os.environ.get(키, 기본값)은 그걸 기본값으로 안 바꿔준다.
+    """
+    import importlib
+
+    monkeypatch.setenv("THIS_WEEK_TASTE_UA", "")
+    import scrapers.base as base
+    importlib.reload(base)
+    try:
+        assert base.USER_AGENT == base.DEFAULT_USER_AGENT
+    finally:
+        monkeypatch.delenv("THIS_WEEK_TASTE_UA", raising=False)
+        importlib.reload(base)
+
+
+def test_빈_UA로는_세션을_못_만든다():
+    from scrapers import base
+    import pytest as _pytest
+
+    for bad in ("", "   "):
+        with _pytest.raises(ValueError, match="비었다"):
+            base.Session(user_agent=bad)
+
+
+def test_UA에_claude를_넣으면_거부한다():
+    """일부 사이트가 robots.txt에서 ClaudeBot을 막는다. 넣는 순간 금지 대상이 된다."""
+    from scrapers import base
+    import pytest as _pytest
+
+    with _pytest.raises(ValueError, match="Claude"):
+        base.Session(user_agent="ClaudeBot/1.0")
+
+
+def test_기본_UA가_실재하는_about_페이지를_가리킨다():
+    """UA가 없는 페이지를 가리키면 '연락 가능한 식별자'가 아니다.
+
+    주소는 web/config/site.ts, 페이지는 web/app/about/page.tsx — 셋이 맞아야 한다.
+    """
+    from pathlib import Path
+    from scrapers import base
+
+    assert "example.invalid" not in base.DEFAULT_USER_AGENT
+    assert base.DEFAULT_USER_AGENT.endswith("/about)")
+    root = Path(__file__).resolve().parent.parent
+    assert (root / "web" / "app" / "about" / "page.tsx").exists()
+
+    url = base.DEFAULT_USER_AGENT.split("(+")[1].rstrip(")").removesuffix("/about")
+    site_ts = (root / "web" / "config" / "site.ts").read_text(encoding="utf-8")
+    assert f'"{url}"' in site_ts, f"site.ts의 url과 UA가 어긋난다: {url}"

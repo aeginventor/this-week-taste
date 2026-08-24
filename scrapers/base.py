@@ -27,7 +27,10 @@ log = logging.getLogger(__name__)
 #    아니라 지키지 못한 약속이 된다. 페이지는 web/app/about/page.tsx,
 #    주소는 web/config/site.ts의 `url` — 셋이 어긋나면 안 된다.
 DEFAULT_USER_AGENT = "ThisWeekTaste/1.0 (+https://this-week-taste.vercel.app/about)"
-USER_AGENT = os.environ.get("THIS_WEEK_TASTE_UA", DEFAULT_USER_AGENT)
+# `or`를 쓰는 이유: 환경변수가 **빈 문자열로 설정된** 경우를 기본값으로 되돌린다.
+# os.environ.get(키, 기본값)은 빈 문자열을 그대로 돌려주므로, CI에서 변수를
+# 정의만 하고 값을 안 채우면 UA 없이 요청이 나간다. 아무 예외도 나지 않는다.
+USER_AGENT = os.environ.get("THIS_WEEK_TASTE_UA") or DEFAULT_USER_AGENT
 
 TIMEOUT = 15
 MAX_ATTEMPTS = 3
@@ -50,6 +53,10 @@ class Session:
     """호스트 하나를 상대하는 세션. 요청 간격과 재시도를 강제한다."""
 
     def __init__(self, *, user_agent: str = USER_AGENT, min_interval: float = MIN_INTERVAL):
+        # 5장은 **연락 가능한 식별자**를 요구한다. 빈 UA는 식별자가 아니다.
+        # 시끄럽게 막는다 — 조용히 익명으로 긁는 것이 가장 나쁘다 (2.4).
+        if not (user_agent or "").strip():
+            raise ValueError("User-Agent가 비었다. THIS_WEEK_TASTE_UA를 확인할 것")
         if "claude" in user_agent.lower():
             raise ValueError("User-Agent에 'Claude'를 넣지 말 것 (base.py 주석 참조)")
         self.session = requests.Session()
