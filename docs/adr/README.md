@@ -42,3 +42,7 @@
 | [0004](0004-source-expansion-gate.md) | 2주 검증은 발행의 게이트이지 수집의 게이트가 아니다 | 채택 |
 | [0005](0005-backend-stack.md) | 서비스 백엔드는 FastAPI로 시작한다 | 채택 |
 | [0006](0006-category-taxonomy-per-channel.md) | 자체 분류 목록은 채널 단위로 둔다 | 채택 |
+| [0007](0007-week-gap-lookback.md) | 직전 주 스냅샷이 없으면 최대 4주까지 되짚는다 | 채택 |
+| [0008](0008-published-parts-and-merge.md) | 발행물을 소스별 부분과 병합본으로 나눈다 | 채택 |
+| [0009](0009-weekly-effort-goal.md) | 주간 운영 개입 목표를 "0분"에서 "최소화"로 바꾼다 | 채택 |
+| [0010](0010-repo-public-scope.md) | 공개 저장소에는 발행물만 둔다 | 채택 |

@@ -22,7 +22,7 @@ from pipeline import alert, paths, sources, weeks
 
 log = logging.getLogger(__name__)
 
-# 경로는 paths.py 한 곳에서 온다. 저장소 밖을 가리킬 수 있다(공개 범위, ADR-0011).
+# 경로는 paths.py 한 곳에서 온다. 저장소 밖을 가리킬 수 있다(공개 범위, ADR-0010).
 DATA_DIR = paths.DATA_DIR
 SNAPSHOT_DIR = paths.SNAPSHOT_DIR
 

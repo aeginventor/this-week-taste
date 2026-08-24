@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 
 # ⚠️ 발행물만은 **저장소 안에 남는다.** paths.py 로 옮기지 말 것.
 # 요약 + 원문 링크라 공개해도 되는 형태이고(7장), 웹 빌드가 저장소 상대 경로
-# (process.cwd()/../data/weeks)로 읽으므로 옮기면 사이트가 깨진다 (ADR-0011).
+# (process.cwd()/../data/weeks)로 읽으므로 옮기면 사이트가 깨진다 (ADR-0010).
 WEEKS_DIR = Path(__file__).resolve().parent.parent / "data" / "weeks"
 WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 
