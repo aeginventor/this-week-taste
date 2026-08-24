@@ -63,7 +63,7 @@ GitHub Pages를 쓴다면 Actions에서 `web/out`을 아티팩트로 올리면 �
 
 ---
 
-## 3. 주간 자동화 (8장 5단계 — **아직 만들지 않았다**)
+## 3. 주간 자동화 (8장 5단계)
 
 사람 손을 매주 타지 않으려면 이게 필요하다. 형태는 이렇게 된다:
 
@@ -86,8 +86,9 @@ Actions (매주 자동)     snapshot → diff        → 비공개 데이터 저
 이 경계는 [ADR-0009](adr/0009-weekly-effort-goal.md)와 맞는다 — 자동으로 할 수 있는 수집은
 자동으로 하고, 사람은 발행 결과를 보고 판단하는 자리에만 들어간다.
 
+실제 파일은 `.github/workflows/weekly.yml`이다. 뼈대는 이렇다:
+
 ```yaml
-# .github/workflows/weekly.yml (미작성)
 on:
   schedule:
     - cron: "0 1 * * 1"     # 매주 월요일 KST 10:00

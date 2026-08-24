@@ -130,7 +130,8 @@
 ├─ docs/                      # 정찰 결과, 배포 방법, 되돌릴 것 목록
 ├─ learning/                  # 학습 기록. raw/ 는 커밋하지 않는다
 ├─ web/                       # Next.js
-└─ .github/workflows/weekly.yml
+│   └─ app/about/             # 크롤러 UA가 가리키는 페이지. 없으면 UA가 거짓말이 된다
+└─ .github/workflows/weekly.yml   # 매주 수집만 한다. 발행은 사람이
 ```
 
 **`enrich.py`가 왜 따로 있나**: 목록 페이지는 이름·가격·이미지까지만 준다. 설명문과 태그는
@@ -366,7 +367,13 @@ make week      # snapshot → diff → enrich → publish (소스 1개, 부분 �
 make week-all  # 등록된 소스 전부 + 병합. 하나가 실패해도 나머지는 계속 간다 (2.3)
 make merge     # 소스별 부분 산출물 → 사이트가 읽는 파일
 make site      # web/out/ 정적 빌드
+make check-images  # 발행물 이미지가 실제로 열리는지 표본 검사 (배포 전)
 ```
+
+**자동화 경계**: Actions는 `make collect-all`(스냅샷 → diff)까지만 돌리고
+**발행은 사람이 한다.** `curate.py`를 구독 인증(`claude -p`)으로 돌리고 있어 CI에서는
+안 되기 때문이다. 자동 발행하면 전량이 blurb 없이 나간다.
+사람이 발행하기 전에 **비공개 데이터 저장소를 `git pull` 해야 한다.**
 
 ⚠️ **수집 데이터는 저장소 밖에 있다.** `THIS_WEEK_TASTE_DATA_DIR`를 비공개 데이터
 저장소로 지정하고 돌린다(2.2, [ADR-0010](docs/adr/0010-repo-public-scope.md)).
@@ -474,7 +481,14 @@ GITHUB_REPOSITORY    # 〃 (owner/repo). GH_TOKEN과 둘 다 있어야 Issue를 
 THIS_WEEK_TASTE_UA   # User-Agent 전체 문자열
 THIS_WEEK_TASTE_DATA_DIR  # 수집 데이터(raw/snapshots/diffs/enriched)가 사는 곳.
                      # 비우면 저장소의 data/. 발행물은 여기 해당하지 않는다 (2.2)
+DATA_REPO_TOKEN      # (Actions secret) 비공개 데이터 저장소 push 권한.
+                     # 권한을 그 저장소 하나로 좁힌다
 ```
+
+> ⚠️ 환경변수를 **빈 문자열로 정의하는 것과 정의하지 않는 것은 다르다.**
+> `os.environ.get(키, 기본값)`은 빈 문자열을 기본값으로 바꿔주지 않는다.
+> 실제로 CI에서 UA가 통째로 비어 나갈 뻔했다 — `base.py`가 지금은 `or`로 되돌리고,
+> 빈 UA면 세션 생성을 거부한다.
 
 > ⚠️ `THIS_WEEK_TASTE_UA`의 기본값은 `ThisWeekTaste/1.0 (+https://example.invalid/about)`이다.
 > **도메인이 확정되면 반드시 바꿔야 한다.** 5장은 연락 가능한 식별자를 요구하는데
