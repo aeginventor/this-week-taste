@@ -18,12 +18,13 @@ import shutil
 import sys
 from pathlib import Path
 
-from pipeline import alert, sources, weeks
+from pipeline import alert, paths, sources, weeks
 
 log = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-SNAPSHOT_DIR = DATA_DIR / "snapshots"
+# 경로는 paths.py 한 곳에서 온다. 저장소 밖을 가리킬 수 있다(공개 범위, ADR-0011).
+DATA_DIR = paths.DATA_DIR
+SNAPSHOT_DIR = paths.SNAPSHOT_DIR
 
 # 이상 판정 기준 (2.4)
 DROP_THRESHOLD = 0.30   # 직전 주의 30% 미만으로 줄면 = 70% 이상 감소

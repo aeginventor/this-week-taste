@@ -28,12 +28,12 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import diff, sources, weeks
+from pipeline import diff, paths, sources, weeks
 from scrapers import base
 
 log = logging.getLogger(__name__)
 
-ENRICHED_DIR = Path(__file__).resolve().parent.parent / "data" / "enriched"
+ENRICHED_DIR = paths.ENRICHED_DIR
 
 
 def enriched_path(week: str, source_id: str) -> Path:

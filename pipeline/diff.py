@@ -34,11 +34,11 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import alert, normalize, snapshot, weeks
+from pipeline import alert, normalize, paths, snapshot, weeks
 
 log = logging.getLogger(__name__)
 
-DIFF_DIR = Path(__file__).resolve().parent.parent / "data" / "diffs"
+DIFF_DIR = paths.DIFF_DIR
 
 # 이름이 짧아서 문턱을 낮게 잡아야 한다. CU는 제품명을 12자에서 자르므로,
 # n자 이름에서 한 글자만 바뀌어도 유사도가 1 - 1/n 까지 떨어진다:

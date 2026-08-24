@@ -15,6 +15,8 @@ from urllib.parse import urlsplit
 
 import requests
 
+from pipeline import paths
+
 log = logging.getLogger(__name__)
 
 # CLAUDE.md 5장: User-Agent에 연락 가능한 식별자를 넣는다.
@@ -28,7 +30,9 @@ TIMEOUT = 15
 MAX_ATTEMPTS = 3
 MIN_INTERVAL = 1.0  # 요청 간 최소 간격(초). 동시 요청은 하지 않는다.
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# 원본이 어디 사는지는 paths.py가 정한다. 저장소 밖일 수 있다(ADR-0011).
+# scrapers 가 pipeline.weeks 를 쓰는 것과 같은 이유 — 공유 인프라는 한 곳에 둔다.
+RAW_DIR = paths.RAW_DIR
 
 
 class FetchError(RuntimeError):
@@ -126,7 +130,7 @@ def save_raw(week: str, source_id: str, request_id: str, body: str | bytes, ext:
     `data/raw/<week>/<source_id>/<request_id>.<ext>`
     파서가 깨져도 원본이 있으면 재처리할 수 있다. 없으면 그 주는 영영 잃는다.
     """
-    path = DATA_DIR / "raw" / week / source_id / f"{request_id}.{ext}"
+    path = RAW_DIR / week / source_id / f"{request_id}.{ext}"
     path.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(body, bytes):
         path.write_bytes(body)
