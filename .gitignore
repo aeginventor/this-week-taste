@@ -15,6 +15,9 @@ __pycache__/
 # OS
 .DS_Store
 
+# 작업 도구 설정: 공용 설정(.claude/settings.json)은 커밋하고 개인 설정은 하지 않는다.
+.claude/settings.local.json
+
 # 정찰 단계 원본 응답 (180개 / 16MB). 조사 *결론*은 docs/RECON*.md 로 커밋하고
 # 원본은 로컬에만 둔다. 골든 테스트가 쓰는 것만 tests/fixtures/ 로 옮겨 커밋한다.
 scratch/
@@ -23,5 +26,18 @@ scratch/
 # 가공한 til/ 과 sessions/ 는 커밋한다.
 learning/raw/
 
-# data/ 는 커밋한다. JSON 파일이 곧 데이터베이스이고 git 히스토리가 곧 아카이브다
-# (CLAUDE.md 2.2, 2.5). 용량은 90일 정리 잡으로 관리한다 (make clean-raw).
+# data/ 중 **발행물(data/weeks/)만** 커밋한다. JSON 파일이 곧 데이터베이스이고
+# git 히스토리가 곧 아카이브라는 것은 그대로다 (CLAUDE.md 2.2, 2.5).
+#
+# 나머지는 뺀다. 이 저장소가 공개이기 때문이다 — 스냅샷은 소스의 전체 카탈로그이고
+# raw/ 는 응답 원본 그대로라, 여기 두면 7장이 금지한 "소스 데이터를 통째로 재배포"가 된다.
+# 7장은 *페이지*를 말했지만 공개 저장소도 배포다. (ADR-0011)
+#
+# 뺀 것들은 비공개 데이터 저장소에 있고, THIS_WEEK_TASTE_DATA_DIR 로 가리킨다.
+data/raw/
+data/snapshots/
+data/diffs/
+data/enriched/
+
+# 발행 중간 산출물. data/weeks/<week>.json 을 만들기 위한 소스별 조각이라 재생성된다.
+data/published/
