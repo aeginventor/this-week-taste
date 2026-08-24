@@ -129,10 +129,23 @@ def parse_list(markup: str, category_code: str, *, scraped_at: str) -> tuple[lis
         goodsno_match = _GOODSNO_RE.search(block.get("href", ""))
         goodsno = goodsno_match.group(1) if goodsno_match else None
 
-        img = block.select_one("img")
-        image_url = img.get("src") if img else None
-        if image_url and image_url.startswith("/"):
-            image_url = BASE_URL + image_url
+        # ⚠️ **이미지 주소를 내보내지 않는다.** 오리온은 제품 이미지가 본 사이트 호스트의
+        # /upload/ 아래 있는데(`www.orionworld.com/upload/goods/...`), robots.txt가
+        # 그 경로를 명시적으로 막는다:
+        #
+        #     user-agent: *
+        #     disallow: /thdadmin/
+        #     disallow: /upload/
+        #
+        # 목록 경로(/goods/list/)는 허용이라 수집 자체는 규칙을 지킨다. 문제는 우리가
+        # 그 주소를 발행하면 **방문자 브라우저가 대신 그 경로를 요청한다**는 것이다.
+        # robots.txt는 크롤러 지침이지 브라우저 지침이 아니지만, /about에
+        # "차단된 곳은 우회하지 않는다"고 적어둔 것과 결이 어긋난다.
+        #
+        # 다른 소스는 해당 없다 — 이미지가 robots.txt가 없거나 유효하지 않은
+        # **별도 이미지 호스트**에 있다(스타벅스도 경로는 /upload/지만 호스트가 다르다).
+        # 원본은 2.5에 따라 보관되므로 판단이 바뀌면 재처리로 되살릴 수 있다.
+        image_url = None
 
         # goodsno가 주키다. 115건 실측에서 중복 0건이었다.
         # 이름은 중복이 있으므로(후레쉬베리 ×2) 이름 해시로는 가를 수 없다.

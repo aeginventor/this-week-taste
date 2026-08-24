@@ -56,10 +56,14 @@ def test_가격은_항상_없다(parsed):
     assert all(i["price"] is None for i in parsed)
 
 
-def test_이미지가_절대_URL이다(parsed):
-    urls = [i["image_url"] for i in parsed if i["image_url"]]
-    assert urls
-    assert all(u.startswith("https://www.orionworld.com/upload/goods/") for u in urls)
+def test_이미지_주소를_내보내지_않는다(parsed):
+    """오리온은 이미지가 robots.txt 금지 경로(/upload/)에 있다.
+
+    수집은 허용 경로(/goods/list/)만 쓰므로 규칙을 지키지만, 그 주소를 발행하면
+    방문자 브라우저가 대신 금지 경로를 요청하게 된다. 그래서 아예 내보내지 않는다.
+    원본은 보관되므로(2.5) 판단이 바뀌면 재처리로 되살릴 수 있다.
+    """
+    assert all(i["image_url"] is None for i in parsed)
 
 
 def test_카테고리_이름이_들어간다(parsed):
