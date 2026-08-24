@@ -3,7 +3,7 @@ SOURCE ?= cu
 WEEK ?=
 WEEK_ARG := $(if $(WEEK),--week $(WEEK),)
 
-.PHONY: merge check-images help setup test snapshot diff enrich publish week week-all site clean-raw
+.PHONY: merge check-images collect collect-all help setup test snapshot diff enrich publish week week-all site clean-raw
 
 # 등록된 소스 전부. 표는 pipeline/sources.py 한 곳에 있다.
 ALL_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.known()))")
@@ -12,6 +12,7 @@ help:
 	@echo "make setup      의존성 설치 (.venv)"
 	@echo "make test       테스트 (네트워크 없이 동작)"
 	@echo "make week       전 구간: 스냅샷 → diff → 보강 → 발행 (소스 1개)"
+	@echo "make collect-all  수집만 (스냅샷 → diff). 자동화가 도는 부분"
 	@echo "make week-all   등록된 소스 전부 + 병합. 하나가 실패해도 나머지는 계속 간다"
 	@echo "make merge      소스별 부분 산출물을 사이트가 읽는 파일로 합친다"
 	@echo "make site       web 정적 빌드"
@@ -42,6 +43,21 @@ diff:
 
 enrich:
 	$(PY) -m pipeline.enrich --source $(SOURCE) $(WEEK_ARG)
+
+collect:  ## 수집만: 스냅샷 → diff (소스 1개). 발행은 하지 않는다
+	$(PY) -m pipeline.snapshot --source $(SOURCE) $(WEEK_ARG)
+	$(PY) -m pipeline.diff --source $(SOURCE) $(WEEK_ARG)
+
+collect-all:  ## 등록된 소스 전부 수집. 하나가 실패해도 나머지는 계속 간다 (2.3)
+	@failed=""; \
+	for s in $(ALL_SOURCES); do \
+		echo "════════ $$s ════════"; \
+		$(MAKE) --no-print-directory collect SOURCE=$$s WEEK=$(WEEK) || failed="$$failed $$s"; \
+	done; \
+	if [ -n "$$failed" ]; then \
+		echo "‼️  수집 실패:$$failed" >&2; exit 1; \
+	fi; \
+	echo "✅ 전 소스 수집 완료: $(ALL_SOURCES)"
 
 check-images:  ## 발행물 이미지가 실제로 열리는지 표본 검사 (배포 전)
 	$(PY) -m pipeline.imagecheck $(WEEK_ARG)

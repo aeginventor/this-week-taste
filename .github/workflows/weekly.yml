@@ -1,0 +1,82 @@
+# 매주 수집 (CLAUDE.md 8장 5단계)
+#
+# ## 왜 수집만 하는가
+#
+# 발행(enrich → curate → publish)은 사람이 로컬에서 돌린다. LLM 편집 경로 때문이다 —
+# `curate.py`를 구독 인증(`claude -p`)으로 돌리고 있는데 CI에서는 그게 안 된다.
+# 여기서 자동 발행하면 전량이 blurb 없이 나간다.
+#
+# 경계는 ADR-0009와 맞는다: 자동으로 되는 수집은 자동으로, 사람은 판단하는 자리에만.
+#
+# ## 결과는 어디로 가는가
+#
+# **비공개 데이터 저장소에만 커밋한다.** 스냅샷은 소스의 전체 카탈로그라
+# 공개 저장소에 둘 수 없다 (ADR-0010).
+
+name: weekly
+
+on:
+  schedule:
+    # UTC 01:00 = KST 10:00 월요일.
+    # ⚠️ GS25를 붙이면 robots.txt의 Visit-time 때문에 KST 13:00~17:45로 옮겨야 한다.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+# alert.py가 이상 상황에서 Issue를 만든다 (2.4). 그러려면 쓰기 권한이 필요하다.
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  # 겹쳐 돌면 같은 주차 스냅샷을 서로 덮어쓴다.
+  group: weekly
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 코드 저장소
+        uses: actions/checkout@v4
+
+      - name: 데이터 저장소 (비공개)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}-data
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: _data
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # ⚠️ continue-on-error 를 붙이지 말 것.
+      # 이상 상황에서 비영 종료하는 것이 의도된 동작이다 (2.4).
+      # 소스 하나가 실패해도 나머지는 계속 간다 — 그건 collect-all 안에서 처리된다 (2.3).
+      - name: 수집
+        env:
+          THIS_WEEK_TASTE_DATA_DIR: ${{ github.workspace }}/_data
+          THIS_WEEK_TASTE_UA: ${{ vars.THIS_WEEK_TASTE_UA }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: make collect-all PY=python
+
+      - name: 데이터 저장소에 커밋
+        # 수집이 실패해도 성공한 소스의 결과는 남긴다 (2.3).
+        if: always()
+        working-directory: _data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋하지 않는다"
+            exit 0
+          fi
+          git commit -m "data: $(TZ=Asia/Seoul date +%G-W%V) 스냅샷"
+          git push

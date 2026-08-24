@@ -42,3 +42,6 @@ data/enriched/
 
 # 발행 중간 산출물. data/weeks/<week>.json 을 만들기 위한 소스별 조각이라 재생성된다.
 data/published/
+
+# 자동화가 비공개 데이터 저장소를 여기에 체크아웃한다 (.github/workflows/weekly.yml)
+_data/
