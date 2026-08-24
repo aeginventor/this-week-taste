@@ -1,6 +1,6 @@
 {
   "week": "2026-W35",
-  "generated_at": "2026-08-24T14:24:41+09:00",
+  "generated_at": "2026-08-24T18:42:59+09:00",
   "sources": [
     "cu",
     "homeplus",
@@ -8,69 +8,90 @@
     "starbucks"
   ],
   "totals": {
-    "total": 271,
-    "active": 271,
+    "total": 211,
+    "active": 211,
     "discontinued": 0,
-    "with_blurb": 113
+    "with_blurb": 101
   },
   "by_source": {
     "cu": {
       "week": "2026-W35",
       "source_id": "cu",
       "diff_counts": {
-        "previous": 5082,
-        "current": 4754,
-        "matched": 4651,
-        "added": 103,
-        "removed": 431,
-        "changed": 21,
+        "previous": 4244,
+        "current": 4008,
+        "matched": 3913,
+        "added": 95,
+        "removed": 331,
+        "changed": 18,
         "review": 0,
         "conflicts": 0
       },
       "gap_weeks": 2,
       "compared_with": "2026-W33",
-      "added": 103,
+      "snapshot": {
+        "scraped_at": "2026-08-24T15:30:44+09:00",
+        "count": 4008,
+        "previous_week": "2026-W33",
+        "previous_scraped_at": "2026-08-11T17:02:53+09:00"
+      },
+      "added": 95,
       "source_new_label": {
-        "labelled_total": 493,
-        "labelled_and_added": 99,
-        "labelled_not_added": 394,
-        "added_not_labelled": 4
+        "labelled_total": 466,
+        "labelled_and_added": 93,
+        "labelled_not_added": 373,
+        "added_not_labelled": 2
       },
       "monotonic_id": {
         "key": "gd_idx",
         "previous_max": 27989,
-        "added_above_previous_max": 99,
-        "added_below_previous_max": 4
+        "added_above_previous_max": 93,
+        "added_below_previous_max": 2
+      },
+      "out_of_scope": {
+        "count": 4,
+        "names": [
+          "HB)카라카라오렌지6입",
+          "데일리)거봉500g(팩)",
+          "데일리)아오리사과2입(팩)",
+          "미스티)산리오마이키링"
+        ]
       },
       "published": {
-        "total": 103,
-        "with_blurb": 103
+        "total": 91,
+        "with_blurb": 91
       }
     },
     "homeplus": {
       "week": "2026-W35",
       "source_id": "homeplus",
       "diff_counts": {
-        "previous": 2966,
-        "current": 2861,
-        "matched": 2697,
-        "added": 158,
-        "removed": 263,
-        "changed": 232,
-        "review": 6,
+        "previous": 2552,
+        "current": 2467,
+        "matched": 2353,
+        "added": 110,
+        "removed": 195,
+        "changed": 160,
+        "review": 4,
         "conflicts": 0
       },
       "gap_weeks": 2,
       "compared_with": "2026-W33",
-      "added": 158,
+      "snapshot": {
+        "scraped_at": "2026-08-24T15:35:31+09:00",
+        "count": 2467,
+        "previous_week": "2026-W33",
+        "previous_scraped_at": "2026-08-13T14:38:40+09:00"
+      },
+      "added": 110,
       "source_new_label": {
         "labelled_total": 0,
         "labelled_and_added": 0,
         "labelled_not_added": 0,
-        "added_not_labelled": 158
+        "added_not_labelled": 110
       },
       "published": {
-        "total": 158,
+        "total": 110,
         "with_blurb": 0
       }
     },
@@ -89,6 +110,12 @@
       },
       "gap_weeks": 2,
       "compared_with": "2026-W33",
+      "snapshot": {
+        "scraped_at": "2026-08-24T15:34:38+09:00",
+        "count": 114,
+        "previous_week": "2026-W33",
+        "previous_scraped_at": "2026-08-12T19:46:26+09:00"
+      },
       "added": 1,
       "source_new_label": {
         "labelled_total": 8,
@@ -116,6 +143,12 @@
       },
       "gap_weeks": 2,
       "compared_with": "2026-W33",
+      "snapshot": {
+        "scraped_at": "2026-08-24T15:35:01+09:00",
+        "count": 330,
+        "previous_week": "2026-W33",
+        "previous_scraped_at": "2026-08-12T20:19:32+09:00"
+      },
       "added": 9,
       "source_new_label": {
         "labelled_total": 28,
