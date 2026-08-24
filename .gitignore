@@ -3,6 +3,7 @@ node_modules/
 .next/
 web/out/
 web/next-env.d.ts
+web/tsconfig.tsbuildinfo
 .venv/
 __pycache__/
 *.pyc
