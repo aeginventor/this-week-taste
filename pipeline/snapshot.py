@@ -186,7 +186,18 @@ def _scraper_for(source_id: str):
 
 
 def _hold_previous(week: str, source_id: str) -> bool:
-    """이상 상황일 때 지난주 스냅샷을 이번 주로 이월한다 (2.4)."""
+    """이상 상황일 때 지난주 스냅샷을 이번 주로 이월한다 (2.4).
+
+    이월의 목적은 **이번 주 데이터가 없는 자리를 채우는 것**이다. 이미 정상 스냅샷이
+    있으면 채울 자리가 없고, 덮으면 검증을 통과했던 카탈로그가 지난주 것으로 되돌아간다.
+    """
+    existing = load_snapshot(week, source_id)
+    if existing is not None and not existing.get("held_from"):
+        log.warning("%s %s에는 이미 정상 스냅샷이 있다 (%s, %d건) — "
+                    "이월하지 않고 그것을 유지한다.",
+                    source_id, week, existing.get("scraped_at"), existing.get("count", 0))
+        return True
+
     previous_week, previous = previous_available(source_id, week)
     if not previous:
         log.error("이월할 지난주 스냅샷도 없다. %s %s는 이번 주 데이터가 없다.", source_id, week)
