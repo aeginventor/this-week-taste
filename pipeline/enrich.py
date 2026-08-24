@@ -28,12 +28,23 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import diff, paths, sources, weeks
+from pipeline import alert, diff, paths, sources, weeks
 from scrapers import base
 
 log = logging.getLogger(__name__)
 
 ENRICHED_DIR = paths.ENRICHED_DIR
+
+# 상세 조회 요청 수의 상한. 신상 하나마다 요청이 한 번 더 나가므로 여기가
+# 이 파이프라인에서 요청량이 튈 수 있는 유일한 자리다(목록 요청 수는 고정이다).
+#
+# 상한을 두는 진짜 이유는 예의가 아니라 **신호**다. 신상이 수백 건이라는 것은
+# 그 자체로 diff 매칭이 깨졌다는 뜻이고(8장 판단표), 그 상태로 긁으면
+# 버그가 소스 사이트를 대신 두들긴다.
+#
+# ⚠️ 이 값에는 아직 실측 근거가 없다. 진짜 한 주치 신상이 몇 건인지 본 적이 없다.
+# 첫 실제 diff를 본 뒤 조인다.
+MAX_DETAIL_FETCHES = 500
 
 
 def enriched_path(week: str, source_id: str) -> Path:
@@ -96,6 +107,16 @@ def run(source_id: str, week: str | None = None) -> Path:
                  "설명문 없이 남는 항목 %d/%d건 — blurb는 null로 발행된다.",
                  len(added), total)
         return _write(week, source_id, enriched, failures=0, total=total)
+
+    # ⚠️ 잘라서 일부만 긁지 않는다. 그러면 "왜 어떤 건 blurb가 있고 어떤 건 없나"가
+    # 설명이 안 되는 발행물이 나간다. 조용히 절반만 하느니 시끄럽게 멈춘다(2.4).
+    if len(added) > MAX_DETAIL_FETCHES:
+        alert.raise_anomaly(
+            f"[{source_id}] {week} 상세 조회 대상이 상한을 넘었다: "
+            f"{len(added)}건 > {MAX_DETAIL_FETCHES}건",
+            "신상이 이만큼 나오는 것은 diff 매칭이 깨졌다는 신호다(8장 판단표).\n"
+            "상세를 긁지 않고 멈춘다 — 이 상태로 긁으면 버그가 소스 사이트를 두들긴다.\n"
+            f"diff 결과를 먼저 확인할 것: {diff_path}")
 
     session = base.Session()
     failures = 0
