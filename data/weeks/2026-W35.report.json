@@ -1,0 +1,132 @@
+{
+  "week": "2026-W35",
+  "generated_at": "2026-08-24T13:51:18+09:00",
+  "sources": [
+    "cu",
+    "homeplus",
+    "orion",
+    "starbucks"
+  ],
+  "totals": {
+    "total": 271,
+    "active": 271,
+    "discontinued": 0,
+    "with_blurb": 113
+  },
+  "by_source": {
+    "cu": {
+      "week": "2026-W35",
+      "source_id": "cu",
+      "diff_counts": {
+        "previous": 5082,
+        "current": 4754,
+        "matched": 4651,
+        "added": 103,
+        "removed": 431,
+        "changed": 21,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 2,
+      "compared_with": "2026-W33",
+      "added": 103,
+      "source_new_label": {
+        "labelled_total": 493,
+        "labelled_and_added": 99,
+        "labelled_not_added": 394,
+        "added_not_labelled": 4
+      },
+      "monotonic_id": {
+        "key": "gd_idx",
+        "previous_max": 27989,
+        "added_above_previous_max": 99,
+        "added_below_previous_max": 4
+      },
+      "published": {
+        "total": 103,
+        "with_blurb": 103
+      }
+    },
+    "homeplus": {
+      "week": "2026-W35",
+      "source_id": "homeplus",
+      "diff_counts": {
+        "previous": 2966,
+        "current": 2861,
+        "matched": 2697,
+        "added": 158,
+        "removed": 263,
+        "changed": 232,
+        "review": 6,
+        "conflicts": 0
+      },
+      "gap_weeks": 2,
+      "compared_with": "2026-W33",
+      "added": 158,
+      "source_new_label": {
+        "labelled_total": 0,
+        "labelled_and_added": 0,
+        "labelled_not_added": 0,
+        "added_not_labelled": 158
+      },
+      "published": {
+        "total": 158,
+        "with_blurb": 0
+      }
+    },
+    "orion": {
+      "week": "2026-W35",
+      "source_id": "orion",
+      "diff_counts": {
+        "previous": 115,
+        "current": 114,
+        "matched": 113,
+        "added": 1,
+        "removed": 2,
+        "changed": 3,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 2,
+      "compared_with": "2026-W33",
+      "added": 1,
+      "source_new_label": {
+        "labelled_total": 8,
+        "labelled_and_added": 1,
+        "labelled_not_added": 7,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 1,
+        "with_blurb": 1
+      }
+    },
+    "starbucks": {
+      "week": "2026-W35",
+      "source_id": "starbucks",
+      "diff_counts": {
+        "previous": 326,
+        "current": 330,
+        "matched": 321,
+        "added": 9,
+        "removed": 5,
+        "changed": 1,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 2,
+      "compared_with": "2026-W33",
+      "added": 9,
+      "source_new_label": {
+        "labelled_total": 28,
+        "labelled_and_added": 2,
+        "labelled_not_added": 26,
+        "added_not_labelled": 7
+      },
+      "published": {
+        "total": 9,
+        "with_blurb": 9
+      }
+    }
+  }
+}
