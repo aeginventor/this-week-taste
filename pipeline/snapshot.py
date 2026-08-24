@@ -190,6 +190,7 @@ def _hold_previous(week: str, source_id: str) -> bool:
 
     이월의 목적은 **이번 주 데이터가 없는 자리를 채우는 것**이다. 이미 정상 스냅샷이
     있으면 채울 자리가 없고, 덮으면 검증을 통과했던 카탈로그가 지난주 것으로 되돌아간다.
+    `--refresh`가 이상 상황에 걸릴 때 실제로 그렇게 된다(2.6).
     """
     existing = load_snapshot(week, source_id)
     if existing is not None and not existing.get("held_from"):
@@ -217,9 +218,29 @@ def _hold_previous(week: str, source_id: str) -> bool:
     return True
 
 
-def take(source_id: str, week: str | None = None) -> Path:
-    """한 소스의 스냅샷을 뜬다. 이상 상황이면 alert.PipelineAnomaly를 던진다."""
+def take(source_id: str, week: str | None = None, *, refresh: bool = False) -> Path:
+    """한 소스의 스냅샷을 뜬다. 이상 상황이면 alert.PipelineAnomaly를 던진다.
+
+    **한 주차의 스냅샷은 한 번만 뜬다** (ADR-0011). 이미 있으면 다시 긁지 않고 그것을 쓴다.
+    수집(봇)과 발행(사람)이 따로 돌기 때문에, 그러지 않으면 발행이 근거로 삼은 카탈로그가
+    조용히 다른 것으로 바뀐다. 일부러 다시 뜰 때만 `refresh=True`.
+    """
     week = week or weeks.current_week()
+
+    existing = load_snapshot(week, source_id)
+    if existing is not None and not refresh:
+        if existing.get("held_from"):
+            # 이월본(2.4)은 재사용 대상이 아니다. 이월은 "이번 주 데이터가 없다"는 뜻이라
+            # 그걸 굳히면 지난주 카탈로그가 이번 주의 최종 스냅샷이 된다.
+            log.warning("%s %s는 %s에서 이월된 스냅샷이다 — 다시 뜬다.",
+                        source_id, week, existing["held_from"])
+        else:
+            # 조용히 건너뛰지 않는다. 다시 긁은 줄 알고 있으면 그게 더 위험하다 (2.4).
+            log.warning("%s %s 스냅샷이 이미 있다 (%s, %d건) — 다시 긁지 않는다. "
+                        "덮어쓰려면 --refresh (ADR-0011).",
+                        source_id, week, existing.get("scraped_at"), existing.get("count", 0))
+            return snapshot_path(week, source_id)
+
     module = _scraper_for(source_id)
 
     log.info("== %s %s 스냅샷 ==", source_id, week)
@@ -264,11 +285,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="전체 카탈로그 스냅샷")
     parser.add_argument("--source", default="cu")
     parser.add_argument("--week", help="생략하면 이번 주")
+    parser.add_argument("--refresh", action="store_true",
+                        help="이미 있는 스냅샷을 다시 뜬다 (기본은 재사용, ADR-0011)")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     try:
-        take(args.source, args.week)
+        take(args.source, args.week, refresh=args.refresh)
     except alert.PipelineAnomaly:
         # 이미 로그와 Issue로 알렸다. 지난주를 이월하고 실패로 끝낸다 (2.4).
         _hold_previous(args.week or weeks.current_week(), args.source)

@@ -6,6 +6,8 @@
 id가 바뀌면 아카이브 URL이 깨지고 diff가 같은 제품을 "단종 1건 + 신상 1건"으로 오탐한다.
 """
 
+import json
+
 import pytest
 
 from pipeline import publish
@@ -89,3 +91,53 @@ def test_validate_rejects_missing_required_field():
     item["source_url"] = None
     with pytest.raises(Exception, match="발행 스키마 검증 실패"):
         publish._validate([item], "2026-W33")
+
+
+# ── 발행이 무엇을 보고 발행했는가 (ADR-0011) ──────────────────────────────
+#
+# 수집은 봇이, 발행은 사람이 따로 돌린다. 같은 주차를 다시 수집하면 발행물이 근거로 삼은
+# 카탈로그가 조용히 교체되는데, 이 값이 없으면 어긋났다는 것 자체를 알 수 없다.
+# 2026-W35가 실제로 그랬다 — 14:24 발행, 15:30 재수집.
+
+def _snap(week, source_id, scraped_at, **extra):
+    from pipeline import snapshot
+    path = snapshot.snapshot_path(week, source_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(
+        {"week": week, "source_id": source_id, "scraped_at": scraped_at,
+         "count": 1, "items": [], **extra}, ensure_ascii=False), encoding="utf-8")
+
+
+@pytest.fixture
+def snap_dir(tmp_path, monkeypatch):
+    from pipeline import snapshot
+    monkeypatch.setattr(snapshot, "SNAPSHOT_DIR", tmp_path / "snapshots")
+    return tmp_path
+
+
+def _report(week="2026-W36", source_id="homeplus", previous_week="2026-W35"):
+    result = {"added": [], "removed": [], "counts": {}, "previous_week": previous_week,
+              "gap_weeks": 1}
+    return publish._source_report(week, source_id, result, [])
+
+
+def test_리포트가_근거로_쓴_스냅샷_시각을_남긴다(snap_dir):
+    _snap("2026-W36", "homeplus", "2026-08-31T10:00:00+09:00")
+    _snap("2026-W35", "homeplus", "2026-08-24T15:35:31+09:00")
+
+    provenance = _report()["snapshot"]
+
+    assert provenance["scraped_at"] == "2026-08-31T10:00:00+09:00"
+    assert provenance["previous_week"] == "2026-W35"
+    assert provenance["previous_scraped_at"] == "2026-08-24T15:35:31+09:00"
+
+
+def test_이월본이_아니면_held_from을_싣지_않는다(snap_dir):
+    # 해당 없는 자리에 빈 값을 실으면 나중에 의미 있는 값으로 오독된다 (7장).
+    _snap("2026-W36", "homeplus", "2026-08-31T10:00:00+09:00")
+    assert "held_from" not in _report()["snapshot"]
+
+
+def test_이월본이면_출처_주차를_싣는다(snap_dir):
+    _snap("2026-W36", "homeplus", "2026-08-24T15:35:31+09:00", held_from="2026-W35")
+    assert _report()["snapshot"]["held_from"] == "2026-W35"

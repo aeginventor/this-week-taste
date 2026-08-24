@@ -46,3 +46,4 @@
 | [0008](0008-published-parts-and-merge.md) | 발행물을 소스별 부분과 병합본으로 나눈다 | 채택 |
 | [0009](0009-weekly-effort-goal.md) | 주간 운영 개입 목표를 "0분"에서 "최소화"로 바꾼다 | 채택 |
 | [0010](0010-repo-public-scope.md) | 공개 저장소에는 발행물만 둔다 | 채택 |
+| [0011](0011-snapshot-once-per-week.md) | 한 주차의 스냅샷은 한 번만 뜬다 | 채택 |

@@ -264,6 +264,28 @@ def _monotonic_key(source_id: str) -> str | None:
     return sources.monotonic_key(source_id)
 
 
+def _provenance(current: dict | None, previous_week: str | None,
+                previous: dict | None) -> dict:
+    """이 발행이 근거로 삼은 스냅샷이 무엇인가 (ADR-0011).
+
+    수집은 봇이, 발행은 사람이 따로 돌린다. 같은 주차를 다시 수집하면 발행물이 본
+    카탈로그가 **조용히 교체된다.** 그 시각을 여기 남겨야 나중에 어긋났다는 것을 알 수 있다.
+    실제로 2026-W35가 그랬다 — 14:24에 발행하고 15:30에 다시 수집됐다.
+    """
+    provenance = {
+        "scraped_at": (current or {}).get("scraped_at"),
+        "count": (current or {}).get("count"),
+        "previous_week": previous_week,
+        "previous_scraped_at": (previous or {}).get("scraped_at"),
+    }
+    # 이월본일 때만 싣는다. 해당 없는 자리에 빈 값을 실으면 나중에 의미 있는 값으로
+    # 오독된다 — `monotonic_id`를 조건부로 싣는 것과 같은 이유다 (7장).
+    held_from = (current or {}).get("held_from")
+    if held_from:
+        provenance["held_from"] = held_from
+    return provenance
+
+
 def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -> dict:
     """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
 
@@ -285,6 +307,7 @@ def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -
     # 지난주는 diff 결과가 알려준다(run()과 같은 이유).
     previous_week = result.get("previous_week")
     previous = snapshot.load_snapshot(previous_week, source_id) if previous_week else None
+    current = snapshot.load_snapshot(week, source_id)
     monotonic_key = _monotonic_key(source_id)
     if monotonic_key:
         previous_max_gd = max(
@@ -302,6 +325,8 @@ def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -
         # 몇 주치가 한 번에 잡혔는가. 1이 정상. 이걸 모르면 added 건수를 잘못 읽는다.
         "gap_weeks": result.get("gap_weeks", 1),
         "compared_with": result.get("previous_week"),
+        # 무엇을 보고 발행했는가. 지표가 아니라 근거다.
+        "snapshot": _provenance(current, previous_week, previous),
         # 지표 1: added 절대 건수. 수천이면 매칭이 깨진 것이다.
         "added": len(added),
         # 지표 2: 소스 NEW 라벨과의 교차 검증 (대조군)

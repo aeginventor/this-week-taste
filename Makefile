@@ -2,6 +2,9 @@ PY := .venv/bin/python
 SOURCE ?= cu
 WEEK ?=
 WEEK_ARG := $(if $(WEEK),--week $(WEEK),)
+# 스냅샷은 주차당 한 번만 뜬다 (ADR-0011). 다시 뜨려면 REFRESH=1.
+REFRESH ?=
+REFRESH_ARG := $(if $(REFRESH),--refresh,)
 
 .PHONY: merge check-images collect collect-all help setup test snapshot diff enrich publish week week-all site clean-raw
 
@@ -20,6 +23,7 @@ help:
 	@echo ""
 	@echo "  SOURCE=cu     소스 지정 (기본 cu)"
 	@echo "  WEEK=2026-W33 주차 지정 (기본 이번 주)"
+	@echo "  REFRESH=1     이미 있는 스냅샷을 다시 뜬다 (기본은 재사용)"
 	@echo ""
 	@echo "  THIS_WEEK_TASTE_DATA_DIR  수집 데이터 위치 (기본 ./data)"
 	@echo "  THIS_WEEK_TASTE_LLM       api(기본) | cli | off"
@@ -36,7 +40,7 @@ test:
 	$(PY) -m pytest tests/ -q
 
 snapshot:
-	$(PY) -m pipeline.snapshot --source $(SOURCE) $(WEEK_ARG)
+	$(PY) -m pipeline.snapshot --source $(SOURCE) $(WEEK_ARG) $(REFRESH_ARG)
 
 diff:
 	$(PY) -m pipeline.diff --source $(SOURCE) $(WEEK_ARG)
@@ -45,14 +49,14 @@ enrich:
 	$(PY) -m pipeline.enrich --source $(SOURCE) $(WEEK_ARG)
 
 collect:  ## 수집만: 스냅샷 → diff (소스 1개). 발행은 하지 않는다
-	$(PY) -m pipeline.snapshot --source $(SOURCE) $(WEEK_ARG)
+	$(PY) -m pipeline.snapshot --source $(SOURCE) $(WEEK_ARG) $(REFRESH_ARG)
 	$(PY) -m pipeline.diff --source $(SOURCE) $(WEEK_ARG)
 
 collect-all:  ## 등록된 소스 전부 수집. 하나가 실패해도 나머지는 계속 간다 (2.3)
 	@failed=""; \
 	for s in $(ALL_SOURCES); do \
 		echo "════════ $$s ════════"; \
-		$(MAKE) --no-print-directory collect SOURCE=$$s WEEK=$(WEEK) || failed="$$failed $$s"; \
+		$(MAKE) --no-print-directory collect SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \
 	done; \
 	if [ -n "$$failed" ]; then \
 		echo "‼️  수집 실패:$$failed" >&2; exit 1; \
@@ -78,7 +82,7 @@ week-all:
 	@failed=""; \
 	for s in $(ALL_SOURCES); do \
 		echo "════════ $$s ════════"; \
-		$(MAKE) --no-print-directory week SOURCE=$$s WEEK=$(WEEK) || failed="$$failed $$s"; \
+		$(MAKE) --no-print-directory week SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \
 	done; \
 	echo "════════ 병합 ════════"; \
 	$(MAKE) --no-print-directory merge WEEK=$(WEEK); \
