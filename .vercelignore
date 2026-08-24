@@ -1,0 +1,33 @@
+# Vercel에 올릴 필요가 없는 것. 배포되는 것은 web/ 의 정적 사이트뿐이다.
+#
+# requirements.txt가 루트에 있으면 Vercel이 이 저장소를 파이썬 프로젝트로 감지한다.
+# 실제 빌드는 vercel.json이 지정하므로 동작에는 문제가 없지만, 감지 결과가 화면에
+# 그대로 뜨면 다음 사람이 헷갈린다. 애초에 올리지 않는다.
+#
+# ⚠️ data/weeks/ 는 빼면 안 된다. web/lib/weeks.ts 가 빌드 때 읽는다.
+
+# 수집 파이프라인 (배포와 무관)
+pipeline/
+scrapers/
+tests/
+sources/
+requirements.txt
+Makefile
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 문서·기록
+docs/
+learning/
+scratch/
+CLAUDE.md
+
+# 자동화
+.github/
+.claude/
+_data/
+
+# 발행 중간 산출물 (사이트는 data/weeks/ 만 읽는다)
+data/published/
