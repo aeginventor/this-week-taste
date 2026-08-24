@@ -49,6 +49,14 @@ SIMILARITY_THRESHOLD = 0.85
 # L4는 짝짓기가 O(n×m)이라 폭발할 수 있다. 이 규모를 넘으면 계산하지 않고 알린다.
 L4_PAIR_LIMIT = 2_000_000
 
+# 직전 주 스냅샷이 없을 때 몇 주까지 되짚어 올라가는가.
+# 한 주를 건너뛰는 일은 반드시 생긴다(장애, 공휴일, 그냥 못 돌림). 그때 "비교 대상이 없다"로
+# 처리하면 그 주도 기준선이 되어 발행이 영영 한 주씩 밀린다.
+#
+# 상한을 두는 이유: 너무 오래된 것과 비교해놓고 "이번 주 신상"이라고 부를 수 없다.
+# 4주를 넘겨 비면 baseline으로 두고 발행하지 않는다.
+MAX_LOOKBACK_WEEKS = 4
+
 # 값이 달라졌을 때 `changed`로 기록할 필드
 TRACKED_FIELDS = ("name", "price", "image_url", "category_raw")
 
@@ -218,9 +226,31 @@ def _pair_by_similarity(unmatched_current: list[dict], previous_items: list[dict
     return review
 
 
+def _gap(previous_week: str, week: str) -> int:
+    """두 주차가 몇 주 떨어져 있는가. 연도 경계를 넘어도 맞아야 해서 날짜로 센다."""
+    delta = weeks.monday_of(week) - weeks.monday_of(previous_week)
+    return delta.days // 7
+
+
+def _previous_available(source_id: str, week: str) -> tuple[str | None, dict | None]:
+    """있는 것 중 **가장 최근 이전 주차** 스냅샷을 찾는다. 없으면 (None, None).
+
+    직전 주만 보면 한 주 건너뛴 순간 영영 기준선에서 못 벗어난다.
+    """
+    for back in range(1, MAX_LOOKBACK_WEEKS + 1):
+        candidate = weeks.shift(week, -back)
+        found = snapshot.load_snapshot(candidate, source_id)
+        if found is not None:
+            if back > 1:
+                log.warning("%s의 직전 주 스냅샷이 없어 %d주 전(%s)과 비교한다. "
+                            "이번 주 신상이 아니라 %d주치가 한 번에 잡힌다.",
+                            source_id, back, candidate, back)
+            return candidate, found
+    return None, None
+
+
 def run(source_id: str, week: str | None = None) -> Path:
     week = week or weeks.current_week()
-    previous_week = weeks.previous_week(week)
 
     current = snapshot.load_snapshot(week, source_id)
     if current is None:
@@ -228,11 +258,11 @@ def run(source_id: str, week: str | None = None) -> Path:
             f"이번 주 스냅샷이 없다: {snapshot.snapshot_path(week, source_id)}\n"
             "먼저 `python -m pipeline.snapshot`을 돌릴 것.")
 
-    previous = snapshot.load_snapshot(previous_week, source_id)
+    previous_week, previous = _previous_available(source_id, week)
     if previous is None:
         # 첫 주는 발행하지 않는다. 전량을 신상으로 내보내는 일은 어떤 경우에도 하지 않는다.
-        log.warning("지난주(%s) 스냅샷이 없다. %s는 기준선(baseline)으로만 쓰고 발행하지 않는다.",
-                    previous_week, week)
+        log.warning("%s 이전 %d주 안에 스냅샷이 없다. %s는 기준선(baseline)으로만 쓰고 "
+                    "발행하지 않는다.", source_id, MAX_LOOKBACK_WEEKS, week)
         result = {"added": [], "removed": [], "changed": [], "review": [], "conflicts": [],
                   "counts": {"previous": 0, "current": current["count"], "matched": 0,
                              "added": 0, "removed": 0, "changed": 0, "review": 0,
@@ -242,7 +272,11 @@ def run(source_id: str, week: str | None = None) -> Path:
         result = diff_items(previous["items"], current["items"])
         result["baseline"] = False
 
-    result = {"source_id": source_id, "week": week, "previous_week": previous_week, **result}
+    # gap_weeks: 몇 주치가 한 번에 잡혔는가. 1이 정상이다.
+    # 이것 없이 added 건수만 보면 2주치를 한 주치인 척 읽게 된다.
+    gap = 0 if previous_week is None else _gap(previous_week, week)
+    result = {"source_id": source_id, "week": week, "previous_week": previous_week,
+              "gap_weeks": gap, **result}
 
     path = DIFF_DIR / week / f"{source_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
