@@ -3,7 +3,7 @@ SOURCE ?= cu
 WEEK ?=
 WEEK_ARG := $(if $(WEEK),--week $(WEEK),)
 
-.PHONY: merge help setup test snapshot diff enrich publish week week-all site clean-raw
+.PHONY: merge check-images help setup test snapshot diff enrich publish week week-all site clean-raw
 
 # 등록된 소스 전부. 표는 pipeline/sources.py 한 곳에 있다.
 ALL_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.known()))")
@@ -15,6 +15,7 @@ help:
 	@echo "make week-all   등록된 소스 전부 + 병합. 하나가 실패해도 나머지는 계속 간다"
 	@echo "make merge      소스별 부분 산출물을 사이트가 읽는 파일로 합친다"
 	@echo "make site       web 정적 빌드"
+	@echo "make check-images  발행물 이미지가 열리는지 표본 검사 (배포 전)"
 	@echo ""
 	@echo "  SOURCE=cu     소스 지정 (기본 cu)"
 	@echo "  WEEK=2026-W33 주차 지정 (기본 이번 주)"
@@ -41,6 +42,9 @@ diff:
 
 enrich:
 	$(PY) -m pipeline.enrich --source $(SOURCE) $(WEEK_ARG)
+
+check-images:  ## 발행물 이미지가 실제로 열리는지 표본 검사 (배포 전)
+	$(PY) -m pipeline.imagecheck $(WEEK_ARG)
 
 merge:  ## 소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다
 	$(PY) -m pipeline.publish --merge $(WEEK_ARG)

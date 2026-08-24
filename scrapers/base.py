@@ -23,7 +23,10 @@ log = logging.getLogger(__name__)
 # 도메인이 확정되면 THIS_WEEK_TASTE_UA 환경변수로 덮어쓴다.
 # ⚠️ 이 문자열에 'Claude'/'ClaudeBot'을 절대 넣지 말 것. 일부 사이트(bhc 등)가
 #    robots.txt에서 ClaudeBot을 Disallow하고 있어 넣는 순간 금지 대상이 된다.
-DEFAULT_USER_AGENT = "ThisWeekTaste/1.0 (+https://example.invalid/about)"
+# ⚠️ 이 주소의 /about 페이지가 실제로 존재해야 한다. 없으면 "연락 가능한 식별자"가
+#    아니라 지키지 못한 약속이 된다. 페이지는 web/app/about/page.tsx,
+#    주소는 web/config/site.ts의 `url` — 셋이 어긋나면 안 된다.
+DEFAULT_USER_AGENT = "ThisWeekTaste/1.0 (+https://this-week-taste.vercel.app/about)"
 USER_AGENT = os.environ.get("THIS_WEEK_TASTE_UA", DEFAULT_USER_AGENT)
 
 TIMEOUT = 15
