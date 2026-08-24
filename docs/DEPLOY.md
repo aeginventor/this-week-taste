@@ -1,7 +1,18 @@
 # 배포 / 확인 방법
 
+**배포됨: https://this-week-taste.vercel.app** (2026-08-24)
+
 `web/`은 순수 정적 사이트다(`output: "export"`). 서버 런타임이 없어서 아무 정적 호스팅에나
 올라가고, 빌드 산출물은 `web/out/` 1.1MB다.
+
+⚠️ **이 주소는 세 곳과 묶여 있다.** 바꾸려면 셋을 함께 고쳐야 하고,
+어긋나면 `tests/test_normalize.py`가 실패한다.
+
+| 어디 | 무엇 |
+|---|---|
+| `web/config/site.ts` | `url` |
+| `scrapers/base.py` | `DEFAULT_USER_AGENT`의 `+https://.../about` |
+| `web/app/about/page.tsx` | 그 페이지가 실제로 존재해야 한다 |
 
 ---
 
@@ -37,21 +48,37 @@ cd web/out && python3 -m http.server 8000    # http://localhost:8000
 ([ADR-0010](adr/0010-repo-public-scope.md)). 빌드에는 필요 없으므로 호스트 설정은
 영향받지 않는다 — 다만 `data/`를 통째로 있다고 가정하지 말 것.
 
-### 호스팅 설정 (Cloudflare Pages / Vercel / Netlify 공통)
+### 호스팅 설정은 저장소 안에 있다
+
+**UI에서 설정하지 않는다.** 루트의 `vercel.json`이 전부 지정한다.
+
+```json
+{ "framework": null,
+  "installCommand": "cd web && npm ci",
+  "buildCommand":   "cd web && npm run build",
+  "outputDirectory": "web/out" }
+```
+
+UI 설정으로 두면 누가 언제 바꿨는지 알 수 없고, 프로젝트를 다시 만들 때마다 되풀이해야 한다.
+
+> ⚠️ **Root Directory를 `web`으로 잡으면 안 된다.** `web/lib/weeks.ts`가
+> `process.cwd()/../data/weeks`를 읽으므로 그 위 경로가 필요하다.
+> 저장소 루트에서 빌드하고 `cd web` 하는 것이 이 설정의 이유다.
+
+`.vercelignore`가 파이프라인 파일(`pipeline/`, `scrapers/`, `requirements.txt` …)을 제외한다.
+빌드에 필요 없기도 하지만, `requirements.txt`가 루트에 있으면 **Vercel이 이 저장소를
+파이썬 프로젝트로 감지해서** 화면에 그렇게 뜬다. 동작에는 지장이 없어도 다음 사람이 헷갈린다.
+
+⚠️ **`data/weeks/`는 제외하면 안 된다.** 빌드 때 읽는다.
+
+### 다른 호스트로 옮긴다면
 
 | 항목 | 값 |
 |---|---|
-| Root directory | **저장소 루트** (`web`이 아니다 — 아래 경고 참조) |
+| Root directory | 저장소 루트 |
 | Build command | `cd web && npm ci && npm run build` |
 | Output directory | `web/out` |
 | Node version | 20 이상 |
-
-> ⚠️ **`web/`을 Root directory로 잡으면 빈 사이트가 나온다.** `web/lib/weeks.ts`가
-> `process.cwd()/../data/weeks`를 읽는데, Root directory를 `web`으로 두면 호스트에 따라
-> 그 위 경로가 빌드 컨텍스트에서 잘린다. 저장소 루트에서 빌드하고 `cd web` 하는 쪽이 안전하다.
->
-> Vercel에서 Root Directory를 `web`으로 두고 싶다면
-> **"Include source files outside of the Root Directory"**를 켜야 한다.
 
 GitHub Pages를 쓴다면 Actions에서 `web/out`을 아티팩트로 올리면 된다. 다만 사용자 페이지가
 아닌 프로젝트 페이지(`/<repo>/` 하위 경로)에 올릴 경우 `basePath` 설정이 추가로 필요하다.
@@ -145,7 +172,7 @@ jobs:
 |---|---|---|
 | 1 | ✅ ~~User-Agent의 `example.invalid`~~ | 2026-08-24 해결. `https://this-week-taste.vercel.app/about`을 가리킨다 |
 | 2 | ✅ ~~`/about` 페이지가 없다~~ | 2026-08-24 해결. `web/app/about/page.tsx`. 수집 방식과 연락 창구(저장소 이슈)를 담았다 |
-| 3 | ⏸ **서비스명 미확정** | 표시명 '이번주맛'은 여전히 플레이스홀더다. 지금은 저장소 이름으로 배포하고, 이름이 정해지면 `web/config/site.ts`의 `name`·`url`과 `THIS_WEEK_TASTE_UA`를 함께 고친다 |
+| 3 | ⏸ **서비스명 미확정** (배포는 저장소 이름으로 했다) | 표시명 '이번주맛'은 여전히 플레이스홀더다. 지금은 저장소 이름으로 배포하고, 이름이 정해지면 `web/config/site.ts`의 `name`·`url`과 `THIS_WEEK_TASTE_UA`를 함께 고친다 |
 | 4 | ⚠️ **이미지 핫링크** | 7장에 따라 원본 CDN을 참조한다. 통째로 깨지는 것을 감지하려고 `make check-images`를 두었다(소스별 10건 표본, 통과율 50% 미만이면 실패로 종료). **배포 전에 돌린다.** |
 
 ⚠️ **오리온은 이미지 경로가 robots.txt 금지 구역이다.** `disallow: /upload/`인데
