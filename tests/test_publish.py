@@ -141,3 +141,23 @@ def test_이월본이_아니면_held_from을_싣지_않는다(snap_dir):
 def test_이월본이면_출처_주차를_싣는다(snap_dir):
     _snap("2026-W36", "homeplus", "2026-08-24T15:35:31+09:00", held_from="2026-W35")
     assert _report()["snapshot"]["held_from"] == "2026-W35"
+
+
+def test_범위_밖_항목은_이름까지_리포트에_남는다(snap_dir):
+    # 건수만 남기면 무엇이 사라졌는지 알 수 없다. 오판정은 여기서만 눈에 띈다.
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    dropped = [{"external_id": "a", "name": "데일리)아오리사과2입(팩)"},
+               {"external_id": "b", "name": "HB)카라카라오렌지6입"}]
+    result = {"added": [], "removed": [], "counts": {}, "previous_week": None,
+              "gap_weeks": 1}
+    report = publish._source_report("2026-W36", "cu", result, [], out_of_scope=dropped)
+    assert report["out_of_scope"]["count"] == 2
+    assert "HB)카라카라오렌지6입" in report["out_of_scope"]["names"]
+
+
+def test_범위_밖이_없으면_키를_싣지_않는다(snap_dir):
+    # 해당 없는 자리에 0을 실으면 "판정이 돌았는데 0건"과 "판정이 안 돌았다"를 못 가른다.
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    result = {"added": [], "removed": [], "counts": {}, "previous_week": None,
+              "gap_weeks": 1}
+    assert "out_of_scope" not in publish._source_report("2026-W36", "cu", result, [])

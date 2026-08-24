@@ -156,6 +156,17 @@ def run(source_id: str, week: str | None = None) -> Path | None:
         if i.get("external_id") and i.get("source_id") == source_id
     }
 
+    # 범위 밖 판정 (6장). **카테고리로 못 거르는 소스를 위한 마지막 그물이다** —
+    # CU는 상위 6개 카테고리뿐이라 그 안에 섞인 신선식품을 코드로 가를 수 없다.
+    # 판정이 없거나 LLM이 실패하면 False라 포함하는 쪽으로 넘어진다.
+    out_of_scope = [i for i in added
+                    if (curated.get(i["external_id"]) or {}).get("out_of_scope")]
+    if out_of_scope:
+        log.warning("범위 밖으로 %d건을 발행에서 뺀다: %s", len(out_of_scope),
+                    [i["name"] for i in out_of_scope][:10])
+    dropped = {i["external_id"] for i in out_of_scope}
+    added = [i for i in added if i["external_id"] not in dropped]
+
     items = [
         _publish_item(item, week=week, source_id=source_id, curated=curated,
                       previous=previous_by_external.get(item["external_id"]))
@@ -180,7 +191,8 @@ def run(source_id: str, week: str | None = None) -> Path | None:
         "generated_at": weeks.scraped_at(),
         "counts": _counts(items, discontinued),
         # 지표는 소스 단위로만 계산된다. merge()가 by_source로 모은다.
-        "report": _source_report(week, source_id, result, items),
+        "report": _source_report(week, source_id, result, items,
+                                 out_of_scope=out_of_scope),
         "items": items,
     }
     path = part_path(week, source_id)
@@ -286,7 +298,8 @@ def _provenance(current: dict | None, previous_week: str | None,
     return provenance
 
 
-def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -> dict:
+def _source_report(week: str, source_id: str, result: dict, items: list[dict],
+                   *, out_of_scope: list[dict] | None = None) -> dict:
     """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
 
     소스의 NEW 라벨은 판정에 쓰지 않지만(2.1) 검증 지표로는 쓴다. 라벨과의 교집합이
@@ -345,6 +358,13 @@ def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -
             "previous_max": previous_max_gd,
             "added_above_previous_max": above_previous_max,
             "added_below_previous_max": len(added) - above_previous_max,
+        }
+    # LLM이 항목을 **없앤** 기록. 건수만 두면 무엇이 사라졌는지 알 수 없어서
+    # 이름을 함께 남긴다 — 오판정은 여기서만 눈에 띈다 (6장).
+    if out_of_scope:
+        report["out_of_scope"] = {
+            "count": len(out_of_scope),
+            "names": sorted(i["name"] for i in out_of_scope),
         }
     report["published"] = {"total": len(items),
                            "with_blurb": sum(1 for i in items if i.get("blurb"))}

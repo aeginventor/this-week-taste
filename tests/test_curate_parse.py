@@ -148,3 +148,42 @@ def test_가망_없는_실패는_재시도하지_않는다(caplog):
 ])
 def test_코드펜스를_벗긴다(raw, expected):
     assert curate._strip_fence(raw) == expected
+
+
+# ── 범위 밖 판정 (6장) ─────────────────────────────────────────────────────
+#
+# 앞의 셋(분류·요약·병합)과 달리 이것은 항목을 **없앤다.** 틀리면 사이트에서 제품 하나가
+# 조용히 사라지고, 아무 예외도 나지 않는다. 그래서 기본값이 어느 쪽으로 넘어지는지가
+# 이 기능의 전부다 — **모르면 포함한다.**
+
+def _item(name="테스트과자", category_raw="과자류"):
+    return {"external_id": "x1", "name": name, "category_raw": category_raw}
+
+
+def test_판정이_없으면_범위_안이다():
+    assert curate._apply(_item(), None, None)["out_of_scope"] is False
+
+
+def test_LLM이_필드를_안_주면_범위_안이다():
+    # 구형 응답이나 스키마를 안 지킨 응답. 빠뜨리는 쪽으로 넘어지면 안 된다.
+    edit = {"name": "테스트과자", "category": "과자", "blurb": None}
+    assert curate._apply(_item(), edit, None)["out_of_scope"] is False
+
+
+def test_범위_밖으로_판정하면_표시가_실린다():
+    edit = {"name": "테스트과자", "category": "기타", "blurb": None, "out_of_scope": True}
+    assert curate._apply(_item(), edit, None)["out_of_scope"] is True
+
+
+def test_이름이_바뀐_항목은_판정도_버린다():
+    # name 검증에 걸리면 그 항목의 LLM 결과를 통째로 버린다(6장). 범위 밖 판정도
+    # 같이 버려야 한다 — 이름을 못 믿는 응답의 판정만 믿을 이유가 없다.
+    edit = {"name": "다른이름", "category": "기타", "blurb": None, "out_of_scope": True}
+    assert curate._apply(_item(), edit, None)["out_of_scope"] is False
+
+
+def test_판정한_이름이_로그에_남는다(caplog):
+    edit = {"name": "테스트과자", "category": "기타", "blurb": None, "out_of_scope": True}
+    with caplog.at_level("INFO"):
+        curate._apply(_item(), edit, None)
+    assert "테스트과자" in caplog.text

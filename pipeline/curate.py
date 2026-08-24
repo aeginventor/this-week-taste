@@ -58,6 +58,11 @@ MAX_ATTEMPTS = 2         # 최초 1회 + 재시도 1회 (6장)
 # 아니다(7장). 같은 채널의 소스는 같은 목록으로 분류돼야 사이트에서 필터가 성립한다.
 # CU와 GS25가 서로 다른 분류 체계를 갖는 순간 편의점 필터는 의미를 잃는다.
 #
+# 2026-08-24에 범위를 **식품류 공산품 + 프랜차이즈 카페 신제품**으로 좁히면서 목록도
+# 줄였다. `convenience`의 `생활용품`, `mart`의 과일·채소·쌀/잡곡·수산물·정육/계란이
+# 빠졌다 — 그 카테고리를 수집 자체에서 걷어냈으므로(`scrapers/`) 분류할 대상이 없다.
+# 목록에 남겨두면 모델이 범위 밖 항목을 그리로 분류해 조용히 통과시킨다.
+#
 # 아직 소스가 없는 채널(dessert, restaurant)은 넣지 않는다. 그 채널의 소스를 붙일 때
 # 실제 카탈로그를 보고 만든다. 지금 상상해서 쓰면 7장의 추상화 선행 구축이다.
 # 빠뜨린 채널은 `tests/test_curate_categories.py`가 소스 추가 시점에 잡는다.
@@ -65,12 +70,12 @@ CATEGORIES_BY_CHANNEL = {
     "convenience": (
         "도시락", "김밥/주먹밥", "샌드위치/버거", "샐러드", "면류", "즉석조리",
         "디저트/베이커리", "과자", "아이스크림", "음료", "커피/차", "유제품",
-        "주류", "안주", "가공식품/조미료", "생활용품", "기타",
+        "주류", "안주", "가공식품/조미료", "기타",
     ),
     "mart": (
-        "과일", "채소", "쌀/잡곡", "견과", "수산물", "정육/계란", "델리/즉석식품",
-        "유제품", "냉장/냉동식품", "반찬/김치", "커피/차", "음료", "과자",
-        "베이커리", "면류/통조림", "조미료/양념", "건강식품", "기타",
+        "견과", "델리/즉석식품", "유제품", "냉장/냉동식품", "반찬/김치",
+        "커피/차", "음료", "과자", "베이커리", "면류/통조림", "조미료/양념",
+        "건강식품", "기타",
     ),
     "cafe": (
         "커피", "논커피 음료", "차", "주스/스무디", "블렌디드", "베이커리",
@@ -94,12 +99,17 @@ CHANNEL_LABEL = {
 SYSTEM_PROMPT_TEMPLATE = """\
 너는 한국 {channel_label} 신상품 데이터를 정리하는 편집자다.
 
-각 항목에 대해 두 가지만 한다:
+각 항목에 대해 세 가지만 한다:
 1. category: 아래 목록에서 하나를 고른다.
    {categories}
 2. blurb: 주어진 description을 40자 이내 한 줄로 줄인다.
+3. out_of_scope: 식품·음료가 아니면 true, 맞으면 false.
+   범위 밖의 예: 생활용품·잡화, 신선 원물(과일·채소·정육·수산물), 완구·캐릭터 상품.
+   **애매하면 false로 둔다.**
 
 절대 규칙:
+- 항목마다 ref, name, category, blurb, out_of_scope **다섯 필드를 전부** 넣는다.
+  하나라도 빠지면 그 항목은 통째로 버려진다.
 - description이 비어 있으면 blurb는 반드시 null이다. 이름만 보고 짐작해서 쓰지 마라.
 - description에 없는 사실(맛 평가, 후기, 출시 배경, 재료 추측)을 절대 넣지 마라.
 - name은 입력 그대로 돌려준다. 잘려 있어도 복원하지 마라. 그것이 원본이다.
@@ -136,8 +146,9 @@ OUTPUT_SCHEMA = {
                     "name": {"type": "string"},
                     "category": {"type": "string"},
                     "blurb": {"type": ["string", "null"]},
+                    "out_of_scope": {"type": "boolean"},
                 },
-                "required": ["ref", "name", "category", "blurb"],
+                "required": ["ref", "name", "category", "blurb", "out_of_scope"],
                 "additionalProperties": False,
             },
         }
@@ -366,7 +377,10 @@ def _apply(item: dict, edit: dict | None, enriched_entry: dict | None) -> dict:
     """LLM 결과를 항목에 반영한다. 검증에 걸리면 원본을 유지한다."""
     tags = list((enriched_entry or {}).get("tags") or [])
     description = (enriched_entry or {}).get("description")
-    curated = {"category": item.get("category_raw"), "tags": tags, "blurb": None}
+    # out_of_scope의 기본값은 False다. **LLM이 실패하면 포함하는 쪽으로 넘어진다** —
+    # 빠뜨리는 것보다 한 건 더 실리는 쪽이 눈에 띄고 되돌리기 쉽다 (2.4와 같은 방향).
+    curated = {"category": item.get("category_raw"), "tags": tags, "blurb": None,
+               "out_of_scope": False}
 
     if not edit:
         return curated
@@ -379,6 +393,12 @@ def _apply(item: dict, edit: dict | None, enriched_entry: dict | None) -> dict:
 
     if edit.get("category"):
         curated["category"] = edit["category"]
+
+    # 항목을 **없애는** 판정이라 앞의 셋과 성격이 다르다(6장). 근거가 남도록
+    # 여기서 이름을 찍고, publish가 건수를 리포트에 싣는다.
+    if edit.get("out_of_scope"):
+        log.info("범위 밖으로 판정: %s (%s)", item["name"], item.get("category_raw"))
+        curated["out_of_scope"] = True
 
     blurb = edit.get("blurb")
     if blurb and not description:
