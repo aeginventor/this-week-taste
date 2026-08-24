@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test:*)",
+      "Bash(make help:*)",
+      "Bash(make snapshot:*)",
+      "Bash(make diff:*)",
+      "Bash(make enrich:*)",
+      "Bash(make publish:*)",
+      "Bash(make site:*)",
+      "Bash(.venv/bin/python -m pytest:*)",
+      "Bash(.venv/bin/python -m pipeline.diff:*)",
+      "Bash(.venv/bin/python -m pipeline.publish:*)",
+      "Bash(.venv/bin/python -c:*)",
+      "Bash(python3 -c:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git config --get:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(du:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(sed -n:*)",
+      "Bash(jq:*)",
+      "Bash(mkdir -p:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/test-on-edit.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
