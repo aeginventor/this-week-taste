@@ -23,6 +23,7 @@ export type Item = {
   blurb: string | null;
   image_url: string | null;
   source_url: string | null;
+  source_id: string;
   external_id: string;
   first_seen: string;
   last_seen: string;
@@ -32,6 +33,8 @@ export type Item = {
 export type Week = {
   week: string;
   generated_at: string;
+  /** 이 주차에 발행된 소스들. 한 파일이 소스 여럿을 담는다. */
+  sources: string[];
   counts: {
     total: number;
     active: number;

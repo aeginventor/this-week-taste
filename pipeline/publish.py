@@ -45,8 +45,18 @@ log = logging.getLogger(__name__)
 WEEKS_DIR = Path(__file__).resolve().parent.parent / "data" / "weeks"
 WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 
-REQUIRED_FIELDS = ("id", "week", "brand", "channel", "name", "source_url",
+# 소스별 부분 산출물. `run()`이 소스마다 여기에 쓰고 `merge()`가 하나로 합친다.
+# 한 파일에 소스마다 덮어쓰면 마지막 소스만 남는다 — 발행 단계에서 2.3의 격리가 깨진다.
+# 재생성되는 중간물이라 커밋하지 않는다.
+PUBLISHED_DIR = Path(__file__).resolve().parent.parent / "data" / "published"
+
+REQUIRED_FIELDS = ("id", "week", "source_id", "brand", "channel", "name", "source_url",
                    "first_seen", "last_seen", "status")
+
+
+def part_path(week: str, source_id: str) -> Path:
+    """소스별 부분 산출물. `merge()`의 입력이다."""
+    return PUBLISHED_DIR / week / f"{source_id}.json"
 
 
 def week_path(week: str) -> Path:
@@ -79,6 +89,10 @@ def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
         "blurb": edit.get("blurb"),
         "image_url": item.get("image_url"),
         "source_url": item.get("source_url"),
+        # 어느 소스에서 왔는가. 한 주차 파일에 소스가 여럿 들어가므로 필요하다 —
+        # external_id는 소스 안에서만 유일하고 소스끼리는 겹칠 수 있다
+        # (CU의 gd_idx와 오리온의 goodsno가 둘 다 숫자다).
+        "source_id": source_id,
         "external_id": item["external_id"],
         "alt_ids": item.get("alt_ids") or {},
         "first_seen": (previous or {}).get("first_seen") or week,
@@ -129,10 +143,17 @@ def run(source_id: str, week: str | None = None) -> Path | None:
     # 자체 분류 목록은 채널마다 다르다 (curate.CATEGORIES_BY_CHANNEL).
     curated = curate.curate(added, enriched, channel=sources.meta(source_id)["channel"])
 
-    previous_week = weeks.previous_week(week)
-    previous_publication = load_week(previous_week) or {"items": []}
+    # ⚠️ 지난주를 여기서 다시 계산하지 않는다. diff가 실제로 무엇과 비교했는지는
+    # diff만 안다 — 한 주 건너뛰었으면 previous_week가 2주 전일 수 있다.
+    # 따로 계산하면 diff는 W33과 비교했는데 publish는 W34를 찾는 어긋남이 생긴다.
+    previous_week = result["previous_week"]
+    previous_publication = (load_week(previous_week) if previous_week else None) or {"items": []}
+    # ⚠️ **반드시 소스로 좁힌다.** external_id는 소스 안에서만 유일하다.
+    # 좁히지 않으면 오리온 제품이 CU 제품의 id와 first_seen을 물려받는다 —
+    # 예외 없이 조용히 틀리고, 그러면 아카이브 URL이 깨진다(ADR-0001).
     previous_by_external = {
-        i["external_id"]: i for i in previous_publication["items"] if i.get("external_id")
+        i["external_id"]: i for i in previous_publication["items"]
+        if i.get("external_id") and i.get("source_id") == source_id
     }
 
     items = [
@@ -155,22 +176,82 @@ def run(source_id: str, week: str | None = None) -> Path | None:
 
     payload = {
         "week": week,
+        "source_id": source_id,
         "generated_at": weeks.scraped_at(),
-        "counts": {
-            "total": len(items),
-            "active": len(items) - discontinued,
-            "discontinued": discontinued,
-            "with_blurb": sum(1 for i in items if i.get("blurb")),
-        },
+        "counts": _counts(items, discontinued),
+        # 지표는 소스 단위로만 계산된다. merge()가 by_source로 모은다.
+        "report": _source_report(week, source_id, result, items),
+        "items": items,
+    }
+    path = part_path(week, source_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    log.info("발행(부분): %s — 신상 %d / 단종 %d / blurb %d",
+             path, payload["counts"]["active"], discontinued,
+             payload["counts"]["with_blurb"])
+    return path
+
+
+def _counts(items: list[dict], discontinued: int) -> dict:
+    return {
+        "total": len(items),
+        "active": len(items) - discontinued,
+        "discontinued": discontinued,
+        "with_blurb": sum(1 for i in items if i.get("blurb")),
+    }
+
+
+def merge(week: str) -> Path | None:
+    """소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다.
+
+    **한 소스가 실패해도 나머지로 합친다** (2.3). 여기서 멈추면 크롤러 하나가 깨졌을 때
+    그 주 전체가 발행되지 않는다.
+
+    id 중복 검사는 여기서 한 번 더 돈다. 소스별로는 유일해도 합치면 겹칠 수 있고,
+    겹치는 순간 아카이브 URL이 어느 제품을 가리키는지 알 수 없게 된다.
+    """
+    weeks.parse_week(week)
+    part_dir = PUBLISHED_DIR / week
+    parts = sorted(part_dir.glob("*.json")) if part_dir.exists() else []
+    if not parts:
+        log.warning("%s에 합칠 부분 산출물이 없다: %s", week, part_dir)
+        return None
+
+    items: list[dict] = []
+    by_source: dict[str, dict] = {}
+    discontinued = 0
+    for part in parts:
+        payload = json.loads(part.read_text(encoding="utf-8"))
+        items.extend(payload["items"])
+        discontinued += payload["counts"]["discontinued"]
+        by_source[payload["source_id"]] = payload["report"]
+
+    _validate(items, week)
+
+    merged = {
+        "week": week,
+        "generated_at": weeks.scraped_at(),
+        "sources": sorted(by_source),
+        "counts": _counts(items, discontinued),
         "items": items,
     }
     path = week_path(week)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    _write_report(week, source_id, result, items)
-    log.info("발행: %s — 신상 %d / 단종 %d / blurb %d",
-             path, payload["counts"]["active"], discontinued, payload["counts"]["with_blurb"])
+    report = {
+        "week": week,
+        "generated_at": merged["generated_at"],
+        "sources": merged["sources"],
+        "totals": merged["counts"],
+        "by_source": by_source,
+    }
+    (WEEKS_DIR / f"{week}.report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    log.info("병합: %s — 소스 %d개 / 신상 %d / 단종 %d",
+             path, len(by_source), merged["counts"]["active"], discontinued)
     return path
 
 
@@ -183,7 +264,7 @@ def _monotonic_key(source_id: str) -> str | None:
     return sources.monotonic_key(source_id)
 
 
-def _write_report(week: str, source_id: str, result: dict, items: list[dict]) -> None:
+def _source_report(week: str, source_id: str, result: dict, items: list[dict]) -> dict:
     """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
 
     소스의 NEW 라벨은 판정에 쓰지 않지만(2.1) 검증 지표로는 쓴다. 라벨과의 교집합이
@@ -201,7 +282,9 @@ def _write_report(week: str, source_id: str, result: dict, items: list[dict]) ->
     # 지표 3은 **단조 증가하는 정수 키를 주는 소스에만** 성립한다. CU의 gd_idx가 그렇다.
     # 그런 키가 없는 소스에서 이 지표를 그대로 계산하면 previous_max가 0이 되어
     # 전량이 "등록 순서를 거스름"으로 보고된다 — 없는 오탐을 만들어낸다.
-    previous = snapshot.load_snapshot(weeks.previous_week(week), source_id)
+    # 지난주는 diff 결과가 알려준다(run()과 같은 이유).
+    previous_week = result.get("previous_week")
+    previous = snapshot.load_snapshot(previous_week, source_id) if previous_week else None
     monotonic_key = _monotonic_key(source_id)
     if monotonic_key:
         previous_max_gd = max(
@@ -216,6 +299,9 @@ def _write_report(week: str, source_id: str, result: dict, items: list[dict]) ->
         "week": week,
         "source_id": source_id,
         "diff_counts": result["counts"],
+        # 몇 주치가 한 번에 잡혔는가. 1이 정상. 이걸 모르면 added 건수를 잘못 읽는다.
+        "gap_weeks": result.get("gap_weeks", 1),
+        "compared_with": result.get("previous_week"),
         # 지표 1: added 절대 건수. 수천이면 매칭이 깨진 것이다.
         "added": len(added),
         # 지표 2: 소스 NEW 라벨과의 교차 검증 (대조군)
@@ -237,20 +323,25 @@ def _write_report(week: str, source_id: str, result: dict, items: list[dict]) ->
         }
     report["published"] = {"total": len(items),
                            "with_blurb": sum(1 for i in items if i.get("blurb"))}
-
-    path = WEEKS_DIR / f"{week}.report.json"
-    path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("검증 지표: %s", path)
+    # 파일로 쓰지 않는다. merge()가 by_source로 모아서 한 번에 쓴다 —
+    # 소스마다 쓰면 <week>.report.json을 서로 덮어써 마지막 소스 것만 남는다.
+    return report
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="발행용 산출물 생성")
     parser.add_argument("--source", default="cu")
     parser.add_argument("--week", help="생략하면 이번 주")
+    parser.add_argument("--merge", action="store_true",
+                        help="소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다. "
+                             "소스별 실행이 전부 끝난 뒤 한 번 부른다")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    run(args.source, args.week)
+    if args.merge:
+        merge(args.week or weeks.current_week())
+    else:
+        run(args.source, args.week)
     return 0
 
 

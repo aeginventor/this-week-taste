@@ -3,7 +3,7 @@ SOURCE ?= cu
 WEEK ?=
 WEEK_ARG := $(if $(WEEK),--week $(WEEK),)
 
-.PHONY: help setup test snapshot diff enrich publish week week-all site clean-raw
+.PHONY: merge help setup test snapshot diff enrich publish week week-all site clean-raw
 
 # 등록된 소스 전부. 표는 pipeline/sources.py 한 곳에 있다.
 ALL_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.known()))")
@@ -36,6 +36,9 @@ diff:
 enrich:
 	$(PY) -m pipeline.enrich --source $(SOURCE) $(WEEK_ARG)
 
+merge:  ## 소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다
+	$(PY) -m pipeline.publish --merge $(WEEK_ARG)
+
 publish:
 	$(PY) -m pipeline.publish --source $(SOURCE) $(WEEK_ARG)
 
@@ -51,8 +54,10 @@ week-all:
 		echo "════════ $$s ════════"; \
 		$(MAKE) --no-print-directory week SOURCE=$$s WEEK=$(WEEK) || failed="$$failed $$s"; \
 	done; \
+	echo "════════ 병합 ════════"; \
+	$(MAKE) --no-print-directory merge WEEK=$(WEEK); \
 	if [ -n "$$failed" ]; then \
-		echo "‼️  실패한 소스:$$failed" >&2; exit 1; \
+		echo "‼️  실패한 소스:$$failed (나머지는 병합됨)" >&2; exit 1; \
 	fi; \
 	echo "✅ 전 소스 완료: $(ALL_SOURCES)"
 
