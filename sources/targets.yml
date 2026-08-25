@@ -80,7 +80,17 @@ convenience:
     name: 세븐일레븐
     company: 코리아세븐
     priority: P0
-    status: verified
+    # 2026-08-25 실측으로 보류. 개별 상품 URL을 얻을 수 있는 범위가 82건뿐이다.
+    #   Fresh Food 139건(mini 33 / noodle 59 / d_group 47) — 상세가 dosirakView.asp
+    #     POST 전용이라 클릭 가능한 URL이 없다. GET은 껍데기만 온다(38KB, 상품 없음).
+    #     Fresh Food 목록 페이지 자체를 못 찾았다(후보 3개 전부 404).
+    #     dosirakList.asp는 예약도시락이라 다른 페이지다.
+    #   7-Select PB 82건 — presentView.asp?pCd=<코드> 가 GET으로 열린다. URL 있음.
+    #     그러나 상세에도 설명문이 없고(txt가 제품명 반복), 이미지는 /upload/라
+    #     robots.txt 금지 경로다(오리온과 동일). 이름+가격만 남는 82건이 된다.
+    #   1+1(752)·2+1(1,067)·할인(540)은 월간 행사라 애초에 안 받는다 (ADR-0012).
+    # 붙이려면: PB 82건만 / 설명문·이미지 없음을 감수할지 먼저 정할 것.
+    status: blocked
     method: xhr
     url: https://www.7-eleven.co.kr/product/listMoreAjax.asp
     catalog: partial       # 목록의 91%가 월간 행사 상품
@@ -104,7 +114,15 @@ convenience:
     name: 이마트24
     company: 이마트24
     priority: P0
-    status: verified
+    # 2026-08-25 실측으로 보류. **개별 상품 URL이 없다.**
+    # 마크업을 직접 확인했다 — 상품 ID조차 없고 링크가 전부 href="#none"이다.
+    # 식별자는 이미지 파일명의 바코드(/500x500/8809844304952.JPG)가 유일하다.
+    # 7장의 "요약 + 원문 링크"를 못 지킨다. 목록 URL로 대체하면 방문자가
+    # 539건 27페이지에서 그 제품을 찾아야 한다.
+    # 대안: 이마트24 신상은 shinsegae_newsroom(P1, press)으로 얻을 수 있다.
+    # 부수 발견: <span class="floatL" style="opacity:0">NEW</span> — 숨겨진 NEW
+    # 라벨이 마크업에 있다. 붙이게 되면 채점표 후보다.
+    status: blocked
     method: static
     url: https://www.emart24.co.kr/goods/pl
     catalog: partial       # 행사 + PB + FF만. /goods/all은 404(존재하지 않음)
@@ -292,7 +310,14 @@ cafe:
   - id: mega
     name: 메가MGC커피
     priority: P0
-    status: verified
+    # 2026-08-25 실측으로 보류. 정찰이 적어둔 "고유 ID 없음"을 확인했고,
+    # 거기에 더해 **개별 상품 URL도 없다** — 항목이 <a class="inner_modal_open">라
+    # 모달로 뜬다. 목록 HTML에 상품 href가 0개이고, 식별자로 쓸 속성도 없다
+    # (data-page, board_page뿐). 이마트24를 보류한 것과 같은 이유다 (7장).
+    # 아쉬운 점: 목록이 **설명문을 준다**(스타벅스와 같은 케이스). 붙일 수 있으면
+    # blurb가 나오는 몇 안 되는 소스인데, 그것 때문에 7장을 굽히지는 않는다.
+    # 이미지는 별도 호스트(img.79plus.co.kr)라 오리온 같은 경로 문제는 없다.
+    status: blocked
     method: xhr
     url: https://mega-mgccoffee.com/menu/menu.php
     catalog: full
