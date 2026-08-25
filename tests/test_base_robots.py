@@ -120,16 +120,21 @@ def test_창_안이면_통과한다(session, monkeypatch):
     sess.assert_allowed("http://gs25.example/gscvs/ko/products/x")
 
 
+# ⚠️ 아래 셋은 `_robots_for`를 직접 부른다. `assert_allowed`로 부르면 **지금이 창
+# 안인지에 따라 결과가 달라져서**, 창 안에서만 통과하는 테스트가 된다. 실제로 그렇게
+# 썼다가 창이 닫히자마자 깨졌다(2026-08-25 KST 17:46).
+
+
 def test_crawl_delay가_요청_간격을_올린다(session):
     sess = session(GS25_ROBOTS)
-    sess.assert_allowed("http://gs25.example/gscvs/ko/products/x")
+    sess._robots_for("http://gs25.example/gscvs/ko/products/x")
     assert sess._intervals["http://gs25.example"] == 10.0
 
 
 def test_crawl_delay가_없으면_기본_간격_그대로(session):
     """지금 붙은 다른 소스들이 이 경우다. 수집 시간이 변하면 안 된다."""
     sess = session("User-agent: *\nDisallow: /admin\n")
-    sess.assert_allowed("https://other.example/list")
+    sess._robots_for("https://other.example/list")
     assert sess._intervals == {}
     assert sess._visit_windows == {"https://other.example": None}
 
@@ -137,5 +142,5 @@ def test_crawl_delay가_없으면_기본_간격_그대로(session):
 def test_짧은_crawl_delay가_우리_하한을_내리지_않는다(session):
     """5장의 1초는 상한이 아니라 하한이다."""
     sess = session("User-agent: *\nCrawl-delay: 0.1\n")
-    sess.assert_allowed("https://fast.example/list")
+    sess._robots_for("https://fast.example/list")
     assert sess._intervals == {}
