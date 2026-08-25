@@ -137,6 +137,14 @@ SOURCES: dict[str, dict] = {
         # code_01은 RPZ422SL 같은 문자열이라 순서가 아니다.
         "monotonic_key": None,
     },
+    "gs25": {
+        "brand": "GS25",
+        "channel": "convenience",
+        # 목록에도 상세에도 설명문이 없다 → blurb는 항상 null이다.
+        "detail": False,
+        # attFileId가 증가하는 값으로 보이지만 등록 순서인지 확인하지 않았다.
+        "monotonic_key": None,
+    },
     "parisbaguette": {
         "brand": "파리바게뜨",
         "channel": "dessert",

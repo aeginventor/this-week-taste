@@ -60,21 +60,31 @@ convenience:
     status: verified
     method: xhr
     url: http://gs25.gsretail.com/gscvs/ko/products/youus-freshfoodDetail-search
-    catalog: partial       # PB + 차별화 + 행사만. 일반 매입 상품은 목록이 없다
+    catalog: partial       # PB + 차별화만 받는다. 일반 매입 상품은 목록이 없다
     hint: >
+      ✅ 2026-08-25 붙였다 (`scrapers/gs25.py`). 아래는 그때 실측한 값이다.
+      **567건 / 4요청** (범위를 좁힌 뒤. 좁히기 전 795건).
       세션 + CSRF 토큰 필요. 첫 요청 403은 봇 차단이 아니라 CSRF 보호였다.
       1) GET /gscvs/ko/products/youus-freshfood → JSESSIONID + <input name="CSRFToken">
       2) POST <위 url>?CSRFToken=<토큰> (같은 쿠키 유지)
          pageNum=1&pageSize=500&searchSrvFoodCK=FreshFoodKey&searchSort=searchALLSort
       응답 JSON을 json.loads() **두 번** 해야 한다(문자열 안에 JSON).
-      pageSize 500까지 서버가 존중 → 전체 6요청이면 끝. 4사 중 가장 효율적.
-      목록: FreshFoodKey 203 / DifferentServiceKey 584 / 행사 1,723(별도 엔드포인트
-      /gscvs/ko/products/event-goods-search, parameterList=TOTAL).
-      필드: goodsNm(절삭 없음), price, attFileNm, code(=바코드), goodsStat(단종 판정에 유용).
-      ⚠️ 행사상품 응답에는 code가 없다 → 이미지 URL `GD_<바코드>_001.jpg`에서 추출.
-      ⚠️ 행사 1,723건은 diff 노이즈가 크다. PB+차별화 787건을 주 대상으로 두고 행사는 보조로.
+      pageSize 500까지 서버가 존중 → FreshFood 1요청 + 차별화 2요청.
+      ⚠️ 2026-08-25 실측 정정 — 정찰 기록과 다른 곳이 넷이다.
+      ① 건수: FreshFoodKey 204 / DifferentServiceKey 591 (정찰은 203 / 584).
+      ② **두 목록이 하나도 겹치지 않는다**(795건 전부 고유 code). 이마트24와 반대다.
+      ③ **차별화 목록에 식품이 아닌 것이 228건 섞여 있다** — DAILY_SUPPLIES 173(볼펜·우산·
+         멀티탭), BEAUTY 33(손톱깎이), HEALTH 22(치실·밴드). 스크래퍼가 뺀다 (ADR-0012).
+         남는 8개 분류 567건: 프레시푸드 204 간편식품 188 음료 65 과자 49 유제품 24
+         일반식품 22 냉장식품 8 냉동식품 7.
+      ④ **개별 상품 URL이 없다.** 목록 항목이 링크 없는 div라 source_url은 목록 페이지다
+         (ADR-0013). 설명문도 없어 blurb는 항상 null이다.
+      ⚠️ **행사상품(1,723건)은 받지 않는다.** 카탈로그가 아니라 프로모션이라 월 경계에서
+         통째로 바뀐다 (ADR-0012). 이마트24의 /goods/event를 뺀 것과 같은 판단이다.
+      ⚠️ isNew가 "T"/"F" **문자열**이다(567건 중 T 87). truthy로 읽으면 전건이 신상이 된다.
+      ⚠️ 이름 끝의 `1편`/`2편`은 편성 코드다. 사이트 자신이 지우고 그리므로 우리도 뗀다.
       ⚠️ robots.txt: Crawl-delay 10, Visit-time 0400-0845 UTC(=KST 13:00~17:45).
-         → GitHub Actions cron을 KST 13~17시 사이로 잡아야 한다.
+         **둘 다 base.Session이 강제한다** (ADR-0014). 수집 cron도 그 창 안으로 갈랐다.
 
   - id: seven_eleven
     name: 세븐일레븐
