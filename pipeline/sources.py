@@ -64,6 +64,24 @@ SOURCES: dict[str, dict] = {
         # 확인하지 않았다. 확인되지 않은 소스는 넣지 않는다.
         "monotonic_key": None,
     },
+    "baskinrobbins": {
+        "brand": "배스킨라빈스",
+        "channel": "dessert",
+        # 목록은 이름·이미지·태그까지 준다. 설명문만 상세에 있다.
+        # 태그와 설명문의 출처가 갈리는 첫 소스다 — enrich가 태그를 보존한다(4장).
+        "detail": True,
+        # seq는 두 네임스페이스로 갈리고 각각 1부터 시작한다. 단조 증가가 성립하지 않는다.
+        "monotonic_key": None,
+    },
+    "dunkin": {
+        "brand": "던킨",
+        "channel": "dessert",
+        # 목록은 이름·이미지까지만 준다. 설명문(EXPLAIN)과 태그(HASHTAG)는 둘 다 상세에 있다.
+        # 배스킨라빈스와 정반대 배치다 — 그쪽은 태그를 목록이 준다.
+        "detail": True,
+        # id가 products/productCats 두 네임스페이스로 갈린다. 단조 증가가 성립하지 않는다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",
