@@ -88,7 +88,8 @@ def run(source_id: str, week: str | None = None) -> Path:
     enriched: dict[str, dict] = {}
     from_list = [i for i in added if (i.get("description") or "").strip()]
     for item in from_list:
-        enriched[item["external_id"]] = {"description": item["description"], "tags": []}
+        enriched[item["external_id"]] = {"description": item["description"],
+                                         "tags": list(item.get("tags") or [])}
     if from_list:
         log.info("목록에 설명문이 있어 상세를 긁지 않는 항목: %d/%d건",
                  len(from_list), len(added))
@@ -144,12 +145,16 @@ def run(source_id: str, week: str | None = None) -> Path:
             failures += 1
             continue
 
+        # ⚠️ 태그는 상세에만 있는 것이 아니다. 배스킨라빈스는 **목록이** 태그를 주고
+        # 설명문만 상세에 있다. 상세 결과로 통째로 덮으면 스냅샷이 이미 가진 태그가
+        # 사라지는데, 그건 실패가 아니라 그 소스의 모양이다 (4장 `tags`).
+        tags = detail["tags"] or list(item.get("tags") or [])
         enriched[item["external_id"]] = {
             "description": detail["description"],
-            "tags": detail["tags"],
+            "tags": tags,
         }
         log.info("  [%d/%d] %s — 설명 %s / 태그 %d개", index, len(added), item["name"],
-                 "있음" if detail["description"] else "없음", len(detail["tags"]))
+                 "있음" if detail["description"] else "없음", len(tags))
 
     return _write(week, source_id, enriched, failures=failures, total=total)
 
