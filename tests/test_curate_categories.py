@@ -51,16 +51,24 @@ def test_프롬프트에_그_채널의_목록이_들어간다(channel):
         assert name in prompt
 
 
+# ⚠️ 실재하지 않는 채널 이름을 쓴다. 아직 소스가 없는 진짜 채널 이름(`dessert` 등)을
+# 쓰면 그 채널의 첫 소스를 붙이는 날 이 테스트가 같이 깨진다 — 2026-08-25에
+# 배스킨라빈스를 붙이면서 실제로 그랬다. 이 테스트가 지키려는 것은 "특정 채널이
+# 비어 있다"가 아니라 "모르는 채널이 와도 발행이 죽지 않는다"이다.
+UNKNOWN_CHANNEL = "존재하지않는채널"
+
+
 def test_모르는_채널은_UnknownChannel():
+    assert UNKNOWN_CHANNEL not in curate.CATEGORIES_BY_CHANNEL
     with pytest.raises(curate.UnknownChannel, match="분류 목록이 없다"):
-        curate.system_prompt("dessert")
+        curate.system_prompt(UNKNOWN_CHANNEL)
 
 
 def test_모르는_채널이어도_발행은_계속된다(caplog):
     """6장: 편집 품질보다 발행 자체가 우선이다. 여기서 예외가 나가면 그 주가 통째로 죽는다."""
     items = [{"external_id": "x1", "name": "무언가", "category_raw": "소스 원본 분류"}]
     with caplog.at_level("ERROR"):
-        result = curate.curate(items, {}, channel="dessert")
+        result = curate.curate(items, {}, channel=UNKNOWN_CHANNEL)
     assert result["x1"]["category"] == "소스 원본 분류"
     assert result["x1"]["blurb"] is None
     assert "분류 목록이 없다" in caplog.text
