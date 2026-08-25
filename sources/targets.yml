@@ -396,14 +396,23 @@ dessert:
     url: https://www.paris.co.kr/products/
     catalog: full
     hint: >
-      WordPress, 완전 서버 렌더링. /products/ 한 장에 56개가 이미 들어있고
-      ?cat1=<카테고리>로 8종(브레드/케이크/디저트-스낵/샌드위치-샐러드/커피-음료/
-      퍼스트클래스키친/선물) 순회 → 8요청 / 약 250건.
-      각 블록에 `<ul data-total-count="45">`로 전체 건수가 박혀 있다.
+      WordPress.
+      ⚠️⚠️ **2026-08-25 실측에서 이 항목의 수집 방법이 틀린 것으로 드러났다.**
+      `?cat1=<카테고리>`는 **카테고리당 12건 미리보기**이고 `/products/` 첫 화면은 8건씩이다.
+      거기 박힌 `data-total-count`(45·30·49…)도 하위 카테고리 기준이라 전체 건수가 아니다.
+      → **실제 경로는 admin-ajax다** (robots.txt가 `/wp-admin/admin-ajax.php`를 명시 허용):
+         GET /wp-admin/admin-ajax.php?action=pb_get_product_list
+             &cat1=<카테고리 슬러그>&per_page=100&paged=<N>
+         응답은 HTML 조각이고 `<ul data-total-count="170">`이 진짜 전체 건수다.
+         **519건 / 8요청** (per_page=100을 서버가 존중한다).
+      ⚠️ 카테고리 슬러그가 표시 이름과 다르다 — `간편식`의 슬러그는 `퍼스트클래스키친`.
+         슬러그는 /wp-json/wp/v2/product_category 에서 얻는다(REST도 열려 있다. ⚠️ 응답에 BOM).
+      ⚠️ 첫 <img>는 base64 플레이스홀더다. `img.product-tb`를 읽을 것.
       필드: h3.product-name, img.product-tb, 상세 URL 슬러그(=ID). 가격 없음.
-      ⚠️ 슬러그에 한글 퍼센트 인코딩이 섞여 있다
+      ⚠️ 슬러그에 한글 퍼센트 인코딩이 섞일 수 있다
          (/product/%ed%95%ab%eb%8f%84%ea%b7%b8%eb%8f%84%eb%84%9b/ = 핫도그도넛).
-         ID로 쓰기 전에 디코딩 후 정규화할 것.
+         → 2026-08-25 목록 519건에는 0건이었으나 REST에는 보인다. 디코딩을 걸어둔다.
+      ⚠️ **요청을 빠르게 던지면 503이 온다**(정찰 중 실제로 막혔다). 간격 1초 필수.
       ⚠️ diff 궁합 '보통' — 카탈로그가 크고 시즌 회전이 빨라 diff 건수가 과다해질 수 있다.
       공지: /notice/ (운영 공지 위주). robots.txt는 /wp-admin/만 금지.
 
