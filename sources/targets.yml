@@ -114,17 +114,12 @@ convenience:
     name: 이마트24
     company: 이마트24
     priority: P0
-    # 2026-08-25 실측으로 보류. **개별 상품 URL이 없다.**
-    # 마크업을 직접 확인했다 — 상품 ID조차 없고 링크가 전부 href="#none"이다.
-    # 식별자는 이미지 파일명의 바코드(/500x500/8809844304952.JPG)가 유일하다.
-    # 7장의 "요약 + 원문 링크"를 못 지킨다. 목록 URL로 대체하면 방문자가
-    # 539건 27페이지에서 그 제품을 찾아야 한다.
-    # 대안: 이마트24 신상은 shinsegae_newsroom(P1, press)으로 얻을 수 있다.
-    # 부수 발견: <span class="floatL" style="opacity:0">NEW</span> — 숨겨진 NEW
-    # 라벨이 마크업에 있다. 붙이게 되면 채점표 후보다.
-    status: blocked
+    # 2026-08-25 오전에 "개별 상품 URL이 없다"는 이유로 보류했다가 **같은 날 오후에
+    # 붙였다.** 그 규칙 자체가 7장을 잘못 옮긴 것이었다 — ADR-0013 참조.
+    # 상품 링크는 여전히 전부 href="#none"이고, source_url에는 목록 URL을 쓴다.
+    status: verified
     method: static
-    url: https://www.emart24.co.kr/goods/pl
+    url: https://emart24.co.kr/goods/pl
     catalog: partial       # 행사 + PB + FF만. /goods/all은 404(존재하지 않음)
     hint: >
       XHR이 아니라 서버 렌더링이다. GET /goods/pl?page=2 로 HTML에 상품 20개가 이미 들어있다.
@@ -133,9 +128,15 @@ convenience:
       ⚠️ 페이지당 20개 고정. pageLength=100을 넘겨도 서버가 무시한다.
       전체 수는 인라인 스크립트 `const totalCount = "538";`에서 읽는다.
       ID 필드가 없다 → 이미지 파일명의 바코드(`/500x500/5413216993472.JPG`) 사용, 실패 시 이름 해시.
-      ⚠️ 상품 상세 링크가 href="#none"이라 **개별 상품 URL이 없다.**
-         source_url을 목록 URL로 대체해야 하며, CLAUDE.md 7장의 "요약+원문 링크" 요건을
-         목록 URL로 충족시킬 수 있는지 판단이 필요하다.
+      ⚠️ 2026-08-25 실측 정정 — 정찰 기록과 다른 곳이 넷이다.
+      ① `www.emart24.co.kr`은 302로 `emart24.co.kr`에 넘긴다.
+      ② 건수: pl 545 · ff 182 · event 2,314. **pl과 ff가 157건 겹친다**(ff가 pl의 부분집합에 가깝다).
+         바코드 기준 고유는 566건이고, pl 안에서도 14건이 완전 중복이다.
+      ③ 우리는 event(행사)와 special(추석 특선)을 긁지 않는다 — 프로모션이라 diff 노이즈가 크다. 38요청/566건.
+      ④ robots.txt는 /founded/brief/req 와 /founded/recommend 둘만 막는다. /goods/는 허용.
+      부수 발견 확인: <span class="floatL" style="opacity: 0;">NEW</span> — NEW 텍스트는
+      전건에 있고 opacity로 숨긴다. 보이는 것만 8건(566건 중). 채점표 후보다.
+      ⚠️ 상품 상세 링크가 href="#none"이라 개별 상품 URL이 없다 → source_url은 목록 URL(ADR-0013).
       보도자료는 shinsegae_newsroom(family=3)에서 얻을 수 있다.
       robots.txt: 상품 경로 전면 허용.
 

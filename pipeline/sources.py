@@ -98,6 +98,14 @@ SOURCES: dict[str, dict] = {
         # id가 정수지만 등록 순서인지 확인하지 않았다.
         "monotonic_key": None,
     },
+    "emart24": {
+        "brand": "이마트24",
+        "channel": "convenience",
+        # 상세 페이지 자체가 없다(ADR-0013). 목록에도 설명문이 없어 blurb는 항상 null이다.
+        "detail": False,
+        # 바코드는 등록 순서가 아니다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",
