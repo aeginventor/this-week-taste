@@ -11,6 +11,11 @@ REFRESH_ARG := $(if $(REFRESH),--refresh,)
 # 등록된 소스 전부. 표는 pipeline/sources.py 한 곳에 있다.
 ALL_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.known()))")
 
+# 소스 부분집합. robots.txt가 수집 시각을 제한하는 소스가 있어서 필요하다 (ADR-0014).
+#   ONLY=gs25   그 소스만
+#   SKIP=gs25   그 소스만 빼고
+SELECTED = $(if $(ONLY),$(ONLY),$(filter-out $(SKIP),$(ALL_SOURCES)))
+
 help:
 	@echo "make setup      의존성 설치 (.venv)"
 	@echo "make test       테스트 (네트워크 없이 동작)"
@@ -24,6 +29,8 @@ help:
 	@echo "  SOURCE=cu     소스 지정 (기본 cu)"
 	@echo "  WEEK=2026-W33 주차 지정 (기본 이번 주)"
 	@echo "  REFRESH=1     이미 있는 스냅샷을 다시 뜬다 (기본은 재사용)"
+	@echo "  ONLY=gs25     그 소스만 (collect-all / week-all)"
+	@echo "  SKIP=gs25     그 소스만 빼고 (〃)"
 	@echo ""
 	@echo "  THIS_WEEK_TASTE_DATA_DIR  수집 데이터 위치 (기본 ./data)"
 	@echo "  THIS_WEEK_TASTE_LLM       api(기본) | cli | off"
@@ -54,14 +61,14 @@ collect:  ## 수집만: 스냅샷 → diff (소스 1개). 발행은 하지 않�
 
 collect-all:  ## 등록된 소스 전부 수집. 하나가 실패해도 나머지는 계속 간다 (2.3)
 	@failed=""; \
-	for s in $(ALL_SOURCES); do \
+	for s in $(SELECTED); do \
 		echo "════════ $$s ════════"; \
 		$(MAKE) --no-print-directory collect SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \
 	done; \
 	if [ -n "$$failed" ]; then \
 		echo "‼️  수집 실패:$$failed" >&2; exit 1; \
 	fi; \
-	echo "✅ 전 소스 수집 완료: $(ALL_SOURCES)"
+	echo "✅ 수집 완료: $(SELECTED)"
 
 check-images:  ## 발행물 이미지가 실제로 열리는지 표본 검사 (배포 전)
 	$(PY) -m pipeline.imagecheck $(WEEK_ARG)
@@ -80,7 +87,7 @@ week: snapshot diff enrich publish
 # 여기서 `&&`로 이으면 첫 실패에서 전부 멈춰 격리가 무의미해진다.
 week-all:
 	@failed=""; \
-	for s in $(ALL_SOURCES); do \
+	for s in $(SELECTED); do \
 		echo "════════ $$s ════════"; \
 		$(MAKE) --no-print-directory week SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \
 	done; \
@@ -89,7 +96,7 @@ week-all:
 	if [ -n "$$failed" ]; then \
 		echo "‼️  실패한 소스:$$failed (나머지는 병합됨)" >&2; exit 1; \
 	fi; \
-	echo "✅ 전 소스 완료: $(ALL_SOURCES)"
+	echo "✅ 완료: $(SELECTED)"
 
 site:
 	cd web && npm run build

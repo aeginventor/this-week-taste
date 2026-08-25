@@ -17,16 +17,18 @@ name: weekly
 
 on:
   schedule:
-    # UTC 01:00 = KST 10:00 월요일.
+    # UTC 01:00 = KST 10:00 월요일. 시각 제한이 없는 소스 전부.
     #
     # ⚠️ **요일 숫자는 UTC 기준이다.** KST 09:00보다 이르게 옮기면 UTC로는 일요일이 되므로
     #    요일도 1 → 0으로 바꿔야 한다. 안 바꾸면 조용히 KST 화요일에 돈다.
     #    (예: KST 월 06:30 = `30 21 * * 0`)
     # ⚠️ 주차는 KST로 계산한다(pipeline/weeks.py). 일요일 밤에 돌리면 스냅샷이 지난주
     #    주차로 저장되어 **이미 발행한 주차를 건드린다.** KST 월요일 00:00이 하한선이다.
-    # ⚠️ GS25를 붙이면 robots.txt의 Visit-time 때문에 KST 13:00~17:45여야 한다.
-    #    지금 시각도 그 창 밖이라, 그 소스는 시각을 옮기든 안 옮기든 워크플로를 갈라야 한다.
     - cron: "0 1 * * 1"
+    # UTC 05:00 = KST 14:00 월요일. **robots.txt가 수집 시각을 제한하는 소스** (ADR-0014).
+    # gs25가 `Visit-time: 0400-0845`(UTC)를 걸어두었고 위 시각은 그 창 밖이다.
+    # 창은 `base.Session`이 강제한다 — 여기서 시각을 틀리면 그 소스는 수집되지 않고 실패한다.
+    - cron: "0 5 * * 1"
   workflow_dispatch:
 
 # alert.py가 이상 상황에서 Issue를 만든다 (2.4). 그러려면 쓰기 권한이 필요하다.
@@ -69,13 +71,17 @@ jobs:
       # ⚠️ continue-on-error 를 붙이지 말 것.
       # 이상 상황에서 비영 종료하는 것이 의도된 동작이다 (2.4).
       # 소스 하나가 실패해도 나머지는 계속 간다 — 그건 collect-all 안에서 처리된다 (2.3).
+      #
+      # 어느 cron이 깨웠는지로 대상을 가른다. 손으로 돌리는 workflow_dispatch는
+      # 아무 때나 눌리므로 시각 창이 걸린 소스를 빼는 쪽으로 떨어뜨린다.
       - name: 수집
         env:
           THIS_WEEK_TASTE_DATA_DIR: ${{ github.workspace }}/_data
           THIS_WEEK_TASTE_UA: ${{ vars.THIS_WEEK_TASTE_UA }}
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: make collect-all PY=python
+          SELECTION: ${{ github.event.schedule == '0 5 * * 1' && 'ONLY=gs25' || 'SKIP=gs25' }}
+        run: make collect-all PY=python $SELECTION
 
       - name: 데이터 저장소에 커밋
         # 수집이 실패해도 성공한 소스의 결과는 남긴다 (2.3).
