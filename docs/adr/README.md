@@ -49,3 +49,4 @@
 | [0011](0011-snapshot-once-per-week.md) | 한 주차의 스냅샷은 한 번만 뜬다 | 채택 |
 | [0012](0012-collection-scope.md) | 수집 범위를 식품류 공산품과 카페 신메뉴로 좁힌다 | 채택 |
 | [0013](0013-source-url-optional.md) | 개별 상품 URL이 없는 소스도 붙인다 | 채택 |
+| [0014](0014-collection-time-window.md) | robots가 정한 수집 시각을 코드로 강제한다 | 채택 |

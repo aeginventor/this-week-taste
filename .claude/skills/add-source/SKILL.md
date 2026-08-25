@@ -26,11 +26,15 @@ CLAUDE.md 5장 체크리스트를 실행 순서로 펼친 것이다. **`sources/
 
 ## 1. robots.txt를 실측한다
 
-`Crawl-delay`와 `Visit-time`을 본다. 둘 다 있으면 cron에 영향을 준다.
+`Crawl-delay`와 `Visit-time`을 본다. **둘 다 `base.Session`이 강제하므로 스크래퍼가
+할 일은 없다**([ADR-0014](../../../docs/adr/0014-collection-time-window.md)).
+`Visit-time`이 있으면 대신 **수집 cron을 봐야 한다.**
 
-⚠️ **GS25는 `Crawl-delay: 10` + `Visit-time: 0400-0845 UTC`(KST 13:00~17:45)다.**
-현재 cron은 KST 월요일 10:00이라 **그 창 밖이다.** 이런 소스는 `make collect-all`에
-그냥 태울 수 없다 — 워크플로를 갈라야 한다. 붙이기 전에 사람에게 알린다.
+현재 cron은 둘이다 — 시각 제한이 없는 소스는 KST 월 10:00, 창이 걸린 소스는 KST 월 14:00.
+새 소스의 창이 둘 중 어느 쪽에도 안 맞으면 워크플로를 다시 갈라야 한다. 사람에게 알린다.
+
+⚠️ **창 밖에서는 그 소스를 로컬에서도 못 돌린다.** `VisitTimeClosed`로 거부된다.
+gs25가 그런 소스다(`Crawl-delay: 10`, `Visit-time: 0400-0845 UTC` = KST 13:00~17:45).
 
 ## 2. 이 소스의 카테고리 중 **무엇이 우리 범위인가**를 먼저 정한다
 

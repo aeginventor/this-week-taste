@@ -42,7 +42,7 @@
 | 브랜드 | 등급 | method | 엔드포인트 | 요청 | 항목 | robots.txt | 비고 |
 |---|---|---|---|---|---|---|---|
 | CU | **EASY** ⭐ | xhr | `POST /product/productAjax.do` (form) | ~131 | ~5,100 | 파일 없음(404) | **유일한 전 카테고리 카탈로그.** 응답은 HTML 조각. 제품명이 12자에서 잘림 |
-| GS25 | EASY | xhr | `POST /gscvs/ko/products/youus-freshfoodDetail-search?CSRFToken=` | ~6 | ~2,510 | 허용 · **crawl-delay 10 / visit-time 04:00-08:45 UTC** | 세션+CSRF 필요. JSON을 `loads()` 두 번. PB·차별화·행사만 |
+| GS25 | EASY | xhr | `POST /gscvs/ko/products/youus-freshfoodDetail-search?CSRFToken=` | ~6 | ~2,510 | 허용 · **crawl-delay 10 / visit-time 04:00-08:45 UTC** | 세션+CSRF 필요. JSON을 `loads()` 두 번. PB·차별화·행사만. → 2026-08-25에 붙였다. ⚠️ 실측 정정: 우리가 받는 것은 PB+차별화 4요청/567건(행사 제외, 생활용품·미용·위생 228건 제외). 시각 제약은 `base.Session`이 강제한다([ADR-0014](adr/0014-collection-time-window.md)) |
 | 세븐일레븐 | **MEDIUM** | xhr | `POST /product/listMoreAjax.asp` | ~35 | ~2,600 | 허용(`/front/`,`/upload/` 금지) | 1페이지만 13건 고정하는 변칙 페이지네이션. 목록 91%가 월간 행사 |
 | 이마트24 | EASY | static | `GET /goods/pl?page=N` (+`/event`,`/ff`) | ~155 | ~3,080 | 전면 허용 | 서버 렌더링. 20건/page 고정. **개별 상품 URL 없음**(`href="#none"`) → 2026-08-25에 붙였다([ADR-0013](adr/0013-source-url-optional.md)). ⚠️ 실측 정정: 도메인은 `www.` 없는 쪽, 우리가 긁는 것은 `pl`+`ff` 38요청/566건(행사 제외) |
 

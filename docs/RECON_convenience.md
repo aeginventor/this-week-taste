@@ -141,6 +141,34 @@ POST /gscvs/ko/products/event-goods-search?CSRFToken=<토큰>
   PB(203) + 차별화(584) 787개를 주 대상으로 삼고, 행사는 보조로 두는 편이 안전하다.
 - CSRF 토큰은 세션마다 다르다. 매 실행 시 페이지를 먼저 GET할 것.
 
+### ⚠️ 2026-08-25 실측 정정 (`scrapers/gs25.py`를 붙이면서)
+
+정찰 기록은 지도이지 측량값이 아니다. 붙일 때 실제로 잰 값은 아래와 같다.
+
+| 항목 | 정찰(2026-08-11) | 실측(2026-08-25) |
+|---|---|---|
+| FreshFoodKey | 203 | **204** |
+| DifferentServiceKey | 584 | **591** |
+| 우리가 저장하는 건수 | (787 예상) | **567** — 식품이 아닌 228건을 뺐다 |
+| 요청 수 | 6 | **4** (목록 페이지 1 + 검색 3) |
+
+- **차별화 목록에 식품이 아닌 것이 228건 섞여 있다.** `departCd`가 `DAILY_SUPPLIES`
+  173건(볼펜·물티슈·우산·멀티탭), `BEAUTY` 33건(손톱깎이·속눈썹), `HEALTH` 22건
+  (치실·밴드·드레싱). 수집 범위 밖이라 스크래퍼가 뺀다([ADR-0012](adr/0012-collection-scope.md)).
+  CU에서 생활용품 카테고리를, 홈플러스에서 신선 원물을 뺀 것과 같은 판단이다.
+- **두 목록이 하나도 겹치지 않는다**(795건 전부 고유 `code`). 이마트24의 `pl`⊃`ff`와 반대다.
+- **`departCd`가 분류를 준다.** 정찰 기록은 `classCd`·`subclassCd`만 적었는데, 사람이 읽을
+  수 있는 단위는 `departCd`(FRESH_FOOD, CONVENIENCE_FOOD, DRINK, CRACKER, DAIRY,
+  GENERAL_FOOD, CHILLED_FOOD, FROZEN + 위의 범위 밖 셋)다. 화면에는 노출되지 않는 영문 enum이다.
+- **`isNew`가 `"T"`/`"F"` 문자열이다**(567건 중 T 87). truthy로 읽으면 전건이 신상이 된다.
+- **`goodsStat`은 단종 판정에 쓸 수 없다.** 795건 전부 `M`(정상)이다. 목록에 있는 동안은
+  중단 상태가 실리지 않는 것으로 보인다.
+- **개별 상품 URL이 없다.** 목록 항목이 링크 없는 `div.prod_box`라
+  `source_url`은 목록 페이지를 가리킨다([ADR-0013](adr/0013-source-url-optional.md)).
+- **이름 끝의 `1편`/`2편`은 편성 코드다.** 목록 페이지 JS가 `data.goodsNm.replace('1편','')`로
+  지우고 그린다. 우리도 뗀다.
+- `Crawl-delay`·`Visit-time`은 이제 `base.Session`이 강제한다([ADR-0014](adr/0014-collection-time-window.md)).
+
 ---
 
 ## 3. 세븐일레븐 — MEDIUM
