@@ -106,6 +106,37 @@ SOURCES: dict[str, dict] = {
         # 바코드는 등록 순서가 아니다.
         "monotonic_key": None,
     },
+    "mcdonalds": {
+        "brand": "맥도날드",
+        "channel": "restaurant",
+        # 목록이 korContent로 설명문을 준다. 상세는 SPA라 긁을 수도 없다.
+        "detail": False,
+        # seq는 정수지만 등록 순서인지 확인하지 않았다.
+        "monotonic_key": None,
+    },
+    "momstouch": {
+        "brand": "맘스터치",
+        "channel": "restaurant",
+        # 목록이 설명문을 준다(66/66).
+        "detail": False,
+        "monotonic_key": None,
+    },
+    "bhc": {
+        "brand": "bhc치킨",
+        "channel": "restaurant",
+        # 목록이 description과 시리즈 태그(cateNm)를 함께 준다.
+        "detail": False,
+        # productCd는 자릿수가 제각각이라 증가 순서가 아니다.
+        "monotonic_key": None,
+    },
+    "dominos": {
+        "brand": "도미노피자",
+        "channel": "restaurant",
+        # 목록이 가격과 해시태그(=설명문)를 준다. 상세는 도우 선택 화면이라 설명이 없다.
+        "detail": False,
+        # code_01은 RPZ422SL 같은 문자열이라 순서가 아니다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<style>
+  /* 추가된 CSS 스타일 */
+  .submenu {
+    display: none;
+  }
+
+  /* 호버시 서브메뉴 표시 */
+  li:hover .submenu {
+    display: block;
+  }
+</style>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>맘스터치</title>
+
+		<meta name="description" content="대한민국 NO.1 버거&amp;치킨, 피자 브랜드 맘스터치입니다.">
+        <meta name="keywords" content="맘스터치, momstouch, 맘스터치 메뉴, 맘스터치 위치, 맘스터치 창업, 싸이버거, 화이트갈릭버거">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/common/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/common/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/common/favicon-16x16.png">
+
+<!-- sns 공유를 위한 정보기입 시작 -->
+	<meta property="og:type" content="website">
+    <meta property="og:title" content="맘스터치">
+    <meta property="og:description" content=" 대한민국 NO.1 버거&amp;치킨, 피자 브랜드 맘스터치입니다.">
+    <meta property="og:url" content="https://www.momstouch.co.kr">
+<!-- sns 공유를 위한 정보기입 종료 -->
+
+        <link rel="stylesheet" href="/assets/css/vendors.css">
+        <link rel="stylesheet" href="/assets/css/app.css">
+       
+        <script src="/assets/js/vendors.js"></script>
+        <script src="/assets/js/app.js?v=20231223"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+		<script src="/assets/js/common_js.js"></script>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-J8T3LE8JBC"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'G-J8T3LE8JBC');
+		</script>
+        </script>
+		<script type="text/javascript">
+		if(!wcs_add) var wcs_add = {};
+		wcs_add["wa"] = "10c8893a0f2ecc0";
+		if(window.wcs) {
+		  wcs_do();
+		}
+   
+  <!-- 가맹안내 메뉴 스크립트--> 
+     // JavaScript 코드
+  const menuItem = document.querySelector('li');
+  const submenu = document.querySelector('.submenu');
+
+  menuItem.addEventListener('mouseover', () => {
+    submenu.style.display = 'block';
+  });
+
+  menuItem.addEventListener('mouseout', () => {
+    submenu.style.display = 'none';
+  });
+  
+  
+		</script>
+
+    </head>
+
+
+    <body id="momstouch-menu-drink">
+        		<header class="site-header">
+            <div class="backdrop"></div>
+            <div class="inner">
+                <h1 class="logo"><a href="/home.php"><span class="visually-hidden">"MOM'S TOUCH"</span></a></h1>
+                
+                    <!--  <h1 class="logo"><a href="/home.php?skip=intro"><span class="visually-hidden">"MOM'S TOUCH"</span></a></h1> -->
+                <button class="toggle"><span></span><span></span></button>
+                <div class="gnb-menu">
+                    <nav>
+                        <div>
+                            <ul>
+                                <li><a href="/home.php">HOME</a></li>
+                                <li><a href="/menu/new.php?s_sect1=new">메뉴</a>
+                                    <div class="sub-menu">
+                                        <ul>
+										                                            <li><a href="/menu/new.php?s_sect1=new">New!</a></li>
+																															<li><a href="/menu/new.php?s_sect1=CG0045">또잇 치킨</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0005">버거</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0004">치킨</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0003">맘스세트</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0002">사이드</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0001">음료</a></li>
+																					<li><a href="/menu/new.php?s_sect1=CG0046">피자</a></li>
+										                                        </ul>
+                                    </div>
+                                </li>
+								<li><a href="/menu/ttoeat.php?s_sect1=CG0045">맘스터치 간편식</a></li>
+                                <li><a href="/promotion/list.php">프로모션</a></li>
+								<li><a href="/brand/notice-list.php">공지사항</a></li>
+                                <li><a href="/store/main.php">매장찾기</a></li>
+								<li><a href="/brand/info.php">회사소개</a></li>
+								<li><a href="/brand/brand_slogan.php">브랜드 소개</a></li>
+								<li><a href="https://start.momstouch.co.kr" target="_blank">창업문의</a></li>
+								<li><a href="/customer/faq.php">고객문의</a></li>
+
+								<li class="small" style="color: white; font-weight: bold;">&lt; FAMILY SITE &gt;</li>
+							    <!-- <li class="small"><a href="javascript:;">GLOBAL MOM’S TOUCH</a></li> -->
+								<li class="small hidden"><a href="/pizza_and_chicken/index.php">MOM`S PIZZA</a></li>
+								<!-- <li class="small hidden"><a href="https://smartstore.naver.com/momstouchmall" target="_blank">맘스터치몰</a></li> -->
+							</ul>
+                        </div>
+                    </nav>
+                    <div class="gnb-utils">
+                        <div class="sns">
+                            <ul>
+                                <li class="instagram"><a href="https://www.instagram.com/momstouch.love/" target="_blank">
+                                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <title>인스타그램</title>
+                                            <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                                        </svg></a></li>
+                                <li class="facebook"><a href="https://www.facebook.com/momstouchmain" target="_blank">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                            <title>페이스북</title>
+                                            <path d="m475.074219 0h-438.148438c-20.394531 0-36.925781 16.53125-36.925781 36.925781v438.148438c0 20.394531 16.53125 36.925781 36.925781 36.925781h236.574219v-198h-66.5v-77.5h66.5v-57.035156c0-66.140625 40.378906-102.140625 99.378906-102.140625 28.257813 0 52.542969 2.105469 59.621094 3.046875v69.128906h-40.683594c-32.101562 0-38.316406 15.253906-38.316406 37.640625v49.359375h76.75l-10 77.5h-66.75v198h121.574219c20.394531 0 36.925781-16.53125 36.925781-36.925781v-438.148438c0-20.394531-16.53125-36.925781-36.925781-36.925781zm0 0"></path>
+                                        </svg></a></li>
+                                <li class="youtube"><a href="https://www.youtube.com/channel/UCOwRjHPzIh3Xlayb85N1aCQ?sub_confirmation=1" target="_blank">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                            <title>유튜브</title>
+                                            <path d="M490.24,113.92c-13.888-24.704-28.96-29.248-59.648-30.976C399.936,80.864,322.848,80,256.064,80c-66.912,0-144.032,0.864-174.656,2.912c-30.624,1.76-45.728,6.272-59.744,31.008C7.36,138.592,0,181.088,0,255.904C0,255.968,0,256,0,256c0,0.064,0,0.096,0,0.096v0.064c0,74.496,7.36,117.312,21.664,141.728c14.016,24.704,29.088,29.184,59.712,31.264C112.032,430.944,189.152,432,256.064,432c66.784,0,143.872-1.056,174.56-2.816c30.688-2.08,45.76-6.56,59.648-31.264C504.704,373.504,512,330.688,512,256.192c0,0,0-0.096,0-0.16c0,0,0-0.064,0-0.096C512,181.088,504.704,138.592,490.24,113.92z M192,352V160l160,96L192,352z"></path>
+                                        </svg></a></li>
+                            </ul>
+                        </div>
+						                    </div>
+                </div>
+                <div class="utils">
+                    <ul>
+                        
+                          <li><a href="/franchise/contact.php"><span>가맹문의</span></a>
+                            <ul class="submenu">
+                              <li><a href="/franchise/contact.php"><span style="position: fixed;text-align: left;" >맘스터치</span></a></li>
+                              <li><a href="/pizza_and_chicken/index.php"><span style="position: fixed;text-align: right;width:100px;" >MOM`S PIZZA</span></a></li>
+                            </ul>
+                          </li>
+                          
+                       
+                        
+                        <li><a href="/customer/faq.php"><span>고객문의</span></a></li>
+                    </ul>
+                    <div class="sns">
+                        <ul>
+                            <li class="instagram"><a href="https://www.instagram.com/momstouch.love/" target="_blank">
+                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <title>인스타그램</title>
+                                        <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                                    </svg></a></li>
+                            <li class="facebook"><a href="https://www.facebook.com/momstouchmain" target="_blank">
+                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                        <title>페이스북</title>
+                                        <path d="m475.074219 0h-438.148438c-20.394531 0-36.925781 16.53125-36.925781 36.925781v438.148438c0 20.394531 16.53125 36.925781 36.925781 36.925781h236.574219v-198h-66.5v-77.5h66.5v-57.035156c0-66.140625 40.378906-102.140625 99.378906-102.140625 28.257813 0 52.542969 2.105469 59.621094 3.046875v69.128906h-40.683594c-32.101562 0-38.316406 15.253906-38.316406 37.640625v49.359375h76.75l-10 77.5h-66.75v198h121.574219c20.394531 0 36.925781-16.53125 36.925781-36.925781v-438.148438c0-20.394531-16.53125-36.925781-36.925781-36.925781zm0 0"></path>
+                                    </svg></a></li>
+                            <li class="youtube"><a href="https://www.youtube.com/channel/UCOwRjHPzIh3Xlayb85N1aCQ?sub_confirmation=1" target="_blank">
+                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                        <title>유튜브</title>
+                                        <path d="M490.24,113.92c-13.888-24.704-28.96-29.248-59.648-30.976C399.936,80.864,322.848,80,256.064,80c-66.912,0-144.032,0.864-174.656,2.912c-30.624,1.76-45.728,6.272-59.744,31.008C7.36,138.592,0,181.088,0,255.904C0,255.968,0,256,0,256c0,0.064,0,0.096,0,0.096v0.064c0,74.496,7.36,117.312,21.664,141.728c14.016,24.704,29.088,29.184,59.712,31.264C112.032,430.944,189.152,432,256.064,432c66.784,0,143.872-1.056,174.56-2.816c30.688-2.08,45.76-6.56,59.648-31.264C504.704,373.504,512,330.688,512,256.192c0,0,0-0.096,0-0.16c0,0,0-0.064,0-0.096C512,181.088,504.704,138.592,490.24,113.92z M192,352V160l160,96L192,352z"></path>
+                                    </svg></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page menu menu-drink">
+            <header class="page-header">
+							<h2><span>음료</span> 메뉴</h2>
+			                <p>신선하고 좋은 재료로 건강하고 푸짐하게!<br>맘스터치의 메뉴를 소개합니다.</p>
+                <div class="backdrop"><span></span></div>
+                <div class="particle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+			</header>
+            <nav class="nav-tabs">
+                <ul>
+							<li ><a href="new.php?s_sect1=new">NEW</a></li>
+							                    <li ><a href="new.php?s_sect1=CG0005">버거</a>
+											</li>
+				                    <li ><a href="new.php?s_sect1=CG0004">치킨</a>
+											</li>
+				                    <li ><a href="new.php?s_sect1=CG0003">맘스세트</a>
+											</li>
+				                    <li ><a href="new.php?s_sect1=CG0002">사이드</a>
+											</li>
+				                    <li class="current"><a href="new.php?s_sect1=CG0001">음료</a>
+											</li>
+				                    <li ><a href="new.php?s_sect1=CG0046">피자</a>
+											</li>
+				   
+			   </ul>
+            </nav>
+        
+            <div class="menu-list">
+                <ul>
+						      <li>
+						<a href="javascript:go_view('5');">							<figure><span style="background-image: url('/upload_file/product_info/1675070471-NVGQK.png')"></span></figure>
+                            <p class="sub-text">톡 쏘는 사이다</p>
+                            <h3><span>Cider</span>사이다</h3>
+															<p>톡 쏘는 사이다 한잔<br />
+맘스터치 메뉴와 함께 하세요</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('6');">							<figure><span style="background-image: url('/upload_file/product_info/1675070527-BOWKY.png')"></span></figure>
+                            <p class="sub-text">가슴까지 시원한 콜라</p>
+                            <h3><span>Cola</span>콜라</h3>
+															<p>가슴까지 시원한 콜라 한 잔!<br />
+맘스터치 메뉴와 함께 하세요</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('7');">							<figure><span style="background-image: url('/upload_file/product_info/1675070550-XLVIV.png')"></span></figure>
+                            <p class="sub-text">새콤달콤한 미린다</p>
+                            <h3><span>Mirinda</span>미린다</h3>
+															<p>새콤달콤한 미린다<br />
+맘스터치 메뉴와 함께하세요!</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('8');">							<figure><span style="background-image: url('/upload_file/product_info/1675070586-MJOIP.png')"></span></figure>
+                            <p class="sub-text">네온의 짜릿함 마운틴듀</p>
+                            <h3><span>Mountain Dew</span>마운틴듀</h3>
+															<p>네온의 짜릿함 마운틴듀<br />
+맘스터치 메뉴와 함께하세요!</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('9');">							<figure><span style="background-image: url('/upload_file/product_info/1675070611-KXYWP.png')"></span></figure>
+                            <p class="sub-text">새콤한 레몬과 톡 쏘는 소다</p>
+                            <h3><span>Lemon Ade</span>레몬에이드</h3>
+															<p>레몬 한잔으로 비타민 가득 상큼한 하루!</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('12');">							<figure><span style="background-image: url('/upload_file/product_info/1675070659-HWNSN.png')"></span></figure>
+                            <p class="sub-text">상큼한 알맹이가 쏙쏙</p>
+                            <h3><span>Green Grape Ade</span>청포도에이드</h3>
+															<p>청포도알맹이가 쏙쏙~ 상큼한 청포도에이드</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('19');">							<figure><span style="background-image: url('/upload_file/product_info/1675070685-LOZAD.png')"></span></figure>
+                            <p class="sub-text">스페셜로스팅 아메리카노</p>
+                            <h3><span>Americano</span>아메리카노(HOT)</h3>
+															<p>맘스터치만의 스페셜 로스팅 원두를 사용해 부드러운 맛과 커피 본연의 풍미를 살린 아메리카노</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('45');">							<figure><span style="background-image: url('/upload_file/product_info/1675070718-THOKQ.png')"></span></figure>
+                            <p class="sub-text">스페셜로스팅 아메리카노</p>
+                            <h3><span>Americano</span>아메리카노(ICE)</h3>
+															<p>맘스터치만의 스페셜 로스팅 원두를 사용해 부드러운 맛과 커피 본연의 풍미를 살린 아메리카노</p>
+							
+						</a>
+				   </li>
+              			      <li>
+						<a href="javascript:go_view('52');">							<figure><span style="background-image: url('/upload_file/product_info/1675070747-ETFZU.png')"></span></figure>
+                            <p class="sub-text">상큼한 오렌지 주스</p>
+                            <h3><span>Orange Juice</span>오렌지주스</h3>
+															<p>오렌지과즙이 풍부한 상큼한 오렌지 주스</p>
+							
+						</a>
+				   </li>
+                
+				</ul>
+            </div>
+            <div class="menu-pagination">
+                <ul class="pagination">
+                    <li><strong><span>1</span></strong></li>                </ul>
+            </div>
+        </section>
+
+<script type="text/javascript">
+<!--	 
+	function go_view(no){
+		location.href = "view.php?idx="+no+"&pageNo=1&field=&keyword=&v_sect=&s_gubun=&s_level=&s_gender=&s_sect1=CG0001&s_sect2=&s_order=";
+	}
+//-->
+</script>
+
+       	<iframe name="_fra" width="800" height="300" style="display:none;"></iframe>
+
+
+
+ 
+	<footer class="site-footer">
+            <div class="inner">
+                <h1 class="logo"><span>MOM'S TOUCH</span></h1>
+                <nav class="menu"></nav>
+            </div>
+            <div class="inner">
+                <nav class="etc">
+                    <ul>
+                        <li><a href="/etc/terms.php">이용약관</a></li>
+                        <li><a href="/etc/privacy.php">개인정보처리방침</a></li>
+                        <li><a href="/etc/email-reject.php">이메일 무단 수집거부</a></li>
+                        <li><a href="/etc/content.php">콘텐츠 사용 약정 신청</a></li>
+						<li><a href="/etc/card.php">선불전자지급수단 이용약관</a></li>
+						<li><a href="/etc/former.php">전자금융거래서비스</a></li>
+                    </ul>
+                </nav>
+                <dl class="customer">
+                    <div>
+                        <dt>고객 상담 전화</dt>
+                        <dd>1661-4205</dd>
+                    </div>
+					<!--
+                    <div>
+                        <dt>고객 상담 메일</dt>
+                        <dd><a href="mailto:moms@momstouch.co.kr">moms@momstouch.co.kr</a></dd>
+                    </div>
+					-->
+                    <div>
+                        <dt>상담 가능 시간</dt>
+                        <dd>평일 09:00 ~ 18:00 (점심시간 12:00 ~ 13:00)</dd>
+                    </div>
+                </dl>
+                <div class="info">
+                    <ul>
+                        <li>㈜맘스터치앤컴퍼니</li>
+                        <li>대표 : 김동전</li>
+                        <li> 서울특별시 중구 삼일대로6길 5, 5층,6층,7층,8층(충무로2가, 조양빌딩신관)</li>
+                        <li>사업자등록번호 676-86-00102</li>
+                    </ul>
+                    <ul>
+			<li>日本支社: 東京都渋谷区神南1-23-14号 (株式会社MOM‘S TOUCH TOKYO)
+		    </ul>
+			<ul>
+                        <li>통신판매업 신고번호 : 제2024-서울중구-0394호</li>
+                        <li>대표전화 1661-4205</li>
+                        <li>팩스 02-418-0279, 070-4676-0635</li>
+                    </ul>
+                </div>
+                <nav class="sns">
+                    <ul>
+                        <li class="instagram"><a href="https://www.instagram.com/momstouch.love/" target="_blank">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <title>인스타그램</title>
+                                    <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                                </svg></a></li>
+                        <li class="facebook"><a href="https://www.facebook.com/momstouchmain" target="_blank">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <title>페이스북</title>
+                                    <path d="m475.074219 0h-438.148438c-20.394531 0-36.925781 16.53125-36.925781 36.925781v438.148438c0 20.394531 16.53125 36.925781 36.925781 36.925781h236.574219v-198h-66.5v-77.5h66.5v-57.035156c0-66.140625 40.378906-102.140625 99.378906-102.140625 28.257813 0 52.542969 2.105469 59.621094 3.046875v69.128906h-40.683594c-32.101562 0-38.316406 15.253906-38.316406 37.640625v49.359375h76.75l-10 77.5h-66.75v198h121.574219c20.394531 0 36.925781-16.53125 36.925781-36.925781v-438.148438c0-20.394531-16.53125-36.925781-36.925781-36.925781zm0 0"></path>
+                                </svg></a></li>
+                        <li class="youtube"><a href="https://www.youtube.com/channel/UCOwRjHPzIh3Xlayb85N1aCQ?sub_confirmation=1" target="_blank">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <title>유튜브</title>
+                                    <path d="M490.24,113.92c-13.888-24.704-28.96-29.248-59.648-30.976C399.936,80.864,322.848,80,256.064,80c-66.912,0-144.032,0.864-174.656,2.912c-30.624,1.76-45.728,6.272-59.744,31.008C7.36,138.592,0,181.088,0,255.904C0,255.968,0,256,0,256c0,0.064,0,0.096,0,0.096v0.064c0,74.496,7.36,117.312,21.664,141.728c14.016,24.704,29.088,29.184,59.712,31.264C112.032,430.944,189.152,432,256.064,432c66.784,0,143.872-1.056,174.56-2.816c30.688-2.08,45.76-6.56,59.648-31.264C504.704,373.504,512,330.688,512,256.192c0,0,0-0.096,0-0.16c0,0,0-0.064,0-0.096C512,181.088,504.704,138.592,490.24,113.92z M192,352V160l160,96L192,352z"></path>
+                                </svg></a></li>
+                    </ul>
+                </nav>
+                <p class="copyright">COPYRIGHT &copy; MOMS TOUCH. ALL RIGHTS RESERVED.</p>
+            </div>
+        </footer>
+    </body>
+</html>
