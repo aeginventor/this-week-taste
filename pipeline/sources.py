@@ -137,6 +137,14 @@ SOURCES: dict[str, dict] = {
         # code_01은 RPZ422SL 같은 문자열이라 순서가 아니다.
         "monotonic_key": None,
     },
+    "parisbaguette": {
+        "brand": "파리바게뜨",
+        "channel": "dessert",
+        # 목록(admin-ajax 조각)은 이름·이미지까지만 준다. 설명문은 상세의 product-excerpt.
+        "detail": True,
+        # 슬러그가 키라 증가 순서가 아니다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",
