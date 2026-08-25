@@ -53,6 +53,17 @@ SOURCES: dict[str, dict] = {
         # product_cd는 13자리 상품코드라 증가 순서가 아니다.
         "monotonic_key": None,
     },
+    "compose": {
+        "brand": "컴포즈커피",
+        "channel": "cafe",
+        # 목록에도 상세에도 설명문이 없다(상세는 영양·알레르기 정보뿐).
+        # 홈플러스와 같은 이유로 건너뛴다 — 스타벅스가 "목록이 이미 줘서"
+        # 건너뛰는 것과 이유가 정반대다. blurb는 항상 null이다.
+        "detail": False,
+        # item_srl은 Rhymix의 문서 번호라 증가하지만, 메뉴 등록 순서인지
+        # 확인하지 않았다. 확인되지 않은 소스는 넣지 않는다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",
