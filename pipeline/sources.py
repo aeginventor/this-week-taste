@@ -82,6 +82,22 @@ SOURCES: dict[str, dict] = {
         # id가 products/productCats 두 네임스페이스로 갈린다. 단조 증가가 성립하지 않는다.
         "monotonic_key": None,
     },
+    "kyochon": {
+        "brand": "교촌치킨",
+        "channel": "restaurant",
+        # 목록이 101/101 전부에 설명문을 준다. 스타벅스와 같은 이유로 상세를 긁지 않는다.
+        "detail": False,
+        # view.asp?id=41363 은 정수지만 등록 순서인지 확인하지 않았다.
+        "monotonic_key": None,
+    },
+    "bbq": {
+        "brand": "BBQ",
+        "channel": "restaurant",
+        # 목록이 가격·설명문·영양까지 준다. 상세는 클라이언트 렌더링이라 긁을 수도 없다.
+        "detail": False,
+        # id가 정수지만 등록 순서인지 확인하지 않았다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",
