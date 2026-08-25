@@ -1,48 +1,19 @@
 /**
  * data/weeks/<week>.json 을 읽는다. 빌드 타임에만 호출된다 (정적 생성).
  *
- * 발행 항목 스키마는 CLAUDE.md 4장이 단일 진실 공급원이다.
- * 여기 타입이 그것과 어긋나면 CLAUDE.md 쪽이 맞다.
+ * ⚠️ **서버 전용이다.** `node:fs`를 쓰므로 클라이언트 컴포넌트에서 import하면
+ * 빌드가 깨진다. 타입과 포맷터는 `lib/item.ts`에 있다 — 그쪽을 쓸 것.
  */
 import fs from "node:fs";
 import path from "node:path";
 
-export const WEEK_PATTERN = /^\d{4}-W\d{2}$/;
+import { WEEK_PATTERN, type Week } from "@/lib/item";
+
+// 타입과 포맷터는 여기서도 그대로 쓸 수 있게 다시 내보낸다.
+export { WEEK_PATTERN, formatWeek, formatPrice } from "@/lib/item";
+export type { Item, Week } from "@/lib/item";
 
 const WEEKS_DIR = path.join(process.cwd(), "..", "data", "weeks");
-
-export type Item = {
-  id: string;
-  week: string;
-  brand: string;
-  channel: string;
-  name: string;
-  price: number | null;
-  category: string | null;
-  tags: string[];
-  blurb: string | null;
-  image_url: string | null;
-  source_url: string | null;
-  source_id: string;
-  external_id: string;
-  first_seen: string;
-  last_seen: string;
-  status: "active" | "discontinued";
-};
-
-export type Week = {
-  week: string;
-  generated_at: string;
-  /** 이 주차에 발행된 소스들. 한 파일이 소스 여럿을 담는다. */
-  sources: string[];
-  counts: {
-    total: number;
-    active: number;
-    discontinued: number;
-    with_blurb: number;
-  };
-  items: Item[];
-};
 
 /** 발행된 주차 목록, 최신순. `.report.json` 같은 부산물은 제외한다. */
 export function listWeeks(): string[] {
@@ -65,14 +36,4 @@ export function readWeek(week: string): Week | null {
 
 export function latestWeek(): string | null {
   return listWeeks()[0] ?? null;
-}
-
-/** `2026-W33` → `2026년 33주차` */
-export function formatWeek(week: string): string {
-  const [year, w] = week.split("-W");
-  return `${year}년 ${Number(w)}주차`;
-}
-
-export function formatPrice(price: number | null): string | null {
-  return price === null ? null : `${price.toLocaleString("ko-KR")}원`;
 }

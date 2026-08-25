@@ -135,3 +135,68 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
 
 .footer a { color: var(--muted); }
 .footer a:hover { color: var(--accent); }
+
+/* ── 필터와 검색 (8장 6단계) ─────────────────────────────────── */
+.filters {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.filter-title {
+  flex: 0 0 3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; }
+
+/* 아카이브 칩과 같은 모양을 쓴다. 새 색을 도입하지 않는다. */
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--muted);
+  background: var(--card);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.chip:hover { border-color: var(--accent); }
+.chip.on { border-color: var(--accent); color: var(--accent); }
+.chip-count { font-size: 0.72rem; opacity: 0.65; }
+
+.search {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 22rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--fg);
+  background: var(--card);
+}
+.search::placeholder { color: var(--muted); }
+.search:focus { outline: none; border-color: var(--accent); }
+
+.reset {
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
