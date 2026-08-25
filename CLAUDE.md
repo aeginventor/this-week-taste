@@ -397,8 +397,9 @@ pipeline/sources.py            표에 한 줄: brand·channel·detail·monotonic
 
 ### 현재 위치: 4단계 확장 (2026-08-25 기준)
 
-**소스 10개**로 전 구간이 연결되어 실제 데이터로 돌아간다. W35 스냅샷 8,232건.
+**소스 14개**로 전 구간이 연결되어 실제 데이터로 돌아간다. W35 스냅샷 8,561건.
 2026-08-25에 dessert·restaurant 채널이 열려 **6채널 전부**에 소스가 있다.
+restaurant는 그날 오후에 6곳이 되어 채널 중 소스가 가장 많다.
 
 ```
 make setup     # .venv + npm install (최초 1회)
@@ -436,6 +437,10 @@ make check-images  # 발행물 이미지가 실제로 열리는지 표본 검사
 | kyochon | restaurant | — | 101 | 4 | **목록** | 〃 가장 싸다. 가격 92/101 |
 | bbq | restaurant | — | 105 | 6 | **목록** | 〃 **가격 105/105.** 상세는 클라이언트 렌더링 |
 | emart24 | convenience | — | 566 | 38 | **없음** | 〃 **개별 상품 URL이 없다**([ADR-0013](docs/adr/0013-source-url-optional.md)). 가격 있음 |
+| mcdonalds | restaurant | — | 100 | 7 | **목록** | 〃 가격 없음. 이름에 HTML 태그가 온다 |
+| momstouch | restaurant | — | 66 | 6 | **목록** | 〃 가격 없음. 이미지가 인라인 CSS |
+| bhc | restaurant | — | 113 | 5 | **목록** | 〃 가격 없음. **소스가 태그를 준다**(cateNm) |
+| dominos | restaurant | — | 50 | 3 | **목록** | 〃 **EUC-KR.** 가격 M 최저가. source_url이 1층·2층 혼합 |
 
 건수는 **범위를 좁힌 뒤의 값이다**([ADR-0012](docs/adr/0012-collection-scope.md), 2026-08-24).
 CU는 생활용품 카테고리를, 홈플러스는 신선 원물 5개 분류를 뺐다. 좁히기 전은
@@ -472,6 +477,10 @@ cu 5,082/4,754(131요청), homeplus 2,966/2,861(130요청)이었다. W33·W35 �
 | kyochon | ❌ 항목 마크업에 신상 라벨이 없다 |
 | bbq | △ **이름에 `[NEW]` 접두사가 붙는다**(105건 중 8건). 〃 |
 | emart24 | △ NEW 라벨이 `opacity: 0`으로 숨겨져 온다. 보이는 것만 8건(566건 중). 〃 |
+| mcdonalds | ❌ `newIcon` 필드는 있으나 2026-08-25 실측에서 110건 전부 비어 있었다 |
+| momstouch | △ 항목에 `i.new` 배지가 있다(66건 중 6건). 〃 |
+| bhc | △ `isNew`가 있다(113건 중 19건). ⚠️ **`"Y"`/`"N"` 문자열이라 truthy로 읽으면 전건이 신상이 된다** |
+| dominos | △ `div.label-box`에 NEW·기간한정·특가·시그니처 배지가 있다(50건 중 NEW 6건). 〃 |
 
 **라벨이 있다고 채점표가 되는 것이 아니다.** 쓰기 전에 "지난주에도 붙어 있었나"를
 먼저 확인한다. 오래 남는 라벨은 캠페인 표시이지 신상 표시가 아니다.
