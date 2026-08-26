@@ -153,6 +153,15 @@ SOURCES: dict[str, dict] = {
         # 슬러그가 키라 증가 순서가 아니다.
         "monotonic_key": None,
     },
+    "burgerking": {
+        "brand": "버거킹",
+        "channel": "restaurant",
+        # 목록은 이름·이미지까지만 준다. 설명문(menuDesc)과 태그(menuKeywordList)가
+        # 둘 다 상세에 있다 — 던킨과 같은 배치다.
+        "detail": True,
+        # menuCd 7자리는 앞자리가 종류를 뜻한다(1 버거, 3 음료, 7 세트). 등록 순서가 아니다.
+        "monotonic_key": None,
+    },
     "homeplus": {
         "brand": "홈플러스",
         "channel": "mart",

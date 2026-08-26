@@ -521,16 +521,28 @@ restaurant:
     name: 버거킹
     sub: burger
     priority: P0
-    status: unverified      # 접근 경로는 찾았으나 요청 봉투 미확정
-    method: playwright
+    status: verified
+    # 2026-08-26에 붙였다. 실측 정정은 scrapers/burgerking.py docstring 참조.
+    method: xhr
     url: https://www.burgerking.co.kr/burgerking/BKR0632.json
+    catalog: full
     hint: >
-      Vue SPA + bizMOB 프레임워크. /menu/main 진입 시 BKR0632.json / BKR0633.json에 POST한다.
-      빈 body({})로 POST하면 HTTP 400. bizMOB 고유의 요청 봉투(header/body 래핑)를
-      이번 조사에서 확정하지 못했다(DevTools 네트워크 로그가 요청 본문까지는 안 보여줌).
-      ★ 브라우저에서 /menu/main을 열고 BKR0632.json 요청의 **Payload 탭을 1회 캡처**하면
-        EASY로 내려온다. 봉투만 알면 그 뒤는 순수 JSON POST다. 그때까지 playwright로 둔다.
-      robots.txt는 `Allow: /`.
+      Vue SPA + bizMOB 프레임워크. **전체 카탈로그가 요청 1건이다**(192건).
+      POST /burgerking/BKR0632.json — 폼 필드 `message` 하나에 전문 봉투 JSON을 넣는다.
+      봉투: {header:{result:true, error_code:"", error_text:"", info_text:"",
+      message_version:"", login_session_id:"", trcode:"BKR0632", cd_call_chnn:"01"},
+      body:{menuKeywordList:[]}}. 빈 body({})로 POST하면 HTTP 400인 이유가 이것이다.
+      봉투는 브라우저 캡처 없이 알아냈다 — /bizMOB/bizMOB-webExtend.js의
+      bizMOBWeb.Network.requestTr가 그대로 적어두고 있다.
+      응답 {header, body:{allMenuList:[{menuCategoryCd, menuCategoryNm, menuInfo:[...]}]}}.
+      목록 필드: menuCd(=ID, 7자리), menuNm, menuImgPath, menuFlagList(NEW·BEST), spicyYn.
+      ⚠️ 목록에 **가격이 없다.** 상세(BKR0634 {menuCd})의 dineInprc에 있지만
+         사이트가 그 값을 화면에 보여주지 않아 싣지 않는다(2026-08-26 결정).
+      상세가 설명문(menuDesc)과 태그(menuKeywordList)를 준다 → enrich 대상.
+      ⚠️ 추천메뉴(K200001)는 분류가 아니라 판촉 탭이다(26건 전부 다른 분류에도 있다).
+      ⚠️ 한 항목이 여러 분류에 실린다(239행 → 192건). 같은 이름에 코드가 둘인 쌍도 16개.
+      BKR0633은 키워드 필터 목록이라 수집에 쓰지 않는다.
+      robots.txt는 `Allow: /`. 이미지 호스트 mob-prd.burgerking.co.kr은 robots가 404다.
 
   - id: lotteria
     name: 롯데리아
