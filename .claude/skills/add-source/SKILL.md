@@ -5,8 +5,9 @@ description: 새 수집 소스(마트/편의점/카페/디저트/프랜차이즈
 
 # 소스 하나를 붙인다
 
-CLAUDE.md 5장 체크리스트를 실행 순서로 펼친 것이다. **`sources/targets.yml`에
-`status: verified`로 대기 중인 소스가 P0만 14개**이므로 이 순서는 최소 14번 반복된다.
+CLAUDE.md 5장 체크리스트를 실행 순서로 펼친 것이다. 2026-08-26 기준으로
+**`status: verified`인 P0는 전부 붙었고**, 남은 것은 P1 verified 9곳(대부분 보도자료
+소스라 파이프라인 구조가 다르다)과 정찰이 덜 끝난 것들이다.
 
 원칙은 CLAUDE.md가 갖는다. 여기 적는 것은 **매번 같은 자리에서 걸리는 것들**이다.
 
@@ -23,6 +24,12 @@ CLAUDE.md 5장 체크리스트를 실행 순서로 펼친 것이다. **`sources/
 
 `sources/targets.yml`의 해당 항목을 먼저 읽는다. 정찰(1단계) 결과가 이미 거기 있고,
 `docs/RECON_*.md`에 더 자세한 실측이 있다. **정찰이 끝난 소스는 다시 정찰하지 않는다.**
+
+⚠️ **정찰이 "브라우저로 캡처해야 한다"고 적어둔 소스는 그 말을 검증부터 한다.**
+버거킹이 그래서 1년 가까이 밀려 있었다 — 요청 봉투를 모른다(빈 body → HTTP 400)는
+기록이었는데, **봉투를 만드는 코드가 사이트에 실려 있었다**(`/bizMOB/bizMOB-webExtend.js`).
+SPA의 요청 형식은 어차피 브라우저가 JS로 만든다. 그 JS는 우리도 받을 수 있다.
+순서는 `앱 번들(app.js·청크) → 프레임워크 JS → 그래도 모르면 브라우저 캡처`다.
 
 ## 1. robots.txt를 실측한다
 
@@ -138,8 +145,11 @@ pipeline/sources.py       표에 한 줄: brand·channel·detail·monotonic_key
 - `scrapers/homeplus.py` — xhr, 카테고리 108개, 가격 있음, 상세에도 설명문 없음
 - `scrapers/starbucks.py` — xhr, 목록이 설명문을 준다, 가격 없음
 - `scrapers/orion.py` — **static HTML 파싱**, 동명이인 있음, 이미지 미출력
-- `scrapers/compose.py` — static, 카테고리별 페이지네이션, 가격·설명문 둘 다 없음.
-  **가장 최근에 이 체크리스트를 그대로 밟아 만든 것**이라 형식을 베끼기 좋다
+- `scrapers/compose.py` — static, 카테고리별 페이지네이션, 가격·설명문 둘 다 없음
+- `scrapers/gs25.py` — **POST**, 세션 토큰, 소스가 밝힌 총건수와 대조, 범위 밖 분류 제외
+- `scrapers/burgerking.py` — POST + 고정 요청 봉투, **전체 카탈로그가 요청 1건**,
+  한 항목이 여러 분류에 실려 접어야 하는 소스. **가장 최근에 이 체크리스트를 그대로
+  밟아 만든 것**이라 형식을 베끼기 좋다
 
 각 스크래퍼는 `fetch(*, week) -> list[dict]` 하나를 노출하고,
 `python -m scrapers.<id>`로 단독 실행하면 결과를 stdout에 찍는다.

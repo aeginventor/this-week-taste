@@ -90,7 +90,7 @@
 | bhc | EASY | xhr | `GET /api/v1/web/categories/{1,23,47,50,74}/products` | 5 | ~120 | `Allow: /` (⚠️ 아래) | robots에 `ClaudeBot/GPTBot → Disallow: /`. **UA에 Claude 문자열 금지** |
 | 도미노피자 | EASY | static | `GET web.dominos.co.kr/goods/list?dsp_ctgr=C0101` | ~6 | ~80 | `Allow: /goods/` 명시 | **EUC-KR.** 가격이 `L 28,900원~` 범위 표기 |
 | 맘스터치 | EASY | static | `GET /menu/new.php?s_sect1=CG000N` | 8 | ~100 | 없음 | XHR 0건. 이미지가 인라인 CSS `background-image` |
-| 버거킹 | **MEDIUM** | playwright | `POST /burgerking/BKR0632.json` | ? | ? | `Allow: /` | bizMOB 요청 봉투 미확정(빈 body → 400). **Payload 1회 캡처하면 EASY로 내려옴** |
+| 버거킹 | **EASY**(2026-08-26 정정) | xhr | `POST /burgerking/BKR0632.json` (폼 필드 `message`에 전문 봉투) | **1** | 192 | `Allow: /` | 봉투는 캡처가 아니라 사이트 JS(`bizMOB-webExtend.js`)에 있었다. **전체 카탈로그가 요청 1건** |
 | 피자헛 | **MEDIUM** | playwright | 미발견 | ? | ? | 없음(404) | Angular SPA. 매장 선택 전에는 메뉴 XHR이 발생하지 않음 |
 | 롯데리아 | **HARD** | — | — | — | — | ❌ `Disallow: /*/products/*/*/menu/` | 하필 메뉴 경로만 금지. 공지 게시판은 허용 |
 
@@ -270,6 +270,8 @@
 - **blocked 5** — 이마트, 투썸플레이스, 이디야, 뚜레쥬르, 롯데리아.
   전부 robots.txt 또는 봇 차단이다. **기술이 아니라 정책이라 노력으로 해결되지 않는다.**
 - **unverified 2** — 버거킹, 피자헛. 브라우저 캡처 1회면 살릴 수 있다.
+  → **버거킹은 2026-08-26에 확보했다.** 캡처는 필요 없었다 — 봉투를 만드는 코드가
+  사이트에 실려 있었다. 남은 것은 피자헛뿐이다.
 - 그 밖에 롯데마트가 3중 차단으로 P1 → P2 강등됐다.
 
 게다가 살아남은 P0 중에서도 GS25·세븐일레븐·이마트24·홈플러스는 **전체 카탈로그가 아니다.**
@@ -320,8 +322,11 @@ diff 결과 건수가 아니라 **오탐(같은 제품인데 신상으로 잡힌
 > 프랜차이즈 착수 전에 `scrapers/base.py` 정리가 선행되어야 한다.
 
 **v1 제외 권고**: 롯데마트, 남양유업, 뚜레쥬르, 투썸플레이스, 이디야, 롯데리아, 해태제과, 서울우유.
-**추가 캡처 1회로 살릴 수 있는 것**: 버거킹(bizMOB Payload 탭), 피자헛(매장 선택 후 네트워크),
-홈플러스 심플러스 기획전(목록 API 파라미터).
+**추가 캡처 1회로 살릴 수 있는 것**: ~~버거킹(bizMOB Payload 탭)~~(2026-08-26 확보),
+피자헛(매장 선택 후 네트워크), 홈플러스 심플러스 기획전(목록 API 파라미터).
+
+⚠️ **"캡처가 필요하다"는 것도 추정이었다.** 버거킹은 프레임워크 JS를 읽는 것으로 끝났다.
+브라우저가 필요한 것과 브라우저**만** 가능한 것은 다르다.
 
 ---
 

@@ -25,7 +25,7 @@ SPA 6곳은 Chrome DevTools 네트워크 로그로 XHR 엔드포인트를 확인
 | 8 | 배스킨라빈스 | dessert | **EASY** | GET HTML 서버렌더링 | GET HTML | ❌ | ⭕ seq | 404(파일 없음) |
 | 9 | 던킨 | dessert | **EASY** | Inertia JSON · 12/page | 있음 | ❌ | ⭕ id | Allow: / |
 | 10 | 맥도날드 | restaurant | **EASY** | REST JSON | REST JSON | ❌ | ⭕ seq | Allow: / |
-| 11 | 버거킹 | restaurant | **MEDIUM** | POST `BKR0632.json` (봉투 미확인) | `/notice/list` | ? | ? | Allow: / |
+| 11 | 버거킹 | restaurant | **EASY**(2026-08-26 정정) | POST `BKR0632.json` (봉투는 사이트 JS에 있다) | `/notice/list` | 192 | 1요청 | Allow: / |
 | 12 | 롯데리아 | restaurant | **HARD**(정책) | 메뉴 경로가 robots Disallow | ⭕ 허용 | — | — | 메뉴 경로 금지 |
 | 13 | 맘스터치 | restaurant | **EASY** | GET HTML 서버렌더링 | GET HTML | ❌ | ⭕ go_view | 없음 |
 | 14 | BBQ | restaurant | **EASY** | REST JSON | `/events` | ⭕⭕ **있음** | ⭕ id | Allow: / |
@@ -448,14 +448,30 @@ POST https://www.burgerking.co.kr/burgerking/BKR0633.json
 ```
 (홈은 `BKR0220.json`, `BKR0113.json`)
 
-### 막힌 지점
+### 막힌 지점 → **2026-08-26에 풀렸다. EASY다.**
 빈 body(`{}`)로 POST하면 **HTTP 400 Bad Request**가 온다.
-bizMOB은 고유한 요청 봉투(header/body 래핑)를 쓰는데, 그 형태를 이번 조사에서 확정하지 못했다.
+bizMOB은 고유한 요청 봉투(header/body 래핑)를 쓰는데, 그 형태를 이 조사에서 확정하지 못했다.
 DevTools 네트워크 로그는 요청 **본문**까지는 보여주지 않았다.
 
-**다음 단계**: 브라우저에서 `/menu/main`을 열고 `BKR0632.json` 요청의 Payload 탭을 한 번만
-캡처하면 EASY로 내려온다. 봉투만 알면 그 뒤는 순수 JSON POST다.
-그때까지는 Playwright 대상(MEDIUM)으로 둔다.
+⚠️ **봉투를 알아내는 데 브라우저는 필요 없었다.** 이 조사가 "Payload 탭을 1회 캡처하라"고
+적어둔 것은 캡처가 유일한 길이라고 본 것인데, 그렇지 않았다 — **사이트가 봉투를 만드는
+코드를 스스로 싣고 다닌다.** `/bizMOB/bizMOB-webExtend.js`의 `bizMOBWeb.Network.requestTr`가
+그 자리다(`bizMOB-core.js`에도 같은 모양이 있다).
+
+```
+POST /burgerking/BKR0632.json
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+message={"header":{"result":true,"error_code":"","error_text":"","info_text":"",
+         "message_version":"","login_session_id":"","trcode":"BKR0632",
+         "cd_call_chnn":"01"},"body":{"menuKeywordList":[]}}
+```
+
+`cd_call_chnn`만 사이트(`app.js`)가 얹는 값이다(01=PC웹 02=앱 03=모바일웹).
+전문은 셋이다 — `BKR0632`(전체 메뉴), `BKR0633`(키워드 필터 목록, 수집에 안 씀),
+`BKR0634`(상세 `{menuCd}` → `menuDesc`·`menuKeywordList`·`dineInprc`).
+
+**실측 2026-08-26: 192건 / 요청 1건.** 나머지는 `scrapers/burgerking.py` docstring에 있다.
 
 ---
 
@@ -836,8 +852,9 @@ scratch/samples/
 │   ├─ mcdonalds_api_category_list.json        ★ 카테고리 7종
 │   ├─ mcdonalds_api_product_list.json         ★ 상품 22건 + 전체 필드
 │   ├─ burgerking_robots.txt / burgerking_home.html
-│   ├─ burgerking_BKR0632.json                 400 응답(봉투 미확인 근거)
+│   ├─ burgerking_BKR0632.json                 400 응답(봉투를 몰랐을 때의 근거)
 │   ├─ burgerking_BKR0633.json                 400 응답
+│                                              → 200 응답은 tests/fixtures/burgerking_*.json
 │   ├─ lotteria_robots.txt                     ★ 메뉴 경로 Disallow 근거
 │   ├─ lotteria_home.html / lotteria_products.html / lotteria_notice.html
 │   ├─ momstouch_robots.txt                    robots 없음(홈으로 리다이렉트)
@@ -869,5 +886,6 @@ scratch/samples/
   `parisbaguette`, `baskinrobbins`, `dunkin`, `compose`, `mega` → `status: verified`
 - `twosome`, `tourlesjours`, `ediya`, `lotteria` → `status: blocked`
 - `burgerking`, `pizzahut` → `status: unverified` 유지 (추가 캡처 필요)
-- method: `xhr`(스타벅스·메가·맥도날드·BBQ·bhc·던킨) / `static`(컴포즈·파리바게뜨·
-  배스킨라빈스·맘스터치·교촌·도미노) / `playwright`(버거킹·피자헛)
+  → **버거킹은 2026-08-26에 `verified`가 됐다**(11절 참조). 캡처는 필요 없었다.
+- method: `xhr`(스타벅스·메가·맥도날드·BBQ·bhc·던킨·**버거킹**) / `static`(컴포즈·파리바게뜨·
+  배스킨라빈스·맘스터치·교촌·도미노) / `playwright`(피자헛)
