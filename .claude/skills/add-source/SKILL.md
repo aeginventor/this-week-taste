@@ -88,9 +88,13 @@ CU의 생활용품 838건을 정찰 표에서 그대로 옮겨와 티슈·바디
 
 | 층 | 값 | 실제 사례 |
 |---|---|---|
-| 1 | 개별 상품 상세 URL | cu, homeplus, starbucks, orion, compose, baskinrobbins, dunkin, kyochon, bbq |
+| 1 | 개별 상품 상세 URL | cu, homeplus, starbucks, orion, compose, baskinrobbins, dunkin, kyochon, bbq, burgerking, mcdonalds |
 | 2 | **그 제품이 실린 목록 페이지 URL** | emart24 (`/goods/pl`) |
 | 3 | `null` | 아직 없다 |
+
+⚠️ **한 소스 안에서 층이 갈릴 수 있다.** 도미노와 피자헛이 그렇다 — 피자헛은
+`main.js`의 `cpath`가 분류 다섯만 분기해서, 거기 없는 분류(`CF`)만 2층을 쓴다.
+소스 단위로 "이 소스는 몇 층"이라고 적어두면 그 예외가 조용히 틀린다.
 
 ⚠️ **GET으로 200이 온다고 1층인 것이 아니다.** 세븐일레븐은 상세 URL이 200에 38KB를
 주는데 상품 내용이 없었다. **응답에 제품명이 실제로 들어 있는지** 확인할 것.
@@ -182,19 +186,44 @@ pipeline/sources.py       표에 한 줄: brand·channel·detail·monotonic_key
 `monotonic_key`는 **확인되지 않으면 `None`이다.** 틀린 지표는 없는 지표보다 나쁘다
 (7장의 `gd_idx_monotonic` 사고).
 
-## 7. 채널이 dessert / restaurant면 분류 목록을 먼저 만든다
+## 7. 새 채널이면 분류 목록을 만들고 **돌려서 확인한다**
 
-`pipeline/curate.py`의 `CATEGORIES_BY_CHANNEL`에 **그 두 채널이 아직 없다.**
-없으면 `system_prompt()`가 예외를 던지고 `curate()`가 LLM을 건너뛰어,
+`pipeline/curate.py`의 `CATEGORIES_BY_CHANNEL`에 그 채널이 없으면
+`system_prompt()`가 예외를 던지고 `curate()`가 LLM을 건너뛰어,
 **그 소스 전량이 원본 그대로 발행된다**(조용하다 — 발행은 성공한다).
 
-대기 중인 P0 14개 중 9개가 여기 해당한다:
-dessert(parisbaguette, baskinrobbins, dunkin), restaurant(mcdonalds, momstouch, bbq,
-bhc, kyochon, dominos).
+2026-08-25에 **6채널을 전부 채웠으므로** 지금 붙는 소스는 대개 해당 없다.
+새 채널이 생길 때와 **기존 목록을 고칠 때**만 이 절을 본다.
 
 목록은 **실제 카탈로그를 보고** 만든다([ADR-0006](../../../docs/adr/0006-category-taxonomy-per-channel.md)).
 편의점 목록을 재사용하면 분류가 뭉개진다 — 오리온 20건이 전부 `과자`로 떨어져
 사이트 필터가 아무 일도 하지 못했던 것이 그 예다.
+
+### 만들었으면 표본으로 돌려 본다
+
+```bash
+THIS_WEEK_TASTE_DATA_DIR=<비공개 저장소> THIS_WEEK_TASTE_LLM=cli \
+  python -m scripts.curate_dryrun --channel <채널> --week <주차> \
+    --weight <새로_붙은_소스>=12
+```
+
+발행하지 않고 스냅샷만 읽는다. 보는 것은 넷이다 — `기타` 비율, 목록 밖 값,
+한 칸 쏠림, `name` 변조. 2026-08-26 실측(restaurant 40 / dessert 40)에서는
+`기타` 1/80, 목록 밖 0, 변조 0이 나와 **목록을 고치지 않았다.**
+
+⚠️ **표본을 그냥 뽑지 마라.** 목록을 만든 뒤에 붙은 소스가 있으면 `--weight`로
+그쪽을 채운다. restaurant 목록은 소스 6곳을 보고 만들었는데 그 뒤 버거킹·피자헛이
+붙어서, 예행 40건 중 18건을 그 둘로 채웠기 때문에 새 소스가 목록에 맞는지 알 수 있었다.
+
+⚠️ **분포는 품질이 아니다.** 던킨의 `블렌디드/빙수` 4/12는 숫자만 보면
+"도넛집인데 왜?"였는데 이름을 보니 비타슬러시·망고쿨라타·컵빙수라 전부 맞았다.
+스크립트가 항목별 목록을 함께 찍는 이유다 — **거기를 봐야 오분류가 보인다.**
+
+⚠️ **`기타`가 많다고 목록 탓부터 하지 마라.** 예행의 유일한 `기타`
+(파리바게뜨 `쇼콜라티 실론`)는 이름만으로는 사람도 모르는 것이었다.
+`detail: True`인 소스는 예행에서 설명문이 비므로 실제 발행보다 불리하게 나온다.
+
+**나오지 않은 문제를 미리 고치지 않는다.** 그 수정에는 근거가 없다.
 
 ## 8. 공유 코드가 이 소스의 모양을 견디는지 답한다
 
