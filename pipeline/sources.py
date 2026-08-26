@@ -172,6 +172,16 @@ SOURCES: dict[str, dict] = {
         # itemNo가 등록 순서인지 확인하지 않았다.
         "monotonic_key": None,
     },
+    "pizzahut": {
+        "brand": "피자헛",
+        "channel": "restaurant",
+        # 목록이 rpstDesc를 17/17 준다. 상세를 실제로 불러 봤으나 목록보다 주는 것이
+        # 없었다 — 스타벅스와 같은 이유로 건너뛴다.
+        "detail": False,
+        # RPPZ 뒤 숫자가 **출시일 순으로 17/17 단조 증가한다**(2026-08-26 실측, 6년치).
+        # CU의 gd_idx는 등록 순서 추정이었지만 이것은 출시일과 대조해 확인했다.
+        "monotonic_key": "rpst_seq",
+    },
 }
 
 

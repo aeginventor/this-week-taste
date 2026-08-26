@@ -668,16 +668,39 @@ restaurant:
     name: 피자헛
     sub: pizza
     priority: P0
-    status: unverified      # 메뉴 XHR을 찾지 못함
-    method: playwright
-    url: https://www.pizzahut.co.kr
+    status: verified
+    method: xhr
+    catalog: full
+    url: https://www.pizzahut.co.kr/api/menu/pizza/all/VISIT
     hint: >
-      Angular SPA. /menu, /menu/pizza 등을 curl로 받으면 전부 홈페이지와 동일한 SPA 껍데기(13KB)다.
-      브라우저로 각 메뉴 URL을 열고 네트워크를 관찰했으나 **상품 관련 XHR이 한 건도 관측되지 않았다**
-      (GA·광고 픽셀만 발생). /menu/pizza는 /menu/pizza/best로 자동 리다이렉트된다.
-      추정 원인: 주문 방식(배달/포장) + 매장 선택이 끝나야 메뉴 API를 호출하는 구조.
-      ★ 다음 단계: 브라우저에서 배달/포장 선택 → 매장 지정까지 진행한 뒤 네트워크 재캡처.
-      같은 pizza 채널의 도미노가 EASY이므로 우선순위는 낮다. robots.txt는 404.
+      ★ **2026-08-26 실측. "매장 선택이 끝나야 메뉴 API를 호출한다"던 이전 기록은 추정이었고 틀렸다.**
+      봉투도 인증도 없다. 경로: /static/web/asset-loader.js
+      → data-manifest=/static/web/asset-manifest.json → main.<해시>.js의 `{apiUrl:"/api"}`.
+      버거킹과 같은 순서로 풀었다. **2요청 / 피자 25종.**
+      ⚠️ **`/api/menu/pizza/all/VISIT`은 이름과 달리 전체가 아니다** — premium 9 + usoriginal 8뿐이고
+         판촉 탭 cheesefesta 8건이 통째로 빠진다(전체의 32%). 하필 사이트가 NEW 배지를 단 탭이다.
+         던킨 /menu/all, 파리바게뜨 ?cat1=과 같은 함정. 브라우저로 탭을 열어 보고 알았다.
+      ⚠️ 두 번째 요청 `/api/menu/<매장>/list/cheesefesta/VISIT`은 **매장 코드가 필수**다
+         (매장 없는 변형은 전부 400). 0767·0722를 대조해 9건이 바이트 단위로 같아 직영점 하나로 고정했다.
+         판촉 탭이라 파스타가 1건 섞여 온다 → lclass/mclass로 거른다.
+      피자 탭 타입은 main.js에 12개가 박혀 있으나 살아 있는 것은 all·best·premium·usoriginal·cheesefesta뿐.
+         best는 위 둘의 부분집합 + 하프앤하프 세트 1건이라 요청하지 않는다.
+      **설명문 rpstDesc 25/25. 가격 25/25.**
+      필드: rpstMenuCd(=ID), digitalKey, rpstName, rpstDesc, sclass(PM·US·CF), badge, items[].price.
+      ⚠️ **이미지가 응답에 없다**(image·thumb 전부 null). index.html의
+         `imageRoot`(akamai.pizzahut.co.kr/2020pizzahut-prod/public) + /img/menu/<digitalKey>_s.png.
+         실제로 200이다. 그 호스트도 robots.txt가 404다.
+      ⚠️ 가격이 사이즈별로 갈린다 → **최저가**를 싣는다(도미노와 같은 처리).
+      ⚠️ **CF는 개별 상품 URL이 없다.** main.js의 cpath가 PM·MG·US·PN·OH만 분기한다.
+         브라우저로 카드를 눌러도 URL이 안 바뀐다 → 목록 페이지를 쓴다(ADR-0013의 2층).
+      VISIT과 DELIVERY는 응답이 완전히 같다(항목·가격 차이 0건).
+      상세(/api/menu/<매장>/menu/<코드>)는 목록보다 주는 것이 없다 → detail: False.
+      사이드·음료는 /api/menu/<매장>/list/sideAndBeverage에 78건 있으나 **설명문이 0건**이고
+      매장 코드가 필요해 범위에 넣지 않았다(2026-08-26, 사람이 결정).
+      rpstMenuCd 숫자부가 **출시일 순으로 25/25 단조 증가**한다(RPPZ0007→RPPZ2275, 6년치).
+      출시 빈도는 saleStartDate로 실측해 연 3~5건이다. 그 필드는 판정에 쓰지 않는다(2.1).
+      robots.txt는 404(전 경로 허용). 약관 제8조 1항 가호·제9조 2항을 읽고 진행하기로 했다
+      (자동수집 명시 금지 없음, 제9조는 "영리 목적" 한정 — 수익화 시 재검토).
   - { id: papajohns,  name: 파파존스,     sub: pizza, priority: P1, status: unverified }
   - { id: mrpizza,    name: 미스터피자,   sub: pizza, priority: P2, status: unverified }
   - { id: alvolo,     name: 피자알볼로,   sub: pizza, priority: P2, status: unverified }
