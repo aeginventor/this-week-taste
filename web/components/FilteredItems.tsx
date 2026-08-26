@@ -70,17 +70,12 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/\s+/g, "");
 }
 
-export function FilteredItems({ items, discontinued }: {
-  items: Item[];
-  discontinued: Item[];
-}) {
+export function FilteredItems({ items }: { items: Item[] }) {
   const [channels, setChannels] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<Set<string>>(new Set());
   const [brands, setBrands] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
 
-  // 칩은 **신상 기준**으로 만든다. 단종 후보까지 넣으면 이번 주에 없는 브랜드가
-  // 칩으로 남아, 눌렀을 때 신상 0건이 나온다.
   const channelFacets = useMemo(
     () => facets(items, (i) => i.channel, channelLabel), [items]);
   const categoryFacets = useMemo(
@@ -101,7 +96,6 @@ export function FilteredItems({ items, discontinued }: {
   }), [channels, categories, brands, needle]);
 
   const shownActive = filter(items);
-  const shownGone = filter(discontinued);
   const active = channels.size + categories.size + brands.size + (query ? 1 : 0);
 
   function toggler(setter: (fn: (prev: Set<string>) => Set<string>) => void) {
@@ -148,7 +142,6 @@ export function FilteredItems({ items, discontinued }: {
       <p className="counts" aria-live="polite">
         신상 {shownActive.length}건
         {active > 0 && ` / 전체 ${items.length}건`}
-        {shownGone.length > 0 && ` · 단종 후보 ${shownGone.length}건`}
       </p>
 
       {shownActive.length === 0 ? (
@@ -163,21 +156,6 @@ export function FilteredItems({ items, discontinued }: {
           {shownActive.map((item) => (
             <ItemCard key={item.id} item={item} />
           ))}
-        </section>
-      )}
-
-      {shownGone.length > 0 && (
-        <section className="section">
-          <h2>단종 후보</h2>
-          <p className="note">
-            지난주 목록에 있었으나 이번 주에 사라진 제품입니다. 실제 단종이
-            아니라 일시 품절일 수 있습니다.
-          </p>
-          <div className="grid">
-            {shownGone.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
         </section>
       )}
     </>

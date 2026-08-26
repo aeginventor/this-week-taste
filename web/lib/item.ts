@@ -29,7 +29,6 @@ export type Item = {
   external_id: string;
   first_seen: string;
   last_seen: string;
-  status: "active" | "discontinued";
 };
 
 export type Week = {
@@ -39,8 +38,6 @@ export type Week = {
   sources: string[];
   counts: {
     total: number;
-    active: number;
-    discontinued: number;
     with_blurb: number;
   };
   items: Item[];

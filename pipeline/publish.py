@@ -15,10 +15,14 @@
 
 [ADR-0001]: ../docs/adr/0001-product-id.md
 
-## 단종 항목은 이월로만 실릴 수 있다
+## 단종은 발행하지 않는다 — 지표로만 남긴다
 
-`status: discontinued`인 항목은 이번 주 스냅샷에 없다. 지난주 발행본에서 가져오는 것이
-유일한 경로다.
+지난주 발행본에 있던 항목이 이번 주 목록에서 사라진 것은 **제품 단종이라기보다
+지난주 `added`가 틀렸다는 신호**다. 일주일 만에 진짜로 단종되는 제품은 드물고,
+행사 종료·수량 소진·재입고 오탐이 훨씬 그럴듯하다.
+
+그래서 `status` 필드로 발행하지 않고 `report`의 `published_then_gone`으로만 남긴다.
+근거와 버린 대안은 [ADR-0015](../docs/adr/0015-discontinued-as-metric.md).
 
 ## 첫 주는 발행하지 않는다
 
@@ -51,7 +55,7 @@ WEEK_RE = re.compile(r"^\d{4}-W\d{2}$")
 PUBLISHED_DIR = Path(__file__).resolve().parent.parent / "data" / "published"
 
 REQUIRED_FIELDS = ("id", "week", "source_id", "brand", "channel", "name", "source_url",
-                   "first_seen", "last_seen", "status")
+                   "first_seen", "last_seen")
 
 
 def part_path(week: str, source_id: str) -> Path:
@@ -97,7 +101,6 @@ def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
         "alt_ids": item.get("alt_ids") or {},
         "first_seen": (previous or {}).get("first_seen") or week,
         "last_seen": week,
-        "status": "active",
     }
 
 
@@ -173,43 +176,32 @@ def run(source_id: str, week: str | None = None) -> Path | None:
         for item in added
     ]
 
-    # 단종 후보는 지난주 발행본에서 이월한다. 이번 주 스냅샷에는 없기 때문이다.
-    discontinued = 0
-    for removed in result["removed"]:
-        previous = previous_by_external.get(removed["external_id"])
-        if not previous:
-            continue  # 지난주에 발행되지 않았던 항목(신상으로 잡힌 적이 없음)
-        items.append({**previous, "week": week, "last_seen": previous_week,
-                      "status": "discontinued"})
-        discontinued += 1
-
     _validate(items, week)
 
     payload = {
         "week": week,
         "source_id": source_id,
         "generated_at": weeks.scraped_at(),
-        "counts": _counts(items, discontinued),
+        "counts": _counts(items),
         # 지표는 소스 단위로만 계산된다. merge()가 by_source로 모은다.
+        # 지난주 발행본을 넘기는 것은 `published_then_gone` 지표 때문이다 (ADR-0015).
         "report": _source_report(week, source_id, result, items,
-                                 out_of_scope=out_of_scope),
+                                 out_of_scope=out_of_scope,
+                                 previous_published=previous_by_external),
         "items": items,
     }
     path = part_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    log.info("발행(부분): %s — 신상 %d / 단종 %d / blurb %d",
-             path, payload["counts"]["active"], discontinued,
-             payload["counts"]["with_blurb"])
+    log.info("발행(부분): %s — 신상 %d / blurb %d",
+             path, payload["counts"]["total"], payload["counts"]["with_blurb"])
     return path
 
 
-def _counts(items: list[dict], discontinued: int) -> dict:
+def _counts(items: list[dict]) -> dict:
     return {
         "total": len(items),
-        "active": len(items) - discontinued,
-        "discontinued": discontinued,
         "with_blurb": sum(1 for i in items if i.get("blurb")),
     }
 
@@ -232,11 +224,9 @@ def merge(week: str) -> Path | None:
 
     items: list[dict] = []
     by_source: dict[str, dict] = {}
-    discontinued = 0
     for part in parts:
         payload = json.loads(part.read_text(encoding="utf-8"))
         items.extend(payload["items"])
-        discontinued += payload["counts"]["discontinued"]
         by_source[payload["source_id"]] = payload["report"]
 
     _validate(items, week)
@@ -245,7 +235,7 @@ def merge(week: str) -> Path | None:
         "week": week,
         "generated_at": weeks.scraped_at(),
         "sources": sorted(by_source),
-        "counts": _counts(items, discontinued),
+        "counts": _counts(items),
         "items": items,
     }
     path = week_path(week)
@@ -262,8 +252,8 @@ def merge(week: str) -> Path | None:
     (WEEKS_DIR / f"{week}.report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    log.info("병합: %s — 소스 %d개 / 신상 %d / 단종 %d",
-             path, len(by_source), merged["counts"]["active"], discontinued)
+    log.info("병합: %s — 소스 %d개 / 신상 %d",
+             path, len(by_source), merged["counts"]["total"])
     return path
 
 
@@ -298,8 +288,34 @@ def _provenance(current: dict | None, previous_week: str | None,
     return provenance
 
 
+def _published_then_gone(result: dict,
+                         previous_published: dict[str, dict] | None) -> dict | None:
+    """지난주 발행한 신상 중 이번 주 목록에서 사라진 것 (지표 4, ADR-0015).
+
+    **모수는 지난주 *발행본*이지 카탈로그가 아니다.** 우리가 신상이라고 실은 적이
+    없는 항목이 목록에서 빠지는 것은 이 지표가 볼 일이 아니다 — 그냥 오래된 상품이
+    내려간 것이고, 우리 판정의 옳고 그름과 무관하다.
+
+    지난주 발행본이 없으면(첫 발행 주) **아예 싣지 않는다.** 0을 실으면 "사라진 것이
+    없다"로 읽히는데 사실은 "잴 수 없었다"이다. `monotonic_id`를 조건부로 싣는 것과
+    같은 이유다 (7장).
+    """
+    if not previous_published:
+        return None
+
+    removed_ids = {i["external_id"] for i in result["removed"]}
+    gone = [previous_published[k] for k in sorted(previous_published.keys() & removed_ids)]
+    return {
+        "previous_published": len(previous_published),
+        "gone": len(gone),
+        # 건수만 두면 무엇이 사라졌는지 알 수 없다. out_of_scope와 같은 이유로 이름을 남긴다.
+        "names": sorted(i["name"] for i in gone),
+    }
+
+
 def _source_report(week: str, source_id: str, result: dict, items: list[dict],
-                   *, out_of_scope: list[dict] | None = None) -> dict:
+                   *, out_of_scope: list[dict] | None = None,
+                   previous_published: dict[str, dict] | None = None) -> dict:
     """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
 
     소스의 NEW 라벨은 판정에 쓰지 않지만(2.1) 검증 지표로는 쓴다. 라벨과의 교집합이
@@ -359,6 +375,19 @@ def _source_report(week: str, source_id: str, result: dict, items: list[dict],
             "added_above_previous_max": above_previous_max,
             "added_below_previous_max": len(added) - above_previous_max,
         }
+
+    # 지표 4: **지난주에 신상이라고 발행한 것이 이번 주 목록에서 사라졌는가** (ADR-0015).
+    #
+    # 이것을 `status: discontinued`로 발행했었다. 그런데 일주일 만에 진짜로 단종되는
+    # 제품은 드물고, 훨씬 그럴듯한 설명은 **지난주 added가 틀렸다는 것**이다 —
+    # 행사 상품이었거나, 수량이 소진됐거나, 재입고를 신상으로 잡았거나.
+    #
+    # 지표 2·3과 달리 **라벨도 단조 키도 필요 없어서 모든 소스에서 성립한다.**
+    # 둘 다 없어 채점이 불가능했던 홈플러스가 이 지표로 처음 채점된다.
+    gone = _published_then_gone(result, previous_published)
+    if gone is not None:
+        report["published_then_gone"] = gone
+
     # LLM이 항목을 **없앤** 기록. 건수만 두면 무엇이 사라졌는지 알 수 없어서
     # 이름을 함께 남긴다 — 오판정은 여기서만 눈에 띈다 (6장).
     if out_of_scope:

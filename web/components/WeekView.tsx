@@ -11,9 +11,6 @@ function channelLabel(channel: string): string {
  * 클라이언트 컴포넌트에 넘긴다 (`FilteredItems`).
  */
 export function WeekView({ data, weeks }: { data: Week; weeks: string[] }) {
-  const active = data.items.filter((i) => i.status === "active");
-  const discontinued = data.items.filter((i) => i.status === "discontinued");
-
   return (
     <div className="week">
       <div className="week-head">
@@ -30,7 +27,7 @@ export function WeekView({ data, weeks }: { data: Week; weeks: string[] }) {
         )}
       </div>
 
-      <FilteredItems items={active} discontinued={discontinued} />
+      <FilteredItems items={data.items} />
 
       <p className="channels">
         {Array.from(new Set(data.items.map((i) => i.channel))).map((c) => (

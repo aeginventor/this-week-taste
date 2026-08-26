@@ -29,13 +29,13 @@ def _item(source_id, external_id, name):
     }
 
 
-def _write_part(dirs, source_id, items, discontinued=0):
+def _write_part(dirs, source_id, items):
     path = publish.PUBLISHED_DIR / "2026-W35" / f"{source_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({
         "week": "2026-W35", "source_id": source_id,
         "generated_at": "2026-08-24T09:00:00+09:00",
-        "counts": publish._counts(items, discontinued),
+        "counts": publish._counts(items),
         "report": {"week": "2026-W35", "source_id": source_id, "added": len(items)},
         "items": items,
     }, ensure_ascii=False), encoding="utf-8")

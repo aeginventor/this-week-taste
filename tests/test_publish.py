@@ -37,7 +37,6 @@ def test_new_item_gets_id_and_first_seen_from_this_week():
     assert item["id"] == "cu--17620"
     assert item["first_seen"] == "2026-W33"
     assert item["last_seen"] == "2026-W33"
-    assert item["status"] == "active"
 
 
 def test_id_and_first_seen_are_carried_forward_never_recomputed():
@@ -161,3 +160,90 @@ def test_범위_밖이_없으면_키를_싣지_않는다(snap_dir):
     result = {"added": [], "removed": [], "counts": {}, "previous_week": None,
               "gap_weeks": 1}
     assert "out_of_scope" not in publish._source_report("2026-W36", "cu", result, [])
+
+
+# ── 지표 4: 지난주 발행한 신상이 사라졌는가 (ADR-0015) ──────────────
+#
+# `status: discontinued`로 발행하던 것을 지표로 옮겼다. 틀려도 예외가 안 나고
+# 리포트에 숫자로만 나오는 자리라 테스트가 필요하다 (7장).
+
+
+def _published(source_id, external_id, name):
+    return {"source_id": source_id, "external_id": external_id, "name": name,
+            "id": f"{source_id}--{external_id}"}
+
+
+def test_지난주_발행본이_없으면_키를_싣지_않는다(snap_dir):
+    """첫 발행 주에는 잴 수가 없다. 0을 실으면 "사라진 것이 없다"로 오독된다 (7장)."""
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    result = {"added": [], "removed": [{"external_id": "a"}], "counts": {},
+              "previous_week": None, "gap_weeks": 1}
+
+    report = publish._source_report("2026-W36", "cu", result, [], previous_published={})
+
+    assert "published_then_gone" not in report
+
+
+def test_지난주_발행한_신상이_사라지면_이름까지_남는다(snap_dir):
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    previous = {"17620": _published("cu", "17620", "백종원 매콤제육덮밥"),
+                "17621": _published("cu", "17621", "삼각김밥 참치마요")}
+    result = {"added": [], "removed": [{"external_id": "17620"}], "counts": {},
+              "previous_week": "2026-W35", "gap_weeks": 1}
+
+    gone = publish._source_report("2026-W36", "cu", result, [],
+                                  previous_published=previous)["published_then_gone"]
+
+    assert gone == {"previous_published": 2, "gone": 1,
+                    "names": ["백종원 매콤제육덮밥"]}
+
+
+def test_모수는_카탈로그가_아니라_발행본이다(snap_dir):
+    """⚠️ 이 지표의 핵심이다. **우리가 신상이라고 실은 적 없는 항목은 세지 않는다.**
+
+    W33→W35 diff에서 CU의 removed가 431건이었지만 W35가 첫 발행이라 그중 발행된
+    것은 0건이었다. 카탈로그에서 오래된 상품이 내려간 것은 우리 판정의 옳고 그름과
+    무관하다 — 그걸 세면 지표가 상품 수명 이야기가 되어버린다.
+    """
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    previous = {"17620": _published("cu", "17620", "백종원 매콤제육덮밥")}
+    # 사라진 것은 셋인데 그중 지난주 발행본에 있던 것은 하나뿐이다.
+    result = {"added": [],
+              "removed": [{"external_id": "17620"}, {"external_id": "99998"},
+                          {"external_id": "99999"}],
+              "counts": {}, "previous_week": "2026-W35", "gap_weeks": 1}
+
+    gone = publish._source_report("2026-W36", "cu", result, [],
+                                  previous_published=previous)["published_then_gone"]
+
+    assert gone["previous_published"] == 1
+    assert gone["gone"] == 1
+
+
+def test_아무것도_안_사라져도_키를_싣는다(snap_dir):
+    """`out_of_scope`와 반대다. 모수가 있으면 0은 **의미 있는 0**이다 —
+    "지난주 신상이 하나도 안 사라졌다"는 좋은 소식이지 미계산이 아니다."""
+    _snap("2026-W36", "cu", "2026-08-31T10:00:00+09:00")
+    previous = {"17620": _published("cu", "17620", "백종원 매콤제육덮밥")}
+    result = {"added": [], "removed": [], "counts": {},
+              "previous_week": "2026-W35", "gap_weeks": 1}
+
+    gone = publish._source_report("2026-W36", "cu", result, [],
+                                  previous_published=previous)["published_then_gone"]
+
+    assert gone == {"previous_published": 1, "gone": 0, "names": []}
+
+
+def test_라벨도_단조키도_없는_소스에서_계산된다(snap_dir):
+    """**이 지표를 만든 이유다.** 홈플러스는 NEW 라벨도 단조 증가 키도 없어서
+    지표 2·3이 둘 다 안 실린다. 건수 2위인데 채점을 못 하고 있었다."""
+    _snap("2026-W36", "homeplus", "2026-08-31T10:00:00+09:00")
+    previous = {"070234705": _published("homeplus", "070234705", "냉동만두")}
+    result = {"added": [], "removed": [{"external_id": "070234705"}], "counts": {},
+              "previous_week": "2026-W35", "gap_weeks": 1}
+
+    report = publish._source_report("2026-W36", "homeplus", result, [],
+                                    previous_published=previous)
+
+    assert "monotonic_id" not in report          # 단조 키가 없다
+    assert report["published_then_gone"]["gone"] == 1

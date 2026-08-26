@@ -71,7 +71,6 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
   display: flex;
   flex-direction: column;
 }
-.card.gone { opacity: 0.55; }
 
 .thumb {
   width: 100%;

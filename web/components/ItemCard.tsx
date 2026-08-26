@@ -9,7 +9,7 @@ import { formatPrice, type Item } from "@/lib/item";
 export function ItemCard({ item }: { item: Item }) {
   const price = formatPrice(item.price);
   return (
-    <article className={`card ${item.status === "discontinued" ? "gone" : ""}`}>
+    <article className="card">
       {item.image_url ? (
         // CLAUDE.md 7장: 이미지를 복제 저장하지 않고 원본 URL을 참조한다.
         // eslint-disable-next-line @next/next/no-img-element
