@@ -406,9 +406,10 @@ pipeline/sources.py            표에 한 줄: brand·channel·detail·monotonic
 
 ### 현재 위치: 4단계 확장 (2026-08-26 기준)
 
-**소스 17개**로 전 구간이 연결되어 실제 데이터로 돌아간다. W35 스냅샷 9,839건.
+**소스 18개**로 전 구간이 연결되어 실제 데이터로 돌아간다. W35 스냅샷 9,864건.
 2026-08-25에 dessert·restaurant 채널이 열려 **6채널 전부**에 소스가 있다.
-restaurant는 7곳이 되어 채널 중 소스가 가장 많다.
+restaurant는 8곳이 되어 채널 중 소스가 가장 많다.
+2026-08-26에 피자헛이 붙어 **`status: verified`인 P0가 전부 소진됐다.**
 
 ```
 make setup     # .venv + npm install (최초 1회)
@@ -456,6 +457,7 @@ make check-images  # 발행물 이미지가 실제로 열리는지 표본 검사
 | parisbaguette | dessert | — | 519 | 8 | 상세 | 〃 **이 채널 최대.** 가격 없음. `admin-ajax`로 받는다 |
 | gs25 | convenience | — | 567 | 4 | **없음** | 〃 가격 있음. CSRF 필요. **robots가 수집 시각을 제한한다**([ADR-0014](docs/adr/0014-collection-time-window.md)) |
 | burgerking | restaurant | — | 192 | **1** | 상세 | 2026-08-26 추가. 가격 없음. **전체 카탈로그가 요청 1건이다.** 봉투를 갖춘 POST |
+| pizzahut | restaurant | — | 25 | 2 | **목록** | 〃 가격 25/25. **이름이 `all`인 응답이 전체가 아니었다.** 판촉 탭에 매장 코드 필요 |
 
 건수는 **범위를 좁힌 뒤의 값이다**([ADR-0012](docs/adr/0012-collection-scope.md), 2026-08-24).
 CU는 생활용품 카테고리를, 홈플러스는 신선 원물 5개 분류를 뺐다. 좁히기 전은
@@ -499,6 +501,7 @@ cu 5,082/4,754(131요청), homeplus 2,966/2,861(130요청)이었다. W33·W35 �
 | parisbaguette | ❌ 목록 조각에 신상 배지가 없다 |
 | gs25 | △ `isNew`가 있다(567건 중 87건). ⚠️ **`"T"`/`"F"` 문자열이다.** 〃 |
 | burgerking | △ `menuFlagList`에 NEW가 있다(192건 중 **46건**). 비율이 높아 판촉 배지일 공산이 크다. 〃 |
+| pizzahut | △ `badge`가 NEW·BEST·NOTHING 셋이다(25건 중 NEW 2건). 〃 ⚠️ **대신 `rpstMenuCd`가 출시일 순으로 25/25 단조 증가한다** — CU 다음으로 채점 가능한 소스다 |
 
 **라벨이 있다고 채점표가 되는 것이 아니다.** 쓰기 전에 "지난주에도 붙어 있었나"를
 먼저 확인한다. 오래 남는 라벨은 캠페인 표시이지 신상 표시가 아니다.
