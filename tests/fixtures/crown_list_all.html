@@ -1,0 +1,743 @@
+
+
+
+
+
+ 
+
+
+
+
+
+
+<html lang="ko">
+<head>	
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0, user-scalable=yes">
+	<title>CROWN</title>
+	<link rel="icon" href="/resources/image/web/common/favicon.png"/>
+	<link rel="stylesheet" type="text/css" href="/resources/css/web/common/slick.css">
+    <link rel="stylesheet" type="text/css" href="/resources/css/web/common/common.css?20250721">
+    <link rel="stylesheet" type="text/css" href="/resources/css/web/common/layout.css?20260720">
+    <script src="/resources/js/web/common/jquery-1.12.4.min.js"></script>
+	<script src="/resources/js/web/common/slick.min.js"></script>
+	<script src="/resources/js/web/common/ui.js?20260303"></script>
+	<script src="/resources/js/web/common/common.js"></script>
+	
+	<!--[if lt IE 9]>
+	<script src="/resources/js/web/common/html5shiv.js"></script>
+	<![endif]-->
+</head>
+
+
+
+<script>
+
+
+
+
+$(document).ready(function () {
+	// 쿠키 직접 확인
+	if (document.cookie.split(';').every(cookie => !cookie.trim().startsWith('visited='))) {
+		// 방문자 수 증가 요청
+		$.ajax({
+			url: "/visitor_count",
+			type: "POST"
+		});
+
+		// 오늘 자정까지 유지되는 쿠키 설정
+		let now = new Date();
+		let midnight = new Date();
+		midnight.setHours(24, 0, 0, 0);
+		document.cookie = "visited=true;expires=" + midnight.toUTCString() + ";path=/";
+	}
+});
+
+
+</script>
+
+<body>
+	<div class="container">
+		<header>
+			<div class="inner">
+				<h1>
+					<a href="/main" role="button">CROWN</a>
+				</h1>
+				<ul class="sub_menu">
+					<li>
+						<div><a href="/company/ci" role="button">회사소개</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/company/ci" role="button">크라운제과</a></li>
+							<li class="tit"><a href="/ir/hir_01" role="button">IR</a></li>
+							<li class="tit"><a href="/company/location" role="button">오시는길</a></li>
+						</ul>
+					</li>
+					<li>
+						<div><a href="/product/index" role="button">브랜드 소개</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/product/index" role="button">제품 소개</a></li>
+							<li class="tit"><a href="/product/story_biscuit" role="button">과자 이야기</a></li>
+						</ul>
+					</li>
+					<li>
+						<div><a href="/ev/ing" role="button">홍보센터</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/sns/news" role="button">보도자료</a></li>
+							<li class="tit"><a href="/sns/sns" role="button">CROWN SNS</a></li>
+							<li class="tit"><a href="/sns/cf" role="button">CF 스토리</a></li>
+							<li class="tit"><a href="/ev/ing" role="button">이벤트</a></li>
+						</ul>
+					</li>
+					<li>
+						<div><a href="/esg/overview" role="button">ESG경영</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/esg/overview" role="button">ESG추진전략</a></li>
+							<li class="tit"><a href="/esg/environment_01" role="button">안전환경(E)</a></li>
+							<li class="tit"><a href="/esg/society_01" role="button">사회공헌(S)</a></li>
+							<li class="tit"><a href="/esg/governance_01" role="button">지배구조(G)</a></li>
+							<li class="tit"><a href="/esg/social" role="button">윤리제보센터</a></li>
+							<li class="tit"><a href="/esg/imp" role="button">통합경영방침</a></li>
+						</ul>
+					</li>
+					<li>
+						<div><a href="/cs/faq" role="button">고객센터</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/cs/faq" role="button">FAQ</a></li>
+							<li class="tit"><a href="/cs/voice" role="button">고객의 소리</a></li>
+							<li class="tit"><a href="/cs/inquiry" role="button">Q&amp;A</a></li>
+						</ul>
+					</li>
+					<li>
+						<div><a href="/recruit/people" role="button">인재채용</a></div>
+						<ul class="depth_2">
+							<li class="tit"><a href="/recruit/people" role="button">인재상</a></li>
+							<li class="tit"><a href="/recruit/notice" role="button">채용안내</a></li>
+							<li class="tit"><a href="/recruit/application" role="button">입사지원</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</header>
+		<div class="h_rt">
+			<!-- <div class="lang_wrap hd">
+				<span class="arrow"></span>
+				<ul class="op">
+					<li onclick="javascript:toggleLang('kor')">KOR</li>
+					<li onclick="javascript:toggleLang('eng')">ENG</li>
+				</ul>
+			</div> -->
+			<button type="button" class="btn_menu" title="메뉴"></button>
+			<button type="button" class="btn_s" title="검색 영역 보기"></button>
+		</div>
+		<div class="search_wrap">
+			<div class="cover">
+				<form id="totalSearchForm" name="totalSearchForm" action="/search" method="post">
+				<input type="text" name="totalSearchText" class="inp_search" value="">
+				<button type="button" id="totalSearchBtn" class="btn_search" title="검색"></button>
+				<button type="button" class="btn_close" title="닫기"></button>
+				</form>
+
+			</div>
+		</div>
+		<div class="header_bk"></div>
+		
+		<div class="gnb_wrap">
+			<div class="top">
+				<div class="logo"><a href="/main" role="button"></a></div>
+				<div class="rt_cover">
+					<!-- <div class="lang_wrap">
+						<span class="arrow"></span>
+						<ul class="op">
+							<li onclick="javascript:toggleLang('eng')">KOR</li>
+							<li onclick="javascript:toggleLang('eng')">ENG</li>
+						</ul>
+					</div> -->
+					<button type="button" class="btn_close" title="닫기"></button>
+				</div>
+			</div>
+
+			<div class="gnb_menu">
+				<ul class="depth_1">
+					<li><span>회사소개</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit">크라운제과</li>
+								<li><a href="/company/ci" role="button">크라운정신</a></li>
+								<li><a href="/company/ceo" role="button">인사말</a></li>
+								<li><a href="/company/history" role="button">연혁</a></li>
+							</ul>
+							<ul>
+								<li class="tit">오시는길</li>
+								<li><a href="/company/location" role="button">본사</a></li>
+								<li><a href="/company/factory" role="button">공장/연구소</a></li>
+								<li><a href="/company/training_center" role="button">연수원</a></li>
+								<li><a href="/company/office" role="button">영업지점</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>IR</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit">크라운제과</li>
+								<li><a href="/ir/hir_01" role="button">기업공시</a></li>
+								<li><a href="/ir/hir_02" role="button">전자공고</a></li>
+								<li><a href="/ir/hir_03" role="button">IR 자료실</a></li>
+							</ul>
+							<ul>
+								<li class="tit">크라운해태홀딩스</li>
+								<li><a href="/ir/ir_01" role="button">기업공시</a></li>
+								<li><a href="/ir/ir_02" role="button">전자공고</a></li>
+								<li><a href="/ir/ir_03" role="button">IR 자료실</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>브랜드 소개</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/product/index" role="button">제품 소개</a></li>
+								<li><a href="/product/index" role="button">전체</a></li>
+								<li><a href="/product/index?searchCateCd=1478063272" role="button">비스킷</a></li>
+								<li><a href="/product/index?searchCateCd=1478063299" role="button">케이크</a></li>
+								<li><a href="/product/index?searchCateCd=1478063302" role="button">스낵</a></li>
+								<li><a href="/product/index?searchCateCd=1478063306" role="button">캔디/초콜릿</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/product/story_biscuit" role="button">과자 이야기</a></li>
+								<li><a href="/product/story_biscuit" role="button">비스킷</a></li>
+								<li><a href="/product/story_cake" role="button">케이크</a></li>
+								<li><a href="/product/story_snack" role="button">스낵</a></li>
+								<li><a href="/product/story_candy" role="button">캔디</a></li>
+								<li><a href="/product/story_chocolate" role="button">초콜릿</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>홍보센터</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/sns/news" role="button">보도자료</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/sns/sns" role="button">CROWN SNS</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/sns/cf" role="button">CF 스토리</a></li>
+							</ul>
+							<ul>
+								<li class="tit">이벤트</li>
+								<li><a href="/ev/ing" role="button">진행 이벤트</a></li>
+								<li><a href="/ev/end" role="button">지난 이벤트</a></li>
+								<li><a href="/ev/notice" role="button">당첨자 발표</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>ESG경영</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/esg/overview" role="button">ESG추진전략</a></li>
+							</ul>
+							<ul>
+								<li class="tit">안전환경(E)</li>
+								<li><a href="/esg/environment_01" role="button">주요활동</a></li>
+								<li><a href="/esg/environment_03" role="button">정보공개</a></li>
+								<li><a href="/esg/environment_02" role="button">환경등급</a></li>
+							</ul>
+							<ul>
+								<li class="tit">사회공헌(S)</li>
+								<li><a href="/esg/society_01" role="button">희망과자 프로젝트</a></li>
+								<li><a href="/esg/society_02" role="button">메세나 활동</a></li>
+								<li><a href="/esg/society_05" role="button">정보공개</a></li>
+								<li><a href="/esg/society_03" role="button">사회등급</a></li>
+							</ul>
+							<ul>
+								<li class="tit">지배구조(G)</li>
+								<li><a href="/esg/governance_01" role="button">주주 정보</a></li>
+								<li><a href="/esg/governance_02" role="button">기업지배구조</a></li>
+								<li><a href="/esg/governance_04" role="button">정보공개</a></li>
+								<li><a href="/esg/governance_03" role="button">지배구조등급</a></li>
+							</ul>
+							<ul>
+								<li class="tit">윤리제보센터</li>
+								<li><a href="/esg/society_04" role="button">윤리경영</a></li>
+								<li><a href="/esg/social" role="button">윤리제보센터</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/esg/imp" role="button">통합경영방침</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>고객센터</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/cs/faq" role="button">FAQ</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/cs/voice" role="button">고객의 소리</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/cs/inquiry" role="button">Q&amp;A</a></li>
+								<li><a href="/cs/inquiry" role="button">고객문의</a></li>
+								<li><a href="/cs/inquiry_chk" role="button">처리결과 확인</a></li>
+							</ul>
+						</div>
+					</li>
+					<li><span>인재채용</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/recruit/people" role="button">인재상</a></li>
+							</ul>
+							<ul>
+								<li class="tit">채용안내</li>
+								<li><a href="/recruit/notice" role="button">채용공고</a></li>
+								<li><a href="/recruit/step" role="button">채용 프로세스</a></li>
+								<li><a href="/recruit/faq" role="button">채용 FAQ</a></li>
+								<li><a href="/recruit/inquiry" role="button">채용 문의</a></li>
+							</ul>
+							<ul class="n_mo">
+								<li class="tit">입사지원</li>
+								<li><a href="/recruit/application" role="button">입사지원</a></li>
+								<li><a href="/recruit/modify" role="button">입사지원 수정</a></li>
+								<li><a href="/recruit/outcome" role="button">지원결과 확인</a></li>
+							</ul>
+						</div>
+					</li>
+					<!-- <li><span>ETC</span>
+						<div class="depth_2">
+							<ul>
+								<li class="tit"><a href="/etc/privacy" role="button">개인정보처리방침</a></li>
+							</ul>
+							<ul>
+								<li class="tit"><a href="/etc/privacy_02" role="button">이메일 무단수집거부</a></li>
+							</ul>
+						</div>
+					</li> -->
+				</ul>
+			</div>
+		</div>
+
+<div class="wrap">
+	<strong class="title">제품 소개</strong>
+	
+	<div class="snb">
+		<div class="inner">
+			<a href="/main" class="btn_home" role="button">home</a>
+			<div class="list">
+				<div class="opt">
+					브랜드 소개
+				</div>
+				<ul class="hidden_menu">
+					<li><a href="/company/ceo">회사소개</a></li>
+					<li><a href="/ev/ing">홍보센터</a></li>
+					<li><a href="/esg/overview">ESG경영</a></li>
+					<li><a href="/cs/faq">고객센터</a></li>
+					<li><a href="/recruit/people">인재채용</a></li>
+				</ul>
+			</div>
+			<div class="list">
+				<div class="opt">제품 소개</div>
+				<ul class="hidden_menu">
+					<!--<li><a href="/product/history">브랜드 히스토리</a></li>-->
+					<li><a href="/product/story_biscuit">과자 이야기</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<form id="theForm" name="theForm" action="/product/index?searchCateCd=all" method="post">
+	<input type="hidden" id="currentPageNo" name="currentPageNo" value="1" /> <!-- 현재 페이지 -->
+	<input type="hidden" name="idx" id="idx" value="" />
+	<input type="hidden" name="searchCateCd" id="searchCateCd" value="all" />
+
+	<div class="sec_cnt">
+		<ul class="ul_tab">
+			<li >
+				<a href="javascript:searchCate('1478063307');" role="button">신제품</a>
+			</li>
+			<li class='on'>
+				<a href="javascript:searchCate('all');" role="button">전체</a>
+			</li>
+			<li >
+				<a href="javascript:searchCate('1478063272');" role="button">비스킷</a>
+			</li>
+			<li >
+				<a href="javascript:searchCate('1478063299');" role="button">케이크</a>
+			</li>
+			<li >
+				<a href="javascript:searchCate('1478063302');" role="button">스낵</a>
+			</li>
+			<li >
+				<a href="javascript:searchCate('1478063306');" role="button">캔디/초콜릿</a>
+			</li>
+		</ul>
+	
+		<div class="search_area">
+			<strong class="tit">총 <span>45</span>건 있습니다.</strong>
+			<div class="search_cover w80p">
+				<input type="text" name="searchText" class="inp_search" title="검색어를 입력" placeholder="검색어를 입력해주세요" value="">
+				<button type="button" class="btn_search">검색</button>
+			</div>
+		</div>
+		
+		<ul class="pro_list type_hover">
+		
+		
+			
+			<li class="item" onclick="view('313')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/product/05d8ded62e674f84ad2ae4c95a6ae745_ì´ì½íì ë ì ë©´.jpeg" alt="">
+					
+					<img src="/upload/system/product/8ff7fc5546db43ef98152c6005eee7c3_íë©´)ìµ¸ì½íì.png" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>쵸코 / 화이트하임</strong>
+					<div>하임과 느끼는 로맨틱 감성여행! 얼려먹으면 더욱 맛있는 하임</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('316')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/product/bfdfd67dbbac4419b0d3960444f1a7ba_ë§ì´ì®¸ ë¸ê¸° ìì²´ì´ë¯¸ì§ ì ë©´.jpeg" alt="">
+					
+					<img src="/upload/system/product/bbd0ef3c497645d3be0f55f83d3e8e58_ë§ì´ì®¸ ë¸ê¸° íë©´ ìì²´ì´ë¯¸ì§.jpeg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>마이쮸</strong>
+					<div>달고 상큼하게 마이쮸! 내 손 안의 과일</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('149')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/item/콘칲_1.5k_70g.jpg" alt="">
+					
+					<img src="/upload/system/product/00e3e6c720e74703b947d1fa3aa18004_군옥수수.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>C콘칲 군옥수수맛</strong>
+					<div>C가 있어야 진짜 콘칲이다</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('377')">
+				<div class="img">
+					
+					
+					<span class="tag"><img src="/resources/image/web/common/img_tag_best.png?2" alt=""></span>
+					
+					<img src="/upload/system/item/초당2.png" alt="">
+					
+					<img src="/upload/system/product/5864eae75e0f4ba894a6d84151b7a871_초당옥수수.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>C콘칲 초당옥수수</strong>
+					<div>C가 있어야 진짜 콘칲이다</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('396')">
+				<div class="img">
+					
+					<span class="tag"><img src="/resources/image/web/common/img_tag_new.png?2" alt=""></span>
+					
+					
+					<img src="/upload/system/product/1bbf58072d8f4efd9a3d5b381aa9dfbe_26골드콘칲 1.7k 입체이미지.jpg" alt="">
+					
+					<img src="/upload/system/product/5a4bbf836ac64bd099c5cbffa46e56b4_26골드콘칲 1.7k 후면입체이미지 (2).jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>C콘칲 골드</strong>
+					<div>덴마크산 황금빛 체다치즈로 더 깊고 풍부해진 1등 콘칩스낵, C콘칲!</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('309')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/item/쿠크다스_화이트_5.5k_입체이미지.jpg" alt="">
+					
+					<img src="/upload/system/product/6622c0bb72e247098cc1cf088d4de6b6_화이트.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>쿠크다스 화이트 / 커피</strong>
+					<div>쿠키의 명작</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('314')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/product/fcfc70552d7b475d85bd1dbfe9a5723f_참쌀설병_270g.jpg" alt="">
+					
+					<img src="/upload/system/product/3085a02ede0c4d068a7b873aed7601a4_ì°¸ìì¤ë³ ìì²´ì´ë¯¸ì§ íë©´.jpeg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>참쌀 설병 / 선과</strong>
+					<div>국내 1위 쌀과자</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('137')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/item/버터와플(대)_입체이미지0.png" alt="">
+					
+					<img src="/upload/system/product/34cbf559249b4dd994757fe8d16fa4d7_버터와플.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>버터와플</strong>
+					<div>과자의 귀족</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('147')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/item/신짱_1.0k_73g.jpg" alt="">
+					
+					<img src="/upload/system/product/4bf430965ffc4cf48240dcf6a8c1e2c7_신짱.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>못말리는 신짱</strong>
+					<div>달콤한 벌꿀과 고소한 검정깨가 든 못말리는 신짱</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('388')">
+				<div class="img">
+					
+					<span class="tag"><img src="/resources/image/web/common/img_tag_new.png?2" alt=""></span>
+					
+					
+					<img src="/upload/system/product/95ae68cc5dca4fb689a6201b96014512_신짱 누룽지.jpg" alt="">
+					
+					<img src="/upload/system/product/1464f98ffef14f5e815c10f054233fb6_신짱가마솥누루지맛1.7k_후면입체이미지.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>못말리는신짱 가마솥 누룽지맛</strong>
+					<div>라이스볼이 톡톡!</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('308')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/product/d39ba71c5d124481820dc17a91d1b18c_ì°ë ë¸ê¸° ìì²´ì´ë¯¸ì§ ì ë©´.jpeg" alt="">
+					
+					<img src="/upload/system/product/f0864905908b4e63b60ee85f53c52389_산도 딸기 후면 입체이미지.jpg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>산도 딸기 / 크림</strong>
+					<div>국내 최초 샌드형 비스킷</div>
+				</div>
+			</li>
+			
+			<li class="item" onclick="view('317')">
+				<div class="img">
+					
+					
+					<img src="/upload/system/product/6ff6562450de427ca06ebbd89cdebb03_ìì½¤ë¬ì½¤ ì¤í± ë¸ê¸° ìì²´2.jpeg" alt="">
+					
+					<img src="/upload/system/product/f7fd66d7853a4688b1a66383ce6ac8a3_ìì½¤ë¬ì½¤ ì¤í± ë¸ê¸° ìì²´íë©´.jpeg" alt="">
+					
+					
+					<!-- <span class="hover"></span> -->
+				</div>
+				<div class="info">
+					<strong>새콤달콤</strong>
+					<div>새콤함과 달콤함이 조화로운 츄잉캔디</div>
+				</div>
+			</li>
+			
+		
+		
+		
+
+			<!-- 
+			<li class="item">
+				<a href="./view" class="img" role="button">
+					<span class="tag"><img src="/resources/image/web/common/img_tag_best.png?2" alt=""></span>
+					<img src="/resources/image/web/product/item_01.png" alt="">
+					<span class="hover"></span>
+				</a>
+				<div class="info">땅콩의 깊은 풍미가 데구르
+					<strong>고소한 땅콩샌드</strong>
+				</div>
+			</li>
+			 -->
+		</ul>
+	
+		<div class="pagination_wrap">
+			<div class="pagination">
+				
+					<a class="active">1</a><a href="?currentPageNo=2" onclick="linkPage(2);return false; ">2</a><a href="?currentPageNo=3" onclick="linkPage(3);return false; ">3</a><a href="?currentPageNo=4" onclick="linkPage(4);return false; ">4</a>
+
+				
+				<!-- 
+				<div class="btn btn_prev">
+					<a href="javascript:void(0);" role="button" title="이전 페이지로"></a>
+				</div>
+				<ul>
+					<li class="on"><a href="javascript:void(0);" role="button">1</a></li>
+					<li><a href="javascript:void(0);" role="button">2</a></li>
+					<li><a href="javascript:void(0);" role="button">3</a></li>
+					<li><a href="javascript:void(0);" role="button">4</a></li>
+					<li><a href="javascript:void(0);" role="button">5</a></li>
+				</ul>
+	
+				<div class="btn btn_next">
+					<a href="javascript:void(0);" role="button" title="다음 페이지로"></a>
+				</div>
+				 -->
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<script>
+
+$(function(){
+	$(".btn_search").on("click", function(e){ 
+		//var searchType = $("#searchType option:selected").val();
+		//if(searchType ==""){alert("검색조건을 선택 해주세요.");return false;}
+		$('#currentPageNo').val('1'); //변경 될 때마다 초기화
+		$("#theForm").attr("action", "/product/index");
+		$("#theForm").submit();
+    });
+	
+	$("input[name='searchText']").on("keypress", function(e){
+        if(e.which == 13){ // 엔터키 코드 13
+            e.preventDefault(); // 폼 기본 submit 방지
+            $('#currentPageNo').val('1'); //변경 될 때마다 초기화
+    		$("#theForm").attr("action", "/product/index");
+			$("#theForm").submit();
+        }
+    });
+});
+
+function linkPage(pageNo){
+	$('#currentPageNo').val(pageNo);
+	$('#theForm').attr("action","/product/index");
+	$('#theForm').submit();
+}
+
+function view(idx){
+	$('#idx').val(idx);
+	$('#theForm').attr("action","/product/view?idx="+idx);
+	$('#theForm').submit();
+}
+
+function searchCate(cateCd){
+	$('#currentPageNo').val("");
+	$("#searchCateCd").val(cateCd)
+	$("#theForm").attr("action", "/product/index");
+	$("#theForm").submit();
+}
+</script>
+
+
+		<div class="btn_top scr_on">TOP</div>
+		
+		<footer class="scr_on">
+			<div class="inner">
+				<h2 class="logo">
+					<a href="/main" role="button"><img src="/resources/image/web/common/logo_g.png?2" alt="crown"></a>
+				</h2>
+				
+				<p>㈜크라운제과<br>
+				서울특별시 용산구 한강대로72길 3<a href="/company/location" class="btn link" role="button">오시는길</a></p>
+				
+				<div class="inline_wrap">
+					<div>대표이사 : 윤석빈 <br>
+					Tel : 02-791-9133</div>
+					<div>사업자등록번호 : 411-87-00569<br>
+					Fax : 02-791-9119</div>
+					
+					<div class="rt">
+						<div class="sns_wrap">
+							<a href="https://www.instagram.com/crownsns/" class="sns instagram" role="button" target="_blank"></a>
+							<a href="https://blog.naver.com/crownoffcial" class="sns blog" role="button" target="_blank"></a>
+						</div>
+						
+						<div class="rt_inner">
+							<!-- <div class="dd_wrap">
+								<a href="javascript:;" class="btn link" role="button">IR</a>
+								<div class="inner">
+									<div>크라운제과</div>
+									<a href="/ir/hir_01" role="button">- 기업공시</a>
+									<a href="/ir/hir_02" role="button">- 전자공고</a>
+									<a href="/ir/hir_03" role="button">- 재무정보</a>
+									<div>크라운 해태홀딩스</div>
+									<a href="/ir/ir_01" role="button">- 기업공시</a>
+									<a href="/ir/ir_02" role="button">- 전자공고</a>
+									<a href="/ir/ir_03" role="button">- 재무정보</a>
+								</div>
+							</div> -->
+							
+							<div class="dd_wrap">
+								<a href="javascript:void(0);" class="btn link" role="button">FAMILY SITE</a>
+								<div class="inner">
+									<a href="https://www.ht.co.kr/" role="button">해태제과식품</a>
+									<a href="http://www.ch-academy.co.kr/home/index.php" role="button">크라운해태연수원</a>
+									<a href="https://www.chitv.co.kr/" role="button">CHITV</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="inner_btm">
+					<ul class="nav">
+						<li><a href="/etc/privacy" role="button">개인정보처리방침</a></li>
+						<li><a href="/etc/privacy_02" role="button">이메일무단수집거부</a></li>
+					</ul>
+				</div>
+	
+				<p class="copyright">COPYRIGHT © CROWN ALL RIGHTS RESERVED</p>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>

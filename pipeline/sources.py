@@ -172,6 +172,16 @@ SOURCES: dict[str, dict] = {
         # itemNo가 등록 순서인지 확인하지 않았다.
         "monotonic_key": None,
     },
+    "crown": {
+        "brand": "크라운제과",
+        "channel": "fmcg",
+        # 목록이 45/45 설명문을 준다. 상세를 열어 봤으나 제품정보 표가 비어 있어
+        # 목록보다 주는 것이 없었다 — 스타벅스와 같은 이유로 건너뛴다.
+        "detail": False,
+        # idx가 정수지만 등록 순서와 신상 여부가 어긋난다(397이 신제품 탭에 없다).
+        # 사이트에 날짜가 없어 검증할 방법도 없다. 확인되지 않은 소스는 넣지 않는다.
+        "monotonic_key": None,
+    },
     "pizzahut": {
         "brand": "피자헛",
         "channel": "restaurant",

@@ -761,9 +761,28 @@ fmcg:
       hint: "최신 2026-08-11" }
   - { id: hitejinro, name: 하이트진로, priority: P1, status: verified, method: press,
       url: "https://www.hitejinro.com/socialmedia/press_list.asp", hint: "출시 기사 확인" }
-  - { id: crown,     name: 크라운제과, priority: P1, status: verified, method: press, catalog: full,
-      url: "https://www.crown.co.kr/sns/news",
-      hint: "최신 2026-07-31. 제품 카탈로그 /product/index 도 서버 렌더링 → 카탈로그 diff 검토 가능" }
+  - id: crown
+    name: 크라운제과
+    priority: P1
+    status: verified
+    method: static          # press → static. 보도자료가 아니라 제품 카탈로그를 긁는다
+    url: https://www.crown.co.kr/product/index
+    catalog: full
+    press_url: https://www.crown.co.kr/sns/news   # 보도자료. 지금은 쓰지 않는다
+    hint: >
+      ✅ 구현 완료 (scrapers/crown.py). 실측 2026-08-27: 45건 / 7요청.
+      GET /product/index?searchCateCd=<탭코드>&currentPageNo=<쪽>. 서버 렌더링, 페이지당 12건.
+      idx 중복 0건, 이름 중복 0건, 설명문 45/45, 이미지 45/45.
+      robots.txt가 없다(HTTP 404) → 금지 규칙도 없다.
+      ⚠️ **탭 `신제품`이 나머지 넷과 교집합 0이다.** 비스킷·케이크·스낵·캔디/초콜릿만
+         긁으면 신제품이 통째로 빠진다. `all` 탭 총건수와 대조해 완전성을 지킨다.
+      ⚠️ **신제품 탭이 3건뿐이고 흔들린다.** 08-26에 4건이던 것이 08-27에 3건이 됐다
+         (idx=389가 카탈로그에서 사라졌다. 상세 URL은 여전히 200이다).
+         이 탭이 0~1건이 되면 건수 검증에 걸려 소스 전체가 이월된다.
+      ⚠️ 가격이 목록에도 상세에도 없다(오리온과 같다). price는 항상 null.
+      ⚠️ 이미지 경로에 한글·공백이 있어 퍼센트 인코딩해서 내보낸다.
+      상세(/product/view?idx=)는 제품정보 표가 비어 있어 목록보다 주는 것이 없다 → detail: False.
+      idx는 단조 증가 키로 쓰지 않는다 — 397이 신제품 탭에 없어 등록 순서와 신상이 어긋난다.
   - { id: binggrae,  name: 빙그레,     priority: P1, status: verified, method: press,
       url: "https://www.bing.co.kr/news/news_announced",
       hint: "최신 2026-08-11. /news/news_new(신제품)는 2026-06-02로 갱신이 느리니 보도 쪽을 쓸 것" }
