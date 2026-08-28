@@ -77,9 +77,22 @@ def make_id(source_id: str, external_id: str) -> str:
 
 
 def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
-                  previous: dict | None) -> dict:
+                  enriched: dict, previous: dict | None) -> dict:
     meta = sources.meta(source_id)
     edit = curated.get(item["external_id"]) or {}
+    # ⚠️ **태그는 LLM만의 산물이 아니다.** 소스가 직접 주는 것이 있고(배스킨라빈스
+    # 128/128, bhc의 cateNm), 그것을 여기서 버리면 4장의 계약이 깨진다 —
+    # "소스가 주면 채우고, 안 주면 []". `curated`만 보면 **LLM이 실패했을 때**
+    # 소스가 준 태그가 통째로 사라지는데, 발행은 원본 폴백으로 계속되므로(6장)
+    # 그 손실이 조용하다. 바로 아래 `category`와 같은 모양의 폴백을 둔다.
+    #
+    # 순서: LLM이 다듬은 것 → enrich가 합친 것(상세 태그 + 스냅샷 태그) → 스냅샷.
+    # enrich를 스냅샷보다 앞에 두는 이유는 enrich가 이미 둘을 합쳐뒀기 때문이다
+    # (`enrich.py`의 `detail["tags"] or item["tags"]`).
+    tags = (edit.get("tags")
+            or (enriched.get(item["external_id"]) or {}).get("tags")
+            or item.get("tags")
+            or [])
     return {
         # id와 first_seen은 지난주 발행본이 있으면 그것을 이월한다.
         "id": (previous or {}).get("id") or make_id(source_id, item["external_id"]),
@@ -89,7 +102,7 @@ def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
         "name": item["name"],
         "price": item.get("price"),
         "category": edit.get("category") or item.get("category_raw"),
-        "tags": edit.get("tags") or [],
+        "tags": tags,
         "blurb": edit.get("blurb"),
         "image_url": item.get("image_url"),
         "source_url": item.get("source_url"),
@@ -172,6 +185,7 @@ def run(source_id: str, week: str | None = None) -> Path | None:
 
     items = [
         _publish_item(item, week=week, source_id=source_id, curated=curated,
+                      enriched=enriched,
                       previous=previous_by_external.get(item["external_id"]))
         for item in added
     ]
