@@ -51,3 +51,5 @@
 | [0013](0013-source-url-optional.md) | 개별 상품 URL이 없는 소스도 붙인다 | 채택 |
 | [0014](0014-collection-time-window.md) | robots가 정한 수집 시각을 코드로 강제한다 | 채택 |
 | [0015](0015-discontinued-as-metric.md) | 단종을 발행하지 않고 오탐 지표로 쓴다 | 채택 |
+| [0016](0016-press-feed-sources.md) | 보도자료 소스를 기사 차집합 + 추출로 다룬다 | **제안** |
+| [0017](0017-collector-identity.md) | 수집 주체에 따라 소스가 다르게 응답한다 | **제안** |
