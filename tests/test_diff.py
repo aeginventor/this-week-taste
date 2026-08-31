@@ -271,3 +271,58 @@ def test_이름이_바뀌어도_키로_이어진다():
     assert result["counts"]["removed"] == 0      # 단종도 아님
     assert result["changed"][0]["matched_by"] == "goodsno"
     assert result["changed"][0]["fields"]["name"] == {"from": "오뜨", "to": "오뜨 애플파이"}
+
+
+def test_integer_alt_id_is_not_a_conflict():
+    """`alt_ids` 값이 정수인 소스에서 없는 충돌을 만들어내지 않는다.
+
+    `_keys()`가 매칭용 값을 `str()`로 통일하므로, 충돌 검사도 같은 방식으로
+    정규화한 뒤 비교해야 한다. 안 그러면 `1893 != "1893"`이 참이 되어
+    **값이 그대로인데 충돌로 잡힌다.**
+
+    2026-08-31 W36에서 피자헛 25/25 전건이 이렇게 잡혀 Issue가 만들어졌다.
+    매칭은 정규화된 키로 돌아 멀쩡했고 보고만 거짓이었다 — 결과가 아니라
+    경보만 틀리는 자리라 더 오래 남는다.
+    """
+    def pizza(name, seq):
+        return {
+            "source_id": "pizzahut",
+            "external_id": f"RPPZ{seq}",
+            "alt_ids": {"rpst_seq": seq},      # 정수다. 문자열이 아니다
+            "name": name,
+            "price": 21900,
+            "category_raw": "피자",
+            "image_url": "https://cdn.example/p.jpg",
+            "source_url": "https://www.pizzahut.co.kr/",
+            "scraped_at": "2026-08-31T12:00:00+09:00",
+        }
+
+    previous = [pizza("알로하 하와이", 1893), pizza("베지 러버", 2115)]
+    current = copy.deepcopy(previous)
+
+    result = diff_items(previous, current)
+    assert result["counts"]["matched"] == 2
+    assert result["counts"]["conflicts"] == 0, result["conflicts"]
+
+
+def test_integer_alt_id_still_reports_a_real_conflict():
+    """정규화가 진짜 충돌까지 삼키지는 않는다."""
+    def pizza(name, seq, code):
+        return {
+            "source_id": "pizzahut",
+            "external_id": code,
+            "alt_ids": {"rpst_seq": seq},
+            "name": name,
+            "price": 21900,
+            "category_raw": "피자",
+            "image_url": "https://cdn.example/p.jpg",
+            "source_url": "https://www.pizzahut.co.kr/",
+            "scraped_at": "2026-08-31T12:00:00+09:00",
+        }
+
+    previous = [pizza("알로하 하와이", 1893, "RPPZ1893")]
+    current = [pizza("알로하 하와이", 9999, "RPPZ1893")]   # 이름·코드 같고 seq만 다르다
+
+    result = diff_items(previous, current)
+    assert result["counts"]["conflicts"] == 1
+    assert result["conflicts"][0]["conflicting_key"] == "rpst_seq"

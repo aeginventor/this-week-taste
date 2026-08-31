@@ -136,9 +136,16 @@ def diff_items(previous_items: list[dict], current_items: list[dict]) -> dict:
         matched.append((item, previous, layer))
 
         # 한 키로는 이어졌는데 다른 키가 어긋나면 조용히 넘기지 않는다.
+        #
+        # ⚠️ 양쪽을 **같은 방식으로 정규화한 뒤** 비교한다. `_keys()`는 매칭에 쓸 값을
+        # `str()`로 통일하는데, 여기서 지난주 값을 원본 그대로 읽어 비교하면
+        # `1893 != "1893"`이 참이 되어 없는 충돌을 만들어낸다. 피자헛이
+        # `alt_ids` 값을 정수로 주는 유일한 소스라 2026-08-31에 25/25 전건이
+        # 충돌로 잡혔다(Issue #3). 매칭은 정규화된 키로 돌아 멀쩡했고
+        # **보고만 거짓이었다** — 그래서 더 조용히 틀릴 수 있는 자리다.
         for key_name, value in _keys(item):
             other = (previous.get("alt_ids") or {}).get(key_name)
-            if other and other != value:
+            if other and str(other) != value:
                 conflicts.append({
                     "matched_by": layer,
                     "conflicting_key": key_name,
