@@ -1,0 +1,2301 @@
+{
+  "week": "2026-W36",
+  "generated_at": "2026-08-31T14:46:24+09:00",
+  "sources": [
+    "baskinrobbins",
+    "bbq",
+    "bhc",
+    "burgerking",
+    "compose",
+    "crown",
+    "cu",
+    "dominos",
+    "dunkin",
+    "emart24",
+    "kyochon",
+    "mcdonalds",
+    "momstouch",
+    "orion",
+    "parisbaguette",
+    "pizzahut",
+    "starbucks"
+  ],
+  "counts": {
+    "total": 105,
+    "with_blurb": 69
+  },
+  "items": [
+    {
+      "id": "compose--334211",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "요거폼 포도자스민 티브리즈",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/211/334/cb5bf9920a3b8b7e65c032d82b01db6b.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334211",
+      "source_id": "compose",
+      "external_id": "334211",
+      "alt_ids": {
+        "item_srl": "334211"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334207",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "H-딸기 자스민 밀크 티브리즈",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/207/334/f823209b0e12378e053ec6301194ded6.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334207",
+      "source_id": "compose",
+      "external_id": "334207",
+      "alt_ids": {
+        "item_srl": "334207"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334209",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "I-딸기 자스민 밀크 티브리즈",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/209/334/837977c6d9abdaa01ba5b99f6f2c6c9a.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334209",
+      "source_id": "compose",
+      "external_id": "334209",
+      "alt_ids": {
+        "item_srl": "334209"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334203",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "H-비스코프 라떼",
+      "price": null,
+      "category": "커피",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/203/334/4e342242eab4a08024b6a090cd9ee86d.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334203",
+      "source_id": "compose",
+      "external_id": "334203",
+      "alt_ids": {
+        "item_srl": "334203"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334205",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "I-비스코프 라떼",
+      "price": null,
+      "category": "커피",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/205/334/578f6bd38c0c174236ba8b61d1d09ba9.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334205",
+      "source_id": "compose",
+      "external_id": "334205",
+      "alt_ids": {
+        "item_srl": "334205"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334195",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "명란 소프트 바게트",
+      "price": null,
+      "category": "베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/195/334/4e8fe63253aebcfb09e3bf9f348766a4.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334195",
+      "source_id": "compose",
+      "external_id": "334195",
+      "alt_ids": {
+        "item_srl": "334195"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334197",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "초코 바게트",
+      "price": null,
+      "category": "베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/197/334/56d6bdbf196f344843f060ef62d7c075.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334197",
+      "source_id": "compose",
+      "external_id": "334197",
+      "alt_ids": {
+        "item_srl": "334197"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334199",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "생크림 시나몬 크루아상",
+      "price": null,
+      "category": "베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/199/334/2a096cb41689a42ba5947c0a063c9fc4.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334199",
+      "source_id": "compose",
+      "external_id": "334199",
+      "alt_ids": {
+        "item_srl": "334199"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "compose--334201",
+      "week": "2026-W36",
+      "brand": "컴포즈커피",
+      "channel": "cafe",
+      "name": "아이스크림 크루아상",
+      "price": null,
+      "category": "케이크/디저트",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://composecoffee.com/files/attach/images/272857/201/334/3413121e2e7cd9bd855523a25d7e1026.jpg",
+      "source_url": "https://composecoffee.com/index.php?mid=compose&act=dispCafemenuGalleryItem&item_srl=334201",
+      "source_id": "compose",
+      "external_id": "334201",
+      "alt_ids": {
+        "item_srl": "334201"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28093",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "김)레벨업햄참치김치볶음1",
+      "price": 3600,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800271906726.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28093",
+      "source_id": "cu",
+      "external_id": "28093",
+      "alt_ids": {
+        "barcode": "8800271906726",
+        "gd_idx": "28093"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28094",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "도)간장불백김치제육더블1",
+      "price": 5500,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800271906801.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28094",
+      "source_id": "cu",
+      "external_id": "28094",
+      "alt_ids": {
+        "barcode": "8800271906801",
+        "gd_idx": "28094"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28096",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "빅삼)레벨업햄참치김치1",
+      "price": 1900,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800387751821.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28096",
+      "source_id": "cu",
+      "external_id": "28096",
+      "alt_ids": {
+        "barcode": "8800387751821",
+        "gd_idx": "28096"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28098",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "핫)볼로네제핫도그1",
+      "price": 3800,
+      "category": "샌드위치/버거",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068943665.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28098",
+      "source_id": "cu",
+      "external_id": "28098",
+      "alt_ids": {
+        "barcode": "8801068943665",
+        "gd_idx": "28098"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28101",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "햄)레벨업불고기새우반반1",
+      "price": 3900,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801771305224.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28101",
+      "source_id": "cu",
+      "external_id": "28101",
+      "alt_ids": {
+        "barcode": "8801771305224",
+        "gd_idx": "28101"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28104",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샌)히팅올리브쏙잠봉모짜1",
+      "price": 4900,
+      "category": "샌드위치/버거",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809895791732.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28104",
+      "source_id": "cu",
+      "external_id": "28104",
+      "alt_ids": {
+        "barcode": "8809895791732",
+        "gd_idx": "28104"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28105",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샐)저당라임유자샐러드2",
+      "price": 2600,
+      "category": "샐러드",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809954750748.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28105",
+      "source_id": "cu",
+      "external_id": "28105",
+      "alt_ids": {
+        "barcode": "8809954750748",
+        "gd_idx": "28105"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28106",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샌)치킨카츠계란샌드1",
+      "price": 4000,
+      "category": "샌드위치/버거",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800271906764.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28106",
+      "source_id": "cu",
+      "external_id": "28106",
+      "alt_ids": {
+        "barcode": "8800271906764",
+        "gd_idx": "28106"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28112",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "겟모닝)스팸에그반반꼬마1",
+      "price": 3400,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800387751760.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28112",
+      "source_id": "cu",
+      "external_id": "28112",
+      "alt_ids": {
+        "barcode": "8800387751760",
+        "gd_idx": "28112"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28113",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "도)간장불백돈까스트리플1",
+      "price": 5900,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800387751944.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28113",
+      "source_id": "cu",
+      "external_id": "28113",
+      "alt_ids": {
+        "barcode": "8800387751944",
+        "gd_idx": "28113"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28122",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샐)바질닭가슴살&계란샐2",
+      "price": 3900,
+      "category": "샐러드",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068944174.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28122",
+      "source_id": "cu",
+      "external_id": "28122",
+      "alt_ids": {
+        "barcode": "8801068944174",
+        "gd_idx": "28122"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28127",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼)베스트트리플삼각1",
+      "price": 3500,
+      "category": "김밥/주먹밥",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801771037422.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28127",
+      "source_id": "cu",
+      "external_id": "28127",
+      "alt_ids": {
+        "barcode": "8801771037422",
+        "gd_idx": "28127"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28128",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "도)미니감자마카로니컵1",
+      "price": 2400,
+      "category": "도시락",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801771037576.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28128",
+      "source_id": "cu",
+      "external_id": "28128",
+      "alt_ids": {
+        "barcode": "8801771037576",
+        "gd_idx": "28128"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28140",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샌)샤샤샤우유크림샌드1",
+      "price": 4300,
+      "category": "샌드위치/버거",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809895791572.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28140",
+      "source_id": "cu",
+      "external_id": "28140",
+      "alt_ids": {
+        "barcode": "8809895791572",
+        "gd_idx": "28140"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28089",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "오리온)초코칩쿠키256g",
+      "price": 3900,
+      "category": "과자",
+      "tags": [
+        "비스켓",
+        "과자류"
+      ],
+      "blurb": "바삭한 쿠키에 초코칩이 박혀 있어 초콜릿과 쿠키의 조화",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801117122409.png",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28089",
+      "source_id": "cu",
+      "external_id": "28089",
+      "alt_ids": {
+        "barcode": "8801117122409",
+        "gd_idx": "28089"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28095",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "조이)애플망고플롯",
+      "price": 3600,
+      "category": "과자",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "망고잼과 크래커의 부드러운 조화가 특징",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800361441076.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28095",
+      "source_id": "cu",
+      "external_id": "28095",
+      "alt_ids": {
+        "barcode": "8800361441076",
+        "gd_idx": "28095"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28103",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "405)마블초코크림빵",
+      "price": 3200,
+      "category": "디저트/베이커리",
+      "tags": [
+        "빵"
+      ],
+      "blurb": "촉촉한 초코빵 속 진하고 달콤한 초코 크림",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809895791534.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28103",
+      "source_id": "cu",
+      "external_id": "28103",
+      "alt_ids": {
+        "barcode": "8809895791534",
+        "gd_idx": "28103"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28109",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "대경)말차라떼커피캔디",
+      "price": 3800,
+      "category": "과자",
+      "tags": [
+        "기능성캔디",
+        "캔디류"
+      ],
+      "blurb": "말차의 깊은 맛과 자일리톨의 개운함을 느낄 수 있는 캔디",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800314660264.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28109",
+      "source_id": "cu",
+      "external_id": "28109",
+      "alt_ids": {
+        "barcode": "8800314660264",
+        "gd_idx": "28109"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28110",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "SA)티니핑머리핀반지캔디",
+      "price": 1000,
+      "category": "과자",
+      "tags": [
+        "토이캔디",
+        "캔디류"
+      ],
+      "blurb": "상큼한 자두와 청량한 소다가 어우러진 자두소다맛 캔디",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800372651815.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28110",
+      "source_id": "cu",
+      "external_id": "28110",
+      "alt_ids": {
+        "barcode": "8800372651815",
+        "gd_idx": "28110"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28120",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼립)포켓몬브라우니링",
+      "price": 2500,
+      "category": "디저트/베이커리",
+      "tags": [
+        "디저트"
+      ],
+      "blurb": "포켓몬스터 30주년 맞이 신규 띠부씰이 들어간 브라우니",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068943900.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28120",
+      "source_id": "cu",
+      "external_id": "28120",
+      "alt_ids": {
+        "barcode": "8801068943900",
+        "gd_idx": "28120"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28121",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼립)포켓몬애플생크림빵",
+      "price": 3400,
+      "category": "과자",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "사과잼과 사과크림이 든 냉장 생크림빵",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068943979.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28121",
+      "source_id": "cu",
+      "external_id": "28121",
+      "alt_ids": {
+        "barcode": "8801068943979",
+        "gd_idx": "28121"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28123",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼립)달콤한옥수수케익",
+      "price": 2000,
+      "category": "디저트/베이커리",
+      "tags": [
+        "빵"
+      ],
+      "blurb": "옥수수 크림이 든 폭신한 반달 케익",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068944211.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28123",
+      "source_id": "cu",
+      "external_id": "28123",
+      "alt_ids": {
+        "barcode": "8801068944211",
+        "gd_idx": "28123"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28124",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼립)미각황치즈롤팡",
+      "price": 2500,
+      "category": "과자",
+      "tags": [
+        "빵"
+      ],
+      "blurb": "황치즈 필링이 든 치즈 풍미 롤팡",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068944327.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28124",
+      "source_id": "cu",
+      "external_id": "28124",
+      "alt_ids": {
+        "barcode": "8801068944327",
+        "gd_idx": "28124"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28133",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "참조은)쿠앤크볼케익",
+      "price": 3900,
+      "category": "디저트/베이커리",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "브라우니 볼케이크와 쿠키앤크림의 조화",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809523626047.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28133",
+      "source_id": "cu",
+      "external_id": "28133",
+      "alt_ids": {
+        "barcode": "8809523626047",
+        "gd_idx": "28133"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28134",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "참조은)스프링클볼케익",
+      "price": 3900,
+      "category": "디저트/베이커리",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "브라우니 볼케이크와 초코크림의 조화",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809523626054.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28134",
+      "source_id": "cu",
+      "external_id": "28134",
+      "alt_ids": {
+        "barcode": "8809523626054",
+        "gd_idx": "28134"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28139",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "엠즈)흑당모찌밀크티롤",
+      "price": 3900,
+      "category": "과자",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "흑당 모찌가 든 밀크티 풍미의 미니롤",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809844305089.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28139",
+      "source_id": "cu",
+      "external_id": "28139",
+      "alt_ids": {
+        "barcode": "8809844305089",
+        "gd_idx": "28139"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28141",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "푸드빌)떠먹는쿠키초코",
+      "price": 3200,
+      "category": "과자",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "진한 초코 풍미의 촉촉한 쿠키",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809962987839.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28141",
+      "source_id": "cu",
+      "external_id": "28141",
+      "alt_ids": {
+        "barcode": "8809962987839",
+        "gd_idx": "28141"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28142",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "푸드빌)떠먹는쿠키카라멜",
+      "price": 3200,
+      "category": "과자",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "카라멜 풍미에 바삭한 크럼블을 더한 쿠키",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809962987846.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28142",
+      "source_id": "cu",
+      "external_id": "28142",
+      "alt_ids": {
+        "barcode": "8809962987846",
+        "gd_idx": "28142"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28143",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "매일)로쉐오리진스2구",
+      "price": 3500,
+      "category": "과자",
+      "tags": [
+        "초콜릿"
+      ],
+      "blurb": "에콰도르 코코아 빈의 섬세한 다크 초콜릿 2구",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8000500452424.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28143",
+      "source_id": "cu",
+      "external_id": "28143",
+      "alt_ids": {
+        "barcode": "8000500452424",
+        "gd_idx": "28143"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28144",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "조이)애플망고퐁당케익",
+      "price": 4300,
+      "category": "디저트/베이커리",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "말차 크레이프에 퐁당 떨어지는 망고",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800361441052.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28144",
+      "source_id": "cu",
+      "external_id": "28144",
+      "alt_ids": {
+        "barcode": "8800361441052",
+        "gd_idx": "28144"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28150",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "405)마블레몬피쵸크림빵",
+      "price": 3200,
+      "category": "디저트/베이커리",
+      "tags": [
+        "빵"
+      ],
+      "blurb": "레몬필링과 피스타치오 크림의 새로운 만남",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809895791510.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28150",
+      "source_id": "cu",
+      "external_id": "28150",
+      "alt_ids": {
+        "barcode": "8809895791510",
+        "gd_idx": "28150"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28092",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "하겐)샌드위치피넛버터",
+      "price": 6900,
+      "category": "아이스크림",
+      "tags": [
+        "아이스크림"
+      ],
+      "blurb": "피넛버터와 코코아 웨이퍼가 어우러진 아이스크림",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/4976994151133.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28092",
+      "source_id": "cu",
+      "external_id": "28092",
+      "alt_ids": {
+        "barcode": "4976994151133",
+        "gd_idx": "28092"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28138",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "알렉스)리트와메트반반바",
+      "price": 3900,
+      "category": "아이스크림",
+      "tags": [
+        "아이스크림"
+      ],
+      "blurb": "딸기와 망고 퓨레가 든 과일 반반바",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809682781540.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28138",
+      "source_id": "cu",
+      "external_id": "28138",
+      "alt_ids": {
+        "barcode": "8809682781540",
+        "gd_idx": "28138"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28090",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샘표)밥도둑고추장멸치",
+      "price": 3900,
+      "category": "가공식품/조미료",
+      "tags": [
+        "반찬류",
+        "식재료"
+      ],
+      "blurb": "밥에 비벼먹는 고추장 멸치볶음",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801005307857.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28090",
+      "source_id": "cu",
+      "external_id": "28090",
+      "alt_ids": {
+        "barcode": "8801005307857",
+        "gd_idx": "28090"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28091",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "샘표)밥도둑돼지장조림",
+      "price": 4400,
+      "category": "가공식품/조미료",
+      "tags": [
+        "반찬류",
+        "김치류"
+      ],
+      "blurb": "돼지고기와 메추리알 장조림 파우치",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801005382854.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28091",
+      "source_id": "cu",
+      "external_id": "28091",
+      "alt_ids": {
+        "barcode": "8801005382854",
+        "gd_idx": "28091"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28097",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "해태)와샤오롱만두180g",
+      "price": 3500,
+      "category": "즉석조리",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "국내산 돼지고기의 와사비 맛 만두",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801019516122.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28097",
+      "source_id": "cu",
+      "external_id": "28097",
+      "alt_ids": {
+        "barcode": "8801019516122",
+        "gd_idx": "28097"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28099",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "CJ)소바바소이허니210g",
+      "price": 9900,
+      "category": "가공식품/조미료",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "겉바속촉한 바삭 튀김 순살치킨",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801392203954.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28099",
+      "source_id": "cu",
+      "external_id": "28099",
+      "alt_ids": {
+        "barcode": "8801392203954",
+        "gd_idx": "28099"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28100",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "CJ)소바바양념허니210g",
+      "price": 9900,
+      "category": "가공식품/조미료",
+      "tags": [
+        "냉장디저트",
+        "디저트"
+      ],
+      "blurb": "겉바속촉한 양념 튀김 순살치킨",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801392203978.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28100",
+      "source_id": "cu",
+      "external_id": "28100",
+      "alt_ids": {
+        "barcode": "8801392203978",
+        "gd_idx": "28100"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28107",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "금미옥)근본떡볶이컵",
+      "price": 3900,
+      "category": "즉석조리",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "성수동 금미옥 떡볶이의 맛을 담은 컵",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800283860146.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28107",
+      "source_id": "cu",
+      "external_id": "28107",
+      "alt_ids": {
+        "barcode": "8800283860146",
+        "gd_idx": "28107"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28108",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "조흥)뿌려모짜모짜렐라40g",
+      "price": 1400,
+      "category": "가공식품/조미료",
+      "tags": [
+        "치즈",
+        "식재료"
+      ],
+      "blurb": "한 번에 즐기는 고소한 모짜렐라 치즈",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800296374470.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28108",
+      "source_id": "cu",
+      "external_id": "28108",
+      "alt_ids": {
+        "barcode": "8800296374470",
+        "gd_idx": "28108"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28111",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "팔도한끼)얼큰순대국밥",
+      "price": 6500,
+      "category": "도시락",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "진한 사골 육수의 얼큰한 순대국밥",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8800387751425.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28111",
+      "source_id": "cu",
+      "external_id": "28111",
+      "alt_ids": {
+        "barcode": "8800387751425",
+        "gd_idx": "28111"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28115",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "오뚜기)미트토마토파스타",
+      "price": 5900,
+      "category": "즉석조리",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "전자레인지로 간편한 미트 토마토 파스타",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801045151755.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28115",
+      "source_id": "cu",
+      "external_id": "28115",
+      "alt_ids": {
+        "barcode": "8801045151755",
+        "gd_idx": "28115"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28116",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "오뚜기)미소진품밥210g",
+      "price": 2400,
+      "category": "도시락",
+      "tags": [
+        "즉석밥류",
+        "가공식사"
+      ],
+      "blurb": "경북 우수 품종 쌀로 지은 미소진품밥",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801045385976.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28116",
+      "source_id": "cu",
+      "external_id": "28116",
+      "alt_ids": {
+        "barcode": "8801045385976",
+        "gd_idx": "28116"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28117",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "오뚜기)알리오올리오",
+      "price": 5900,
+      "category": "즉석조리",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "전자레인지로 간편한 알리오올리오 파스타",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801045738123.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28117",
+      "source_id": "cu",
+      "external_id": "28117",
+      "alt_ids": {
+        "barcode": "8801045738123",
+        "gd_idx": "28117"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28119",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "삼립)타코피자브레드",
+      "price": 3500,
+      "category": "샌드위치/버거",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "타코맛 토핑 올린 브리오슈 빵",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801068943412.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28119",
+      "source_id": "cu",
+      "external_id": "28119",
+      "alt_ids": {
+        "barcode": "8801068943412",
+        "gd_idx": "28119"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28125",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "PBICK)구운믹스넛",
+      "price": 5900,
+      "category": "과자",
+      "tags": [
+        "마른안주류",
+        "안주류",
+        "PBICK"
+      ],
+      "blurb": "볶음땅콩, 구운아몬드, 캐슈넛 믹스",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801133013927.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28125",
+      "source_id": "cu",
+      "external_id": "28125",
+      "alt_ids": {
+        "barcode": "8801133013927",
+        "gd_idx": "28125"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28129",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "백제)멸치맛쌀국수",
+      "price": 2000,
+      "category": "면류",
+      "tags": [
+        "면류",
+        "가공식사"
+      ],
+      "blurb": "멸치 국물로 시원한 쌀국수",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8803060080805.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28129",
+      "source_id": "cu",
+      "external_id": "28129",
+      "alt_ids": {
+        "barcode": "8803060080805",
+        "gd_idx": "28129"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28130",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "백제)김치맛쌀국수",
+      "price": 2000,
+      "category": "면류",
+      "tags": [
+        "면류",
+        "가공식사"
+      ],
+      "blurb": "칼칼한 김치맛 국물의 쌀국수",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8803060080942.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28130",
+      "source_id": "cu",
+      "external_id": "28130",
+      "alt_ids": {
+        "barcode": "8803060080942",
+        "gd_idx": "28130"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28131",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "이가)얼큰육개장칼국수",
+      "price": 4900,
+      "category": "면류",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "얼큰한 육개장 국물 칼국수",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809083709037.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28131",
+      "source_id": "cu",
+      "external_id": "28131",
+      "alt_ids": {
+        "barcode": "8809083709037",
+        "gd_idx": "28131"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28135",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "데일리)맛배3입",
+      "price": 15900,
+      "category": "도시락",
+      "tags": [
+        "과일",
+        "식재료"
+      ],
+      "blurb": "부담없는 가격의 3입팩 상품",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809572423178.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28135",
+      "source_id": "cu",
+      "external_id": "28135",
+      "alt_ids": {
+        "barcode": "8809572423178",
+        "gd_idx": "28135"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28136",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "푸드)통스팸떡볶이볶음밥",
+      "price": 6300,
+      "category": "도시락",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "통스팸과 떡볶이맛 소스 즉석밥",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809629025140.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28136",
+      "source_id": "cu",
+      "external_id": "28136",
+      "alt_ids": {
+        "barcode": "8809629025140",
+        "gd_idx": "28136"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28137",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "푸드)통스팸데리마요덮밥",
+      "price": 6300,
+      "category": "도시락",
+      "tags": [
+        "즉석식",
+        "가공식사"
+      ],
+      "blurb": "통스팸과 데리야끼 소스 즉석밥",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809629025157.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28137",
+      "source_id": "cu",
+      "external_id": "28137",
+      "alt_ids": {
+        "barcode": "8809629025157",
+        "gd_idx": "28137"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28114",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "스벅)자몽하니블랙티350ml",
+      "price": 2200,
+      "category": "커피/차",
+      "tags": [
+        "차음료",
+        "음료"
+      ],
+      "blurb": "자몽과 꿀향 저당 홍차 음료",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801037100129.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28114",
+      "source_id": "cu",
+      "external_id": "28114",
+      "alt_ids": {
+        "barcode": "8801037100129",
+        "gd_idx": "28114"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28118",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "동원)비타C모로오렌지500",
+      "price": 2400,
+      "category": "음료",
+      "tags": [
+        "과즙음료",
+        "음료"
+      ],
+      "blurb": "제로칼로리 모로오렌지 비타민 음료",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801047496885.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28118",
+      "source_id": "cu",
+      "external_id": "28118",
+      "alt_ids": {
+        "barcode": "8801047496885",
+        "gd_idx": "28118"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28126",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "웅진)빅토리아레몬P500ml",
+      "price": 1800,
+      "category": "음료",
+      "tags": [
+        "탄산수",
+        "음료"
+      ],
+      "blurb": "레몬향 탄산수",
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8801382145080.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28126",
+      "source_id": "cu",
+      "external_id": "28126",
+      "alt_ids": {
+        "barcode": "8801382145080",
+        "gd_idx": "28126"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "cu--28132",
+      "week": "2026-W36",
+      "brand": "CU",
+      "channel": "convenience",
+      "name": "서울의밤매실하이볼500ml",
+      "price": 4000,
+      "category": "주류",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://tqklhszfkvzk6518638.edge.naverncp.com/product/8809313089045.jpg",
+      "source_url": "https://cu.bgfretail.com/product/view.do?category=product&gdIdx=28132",
+      "source_id": "cu",
+      "external_id": "28132",
+      "alt_ids": {
+        "barcode": "8809313089045",
+        "gd_idx": "28132"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8800354750239",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "대박각)불맛짬뽕라면",
+      "price": 1800,
+      "category": "면류",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8800354750239.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8800354750239",
+      "alt_ids": {
+        "barcode": "8800354750239"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8800354751595",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "대박각)고추짜장라면",
+      "price": 1800,
+      "category": "면류",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8800354751595.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8800354751595",
+      "alt_ids": {
+        "barcode": "8800354751595"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8808024051006",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "성수310)로열밀크티펫350ml",
+      "price": 1600,
+      "category": "음료",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8808024051006.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8808024051006",
+      "alt_ids": {
+        "barcode": "8808024051006"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8800348942534",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "성수310)화이트브레드초코가나슈빵82g",
+      "price": 2600,
+      "category": "디저트/베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8800348942534.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8800348942534",
+      "alt_ids": {
+        "barcode": "8800348942534"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8801206007259",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "옐로우)조선호텔스트로베리마카롱150ml",
+      "price": 4500,
+      "category": "디저트/베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8801206007259.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8801206007259",
+      "alt_ids": {
+        "barcode": "8801206007259"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8801308490812",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "포차24)맥반석오징어20g",
+      "price": 2400,
+      "category": "안주",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8801308490812.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8801308490812",
+      "alt_ids": {
+        "barcode": "8801308490812"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8801308490829",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "포차24)땅콩버터맛오징어20g",
+      "price": 2400,
+      "category": "안주",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8801308490829.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8801308490829",
+      "alt_ids": {
+        "barcode": "8801308490829"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8807203003607",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "구황작물)꿀고구마바80ml",
+      "price": 2000,
+      "category": "아이스크림",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8807203003607.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8807203003607",
+      "alt_ids": {
+        "barcode": "8807203003607"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8809494072232",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "성수310)홋카이도푸딩사르르크림빵125g(냉장)",
+      "price": 3500,
+      "category": "디저트/베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8809494072232.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8809494072232",
+      "alt_ids": {
+        "barcode": "8809494072232"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8809494072249",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "성수310)홋카이도푸딩크림카스테라130g(냉장)",
+      "price": 3500,
+      "category": "디저트/베이커리",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8809494072249.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8809494072249",
+      "alt_ids": {
+        "barcode": "8809494072249"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "emart24--8809659912182",
+      "week": "2026-W36",
+      "brand": "이마트24",
+      "channel": "convenience",
+      "name": "구황작물)아이스고구마맛탕100g",
+      "price": 3900,
+      "category": "아이스크림",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://msave.emart24.co.kr/cmsbo/upload/nHq/plu_image/500x500/8809659912182.JPG",
+      "source_url": "https://emart24.co.kr/goods/pl",
+      "source_id": "emart24",
+      "external_id": "8809659912182",
+      "alt_ids": {
+        "barcode": "8809659912182"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41574",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "간장윙콤비",
+      "price": 24000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "하프윙과 정육순살의 간장양념 조합",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Soy Sauce Wing Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41574",
+      "source_id": "kyochon",
+      "external_id": "41574",
+      "alt_ids": {
+        "id": "41574"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41575",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "레드윙콤비",
+      "price": 24000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "하프윙과 정육순살의 매운 레드양념 조합",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Red Wing Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41575",
+      "source_id": "kyochon",
+      "external_id": "41575",
+      "alt_ids": {
+        "id": "41575"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41576",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "마라레드윙콤비",
+      "price": 24000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "하프윙과 정육순살의 얼얼한 마라양념",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Mala Red Wing Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41576",
+      "source_id": "kyochon",
+      "external_id": "41576",
+      "alt_ids": {
+        "id": "41576"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41577",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "허니갈릭윙콤비",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "하프윙과 정육순살의 달콤한 허니갈릭",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Honey Garlic Wing Combo(3).png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41577",
+      "source_id": "kyochon",
+      "external_id": "41577",
+      "alt_ids": {
+        "id": "41577"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41578",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[간장+레드]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "간장과 레드양념을 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Soy & Red Wing Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41578",
+      "source_id": "kyochon",
+      "external_id": "41578",
+      "alt_ids": {
+        "id": "41578"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41579",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[간장+마라레드]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "간장과 마라레드를 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Soy & Mala Red Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41579",
+      "source_id": "kyochon",
+      "external_id": "41579",
+      "alt_ids": {
+        "id": "41579"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41580",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[간장+허니갈릭]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "간장과 허니갈릭을 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Soy & Honey Garlic Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41580",
+      "source_id": "kyochon",
+      "external_id": "41580",
+      "alt_ids": {
+        "id": "41580"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41581",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[레드+마라레드]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "레드와 마라레드를 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Red & Mala Red Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41581",
+      "source_id": "kyochon",
+      "external_id": "41581",
+      "alt_ids": {
+        "id": "41581"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41582",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[레드+허니갈릭]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "레드와 허니갈릭을 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Red & Honey Garlic Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41582",
+      "source_id": "kyochon",
+      "external_id": "41582",
+      "alt_ids": {
+        "id": "41582"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "kyochon--41583",
+      "week": "2026-W36",
+      "brand": "교촌치킨",
+      "channel": "restaurant",
+      "name": "반반윙콤비[마라레드+허니갈릭]",
+      "price": 25000,
+      "category": "치킨",
+      "tags": [],
+      "blurb": "마라레드와 허니갈릭을 함께 즐기는 반반 메뉴",
+      "image_url": "https://www.kyochon.com/uploadFiles/TB_ITEM/list_Mala Red & Honey Garlic Combo.png",
+      "source_url": "https://www.kyochon.com/menu/view.asp?id=41583",
+      "source_id": "kyochon",
+      "external_id": "41583",
+      "alt_ids": {
+        "id": "41583"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "parisbaguette--shrimp-potato-salad",
+      "week": "2026-W36",
+      "brand": "파리바게뜨",
+      "channel": "dessert",
+      "name": "쉬림프 포테이토 샐러드",
+      "price": null,
+      "category": "샌드위치/샐러드",
+      "tags": [],
+      "blurb": "새우·에그·양념감자 샐러드",
+      "image_url": "https://d2afncas1tel3t.cloudfront.net/wp-content/uploads/2026/08/쉬림프-포테이토-샐러드-600x600.png",
+      "source_url": "https://www.paris.co.kr/product/shrimp-potato-salad/",
+      "source_id": "parisbaguette",
+      "external_id": "shrimp-potato-salad",
+      "alt_ids": {
+        "slug": "shrimp-potato-salad"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "parisbaguette--financier-madeleine-gift-set-15pcs",
+      "week": "2026-W36",
+      "brand": "파리바게뜨",
+      "channel": "dessert",
+      "name": "구움과자 아뜰리에 (15개입)",
+      "price": null,
+      "category": "쿠키/구움과자",
+      "tags": [],
+      "blurb": "버터·아몬드·초콜릿·바닐라 향 구움과자 15개",
+      "image_url": "https://d2afncas1tel3t.cloudfront.net/wp-content/uploads/2026/08/1000549-구움과자-아뜰리에15개입-600x600.png",
+      "source_url": "https://www.paris.co.kr/product/financier-madeleine-gift-set-15pcs/",
+      "source_id": "parisbaguette",
+      "external_id": "financier-madeleine-gift-set-15pcs",
+      "alt_ids": {
+        "slug": "financier-madeleine-gift-set-15pcs"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "parisbaguette--financier-madeleine-gift-set-10pcs",
+      "week": "2026-W36",
+      "brand": "파리바게뜨",
+      "channel": "dessert",
+      "name": "구움과자 아뜰리에 (10개입)",
+      "price": null,
+      "category": "쿠키/구움과자",
+      "tags": [],
+      "blurb": "버터·아몬드·초콜릿·바닐라 향 구움과자 10개",
+      "image_url": "https://d2afncas1tel3t.cloudfront.net/wp-content/uploads/2026/08/1000550-구움과자-아뜰리에10개입-600x600.png",
+      "source_url": "https://www.paris.co.kr/product/financier-madeleine-gift-set-10pcs/",
+      "source_id": "parisbaguette",
+      "external_id": "financier-madeleine-gift-set-10pcs",
+      "alt_ids": {
+        "slug": "financier-madeleine-gift-set-10pcs"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "parisbaguette--jeju-udo-peanut-bread",
+      "week": "2026-W36",
+      "brand": "파리바게뜨",
+      "channel": "dessert",
+      "name": "제주 우도 땅콩빵",
+      "price": null,
+      "category": "쿠키/구움과자",
+      "tags": [],
+      "blurb": "제주 우도 땅콩 크림 구움과자 9개",
+      "image_url": "https://d2afncas1tel3t.cloudfront.net/wp-content/uploads/2026/08/제주-우도-땅콩빵-600x600.png",
+      "source_url": "https://www.paris.co.kr/product/jeju-udo-peanut-bread/",
+      "source_id": "parisbaguette",
+      "external_id": "jeju-udo-peanut-bread",
+      "alt_ids": {
+        "slug": "jeju-udo-peanut-bread"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000002259",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "블랙 글레이즈드 라떼",
+      "price": null,
+      "category": "커피",
+      "tags": [],
+      "blurb": "짙고 풍부한 커피와 달콤한 글레이즈드 폼의 조화",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000002259]_20260818150452741.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000002259",
+      "source_id": "starbucks",
+      "external_id": "9200000002259",
+      "alt_ids": {
+        "product_cd": "9200000002259"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000002262",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "아이스 블랙 글레이즈드 라떼",
+      "price": null,
+      "category": "커피",
+      "tags": [],
+      "blurb": "짙고 풍부한 커피와 달콤한 글레이즈드 폼의 조화",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000002262]_20260818150714272.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000002262",
+      "source_id": "starbucks",
+      "external_id": "9200000002262",
+      "alt_ids": {
+        "product_cd": "9200000002262"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007155",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "유자 V 피지오",
+      "price": null,
+      "category": "논커피 음료",
+      "tags": [],
+      "blurb": "상큼한 유자와 헤스페리딘을 담은 청량한 음료",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007155]_20260828161920110.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007155",
+      "source_id": "starbucks",
+      "external_id": "9200000007155",
+      "alt_ids": {
+        "product_cd": "9200000007155"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007152",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "유자 말차 V 피지오",
+      "price": null,
+      "category": "논커피 음료",
+      "tags": [],
+      "blurb": "유자와 제주산 말차를 청량하게 즐길 수 있는 음료",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007152]_20260828162012890.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007152",
+      "source_id": "starbucks",
+      "external_id": "9200000007152",
+      "alt_ids": {
+        "product_cd": "9200000007152"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007158",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "아이스 퓨어 말차",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "제주산 녹찻잎을 100% 담은 퓨어 말차",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007158]_20260818154640611.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007158",
+      "source_id": "starbucks",
+      "external_id": "9200000007158",
+      "alt_ids": {
+        "product_cd": "9200000007158"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007184",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "아이스 퓨어 호지차",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "국내산 호지차 100%의 고소한 풍미",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007184]_20260818154751439.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007184",
+      "source_id": "starbucks",
+      "external_id": "9200000007184",
+      "alt_ids": {
+        "product_cd": "9200000007184"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007178",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "퓨어 말차",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "제주산 녹찻잎을 100% 담은 퓨어 말차",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007178]_20260818155248635.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007178",
+      "source_id": "starbucks",
+      "external_id": "9200000007178",
+      "alt_ids": {
+        "product_cd": "9200000007178"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007181",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "퓨어 호지차",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "국내산 호지차 100%의 고소한 풍미",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007181]_20260818155436836.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007181",
+      "source_id": "starbucks",
+      "external_id": "9200000007181",
+      "alt_ids": {
+        "product_cd": "9200000007181"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007164",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "아이스 호지 글레이즈드 티 라떼",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "호지차 라떼에 글레이즈드 폼을 올린 음료",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007164]_20260818155142639.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007164",
+      "source_id": "starbucks",
+      "external_id": "9200000007164",
+      "alt_ids": {
+        "product_cd": "9200000007164"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9200000007161",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "호지 글레이즈드 티 라떼",
+      "price": null,
+      "category": "차",
+      "tags": [],
+      "blurb": "호지차 라떼에 글레이즈드 폼을 올린 음료",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9200000007161]_20260818153947869.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9200000007161",
+      "source_id": "starbucks",
+      "external_id": "9200000007161",
+      "alt_ids": {
+        "product_cd": "9200000007161"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9300000006186",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "마롱 몽블랑 치즈 케이크",
+      "price": null,
+      "category": "케이크/디저트",
+      "tags": [],
+      "blurb": "국내산 밤을 넣은 마롱 치즈 케이크",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9300000006186]_20260818155650324.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9300000006186",
+      "source_id": "starbucks",
+      "external_id": "9300000006186",
+      "alt_ids": {
+        "product_cd": "9300000006186"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9300000006817",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "얼 그레이 카라멜 넛츠 케이크",
+      "price": null,
+      "category": "케이크/디저트",
+      "tags": [],
+      "blurb": "얼 그레이 시트에 마스카포네 생크림과 향긋한 크림",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9300000006817]_20260818155806938.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9300000006817",
+      "source_id": "starbucks",
+      "external_id": "9300000006817",
+      "alt_ids": {
+        "product_cd": "9300000006817"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9300000006829",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "무화과 잠봉 루꼴라 샌드위치",
+      "price": null,
+      "category": "샌드위치/샐러드",
+      "tags": [],
+      "blurb": "무화과 잼과 리코타 치즈, 루꼴라의 담백한 조화",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9300000006829]_20260818160055628.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9300000006829",
+      "source_id": "starbucks",
+      "external_id": "9300000006829",
+      "alt_ids": {
+        "product_cd": "9300000006829"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--5110009171",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "프리미엄 바나나",
+      "price": null,
+      "category": "기타",
+      "tags": [],
+      "blurb": null,
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[5110009171]_20210421162111179.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=5110009171",
+      "source_id": "starbucks",
+      "external_id": "5110009171",
+      "alt_ids": {
+        "product_cd": "5110009171"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    },
+    {
+      "id": "starbucks--9300000006209",
+      "week": "2026-W36",
+      "brand": "스타벅스",
+      "channel": "cafe",
+      "name": "마롱 마들렌",
+      "price": null,
+      "category": "베이커리",
+      "tags": [],
+      "blurb": "국내산 우리 밤을 가득 담은 마들렌",
+      "image_url": "https://image.istarbucks.co.kr/upload/store/skuimg/2026/08/[9300000006209]_20260818160245359.jpg",
+      "source_url": "https://www.starbucks.co.kr/menu/drink_view.do?product_cd=9300000006209",
+      "source_id": "starbucks",
+      "external_id": "9300000006209",
+      "alt_ids": {
+        "product_cd": "9300000006209"
+      },
+      "first_seen": "2026-W36",
+      "last_seen": "2026-W36"
+    }
+  ]
+}
