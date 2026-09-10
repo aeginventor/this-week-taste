@@ -32,6 +32,30 @@ def _url(value, label: str) -> str:
     return value
 
 
+def exclusions(week: str, catalog_items: list[dict]) -> set[str]:
+    """검토자가 특정한 범위 밖 상품만 제외한다. 이름/출처가 바뀌면 다시 검토한다."""
+    path = candidate_path(week)
+    if not path.exists():
+        return set()
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    rows = payload.get("catalog_exclusions", [])
+    if not isinstance(rows, list):
+        raise ValueError("카탈로그 제외 검토가 목록이 아니다")
+    existing = {item["id"]: item for item in catalog_items}
+    excluded = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("카탈로그 제외 검토가 객체가 아니다")
+        key = _text(row.get("id"), "제외할 공개 ID")
+        item = existing.get(key)
+        if key in excluded or not item or any(row.get(k) != item.get(k) for k in ("name", "source_id", "source_url")):
+            raise ValueError(f"제외 검토 대상이 중복되거나 현재 상품과 다르다: {key}")
+        for field in ("reason", "reviewed_by", "evidence"):
+            _text(row.get(field), field)
+        excluded.add(key)
+    return excluded
+
+
 def load(week: str, catalog_items: list[dict]) -> tuple[list[dict], dict]:
     """포함 후보만 반환한다. 잘못된 검토 입력은 발행 전에 명시적으로 거부한다."""
     path = candidate_path(week)

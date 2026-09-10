@@ -298,6 +298,9 @@ def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
     candidate_file = content.candidate_path(week)
     candidate_hash = provenance.file_digest(candidate_file)
     additions, content_report = content.load(week, items)
+    excluded_ids = content.exclusions(week, items)
+    if excluded_ids & {i["id"] for i in additions}:
+        raise provenance.InvalidEvidence("같은 상품을 콘텐츠 검토에서 포함·제외했다")
     for previous_file in sorted(WEEKS_DIR.glob("????-W??.json"), reverse=True):
         if previous_file.stem >= week:
             continue
@@ -310,6 +313,13 @@ def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
     if len(replacements) != content_report.get("catalog_matches", 0):
         raise provenance.InvalidEvidence("콘텐츠 후보 ID가 명시적 연결 없이 기존 항목과 겹친다")
     items = [replacements.get(i["id"], i) for i in items] + [i for i in additions if i["id"] not in replacements]
+    if excluded_ids:
+        content_report["catalog_excluded"] = len(excluded_ids)
+        for source_id, source_report in by_source.items():
+            names = [i["name"] for i in items if i["id"] in excluded_ids and i["source_id"] == source_id]
+            if names:
+                source_report["review_excluded"] = {"count": len(names), "names": names}
+        items = [i for i in items if i["id"] not in excluded_ids]
     if not by_source and not additions:
         raise provenance.InvalidEvidence(f"{week}: 검증된 부분 산출물이 없다. 기존 공개 파일을 보존한다")
 

@@ -137,3 +137,20 @@ def test_catalog_connection_is_explicit_and_preserves_original_identity(isolated
     write(row)
     with pytest.raises(ValueError, match="연결할 카탈로그"):
         content.load(WEEK, [catalog_item])
+
+
+def test_catalog_exclusion_requires_exact_current_item(tmp_path, monkeypatch):
+    from pipeline import content
+    import json
+    import pytest
+    path = tmp_path / '2026-W37.json'
+    monkeypatch.setattr(content, 'candidate_path', lambda week: path)
+    item = {'id': 'cu--1', 'name': '포도', 'source_id': 'cu', 'source_url': 'https://example.com/1'}
+    row = {**item, 'reason': '신선 원물', 'reviewed_by': 'AI', 'evidence': '저장된 공식 상세의 과일 태그와 설명 확인'}
+    path.write_text(json.dumps({'catalog_exclusions': [row]}))
+    assert content.exclusions('2026-W37', [item]) == {'cu--1'}
+    with pytest.raises(ValueError, match='현재 상품과 다르다'):
+        content.exclusions('2026-W37', [{**item, 'name': '포도주스'}])
+    path.write_text(json.dumps({'catalog_exclusions': [row, row]}))
+    with pytest.raises(ValueError):
+        content.exclusions('2026-W37', [item])
