@@ -11,10 +11,16 @@ REFRESH_ARG := $(if $(REFRESH),--refresh,)
 # 등록된 소스 전부. 표는 pipeline/sources.py 한 곳에 있다.
 ALL_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.known()))")
 
-# 소스 부분집합. robots.txt가 수집 시각을 제한하는 소스가 있어서 필요하다 (ADR-0014).
-#   ONLY=gs25   그 소스만
-#   SKIP=gs25   그 소스만 빼고
-SELECTED = $(if $(ONLY),$(ONLY),$(filter-out $(SKIP),$(ALL_SOURCES)))
+# 소스 부분집합.
+#   GROUP=actions-anytime   실행 묶음. 묶음 정의는 pipeline/sources.py 의 GROUPS
+#   ONLY=gs25               그 소스만
+#   SKIP=gs25               그 소스만 빼고
+#
+# GROUP 은 자동화가 쓰고(워크플로의 cron 슬롯마다 하나), ONLY/SKIP 은 사람이 손으로 쓴다.
+# 묶음 이름을 여기 나열하지 않는 이유: 소스가 늘 때 고칠 곳을 표 한 곳으로 묶기 위해서다.
+GROUP ?=
+GROUP_SOURCES = $(shell $(PY) -c "from pipeline import sources; print(' '.join(sources.group('$(GROUP)')))")
+SELECTED = $(if $(ONLY),$(ONLY),$(filter-out $(SKIP),$(if $(GROUP),$(GROUP_SOURCES),$(ALL_SOURCES))))
 
 help:
 	@echo "make setup      의존성 설치 (.venv)"
@@ -29,7 +35,8 @@ help:
 	@echo "  SOURCE=cu     소스 지정 (기본 cu)"
 	@echo "  WEEK=2026-W33 주차 지정 (기본 이번 주)"
 	@echo "  REFRESH=1     이미 있는 스냅샷을 다시 뜬다 (기본은 재사용)"
-	@echo "  ONLY=gs25     그 소스만 (collect-all / week-all)"
+	@echo "  GROUP=local   실행 묶음만 (collect-all / week-all). 묶음은 pipeline/sources.py"
+	@echo "  ONLY=gs25     그 소스만 (〃)"
 	@echo "  SKIP=gs25     그 소스만 빼고 (〃)"
 	@echo ""
 	@echo "  THIS_WEEK_TASTE_DATA_DIR  수집 데이터 위치 (기본 ./data)"
@@ -60,7 +67,12 @@ collect:  ## 수집만: 스냅샷 → diff (소스 1개). 발행은 하지 않�
 	$(PY) -m pipeline.diff --source $(SOURCE) $(WEEK_ARG)
 
 collect-all:  ## 등록된 소스 전부 수집. 하나가 실패해도 나머지는 계속 간다 (2.3)
-	@failed=""; \
+	@if [ -z "$(strip $(SELECTED))" ]; then \
+		echo "‼️  고른 소스가 없다 (GROUP=$(GROUP) ONLY=$(ONLY) SKIP=$(SKIP))" >&2; \
+		echo "   빈 선택을 성공으로 넘기지 않는다 — 조용히 빈 주차가 되는 길이다 (2.4)." >&2; \
+		exit 1; \
+	fi; \
+	failed=""; \
 	for s in $(SELECTED); do \
 		echo "════════ $$s ════════"; \
 		$(MAKE) --no-print-directory collect SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \

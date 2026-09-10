@@ -1,4 +1,13 @@
-"""GS25 유어스(PB)·차별화 상품 카탈로그.
+"""GS25 유어스(PB)·차별화 상품 카탈로그. **2026-08-31 현재 돌지 않는다.**
+
+❌ **엔드포인트가 사라졌다.** 옛 호스트의 모든 경로가 기업 브랜드 페이지로 301되고,
+소비자 경로는 앱 인증이 필요한 API로 옮겨갔다(`sources/targets.yml`의 gs25 항목에
+실측이 있다). 그래서 `pipeline/sources.py`의 표에서 내렸다 — 표에 남겨두면 매주
+긁으려다 실패하고, 고칠 것이 없는데 사람을 부른다(2.4).
+
+**이 파일과 골든 테스트는 남긴다.** 파싱 규칙은 소스가 돌아오면 그대로 쓸 수 있고,
+지워 버리면 다시 정찰부터 해야 한다. 되살릴 때 고칠 곳은 아래 URL 상수와
+`pipeline/sources.py`의 한 줄이다.
 
 정찰 근거: `sources/targets.yml`의 gs25 항목, 골든 픽스처 `tests/fixtures/gs25_*.json`.
 아래 수치는 전부 2026-08-25 실측이다.
@@ -306,7 +315,7 @@ def fetch(*, week: str | None = None, categories: list[str] | None = None) -> li
     week = week or weeks.current_week()
     keys = categories or list(LISTS)
     scraped_at = weeks.scraped_at()
-    session = base.Session()
+    session = base.Session(week=week, source_id=SOURCE_ID)
 
     # 토큰은 세션마다 다르다. 매 실행 시 페이지를 먼저 GET한다.
     token = csrf_token(session, LISTS[keys[0]][1])

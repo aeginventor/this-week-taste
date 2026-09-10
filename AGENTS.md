@@ -419,7 +419,11 @@ pipeline/sources.py            표에 한 줄: brand·channel·detail·monotonic
 
 발행 전에 비공개 데이터 저장소의 원격 변경과 로컬 변경을 확인하고 동기화한다.
 Actions에서는 `make collect-all`로 수집·diff까지만 수행하고 발행은 로컬에서 수행한다.
-수집 대상·스케줄은 소스 표와 `.github/workflows/weekly.yml`의 현재 코드를 확인한다.
+수집 주체·묶음은 `pipeline/sources.py`에서 확인한다.
+시각 제한이 없는 Actions 묶음은 KST 월 10:13·12:13에 수집한다.
+현재 비어 있는 시각 제한 묶음에는 cron을 두지 않는다.
+새 시각 제한 소스를 추가하면 소스 표·cron·선택 배열을 함께 맞추고 검사한다.
+로컬 전용 소스는 `make collect-all GROUP=local`로 수집한다.
 `make week`는 소스 하나의 부분 발행까지, `make week-all`은 소스별 처리와 병합까지 수행한다.
 `make merge`로 병합하고 `make site`로 정적 빌드를 확인한다.
 배포 전에는 `make test`, `make site`, `make check-images`를 실행한다.

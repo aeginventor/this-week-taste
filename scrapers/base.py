@@ -141,7 +141,18 @@ def within_visit_time(window: tuple[clock, clock] | None, now: clock) -> bool:
 class Session:
     """호스트 하나를 상대하는 세션. 요청 간격과 재시도를 강제한다."""
 
-    def __init__(self, *, user_agent: str = USER_AGENT, min_interval: float = MIN_INTERVAL):
+    def __init__(self, *, user_agent: str = USER_AGENT, min_interval: float = MIN_INTERVAL,
+                 week: str | None = None, source_id: str | None = None):
+        """`week`와 `source_id`를 주면 받은 `robots.txt`를 원본으로 보관한다 (2.5).
+
+        2026-08-31에 이것이 없어서 곤란했다. 러너에서 parisbaguette가
+        `RobotsDisallowed`로 막혔는데 같은 파일을 로컬에서 받으면 **허용**이 나왔다.
+        즉 러너가 다른 robots.txt를 받은 것인데, **그것을 증명할 방법이 없었다**
+        (ADR-0017). 판정의 근거가 남지 않으면 같은 논쟁을 매번 처음부터 한다.
+
+        둘 다 주지 않으면 보관하지 않는다. `enrich.py`·`imagecheck.py`처럼
+        수집이 끝난 뒤 도는 쪽은 이미 그 주 robots를 남긴 뒤라 덮어쓸 뿐이다.
+        """
         # 5장은 **연락 가능한 식별자**를 요구한다. 빈 UA는 식별자가 아니다.
         # 시끄럽게 막는다 — 조용히 익명으로 긁는 것이 가장 나쁘다 (2.4).
         if not (user_agent or "").strip():
@@ -157,6 +168,7 @@ class Session:
         self._visit_windows: dict[str, tuple[clock, clock] | None] = {}
         self._intervals: dict[str, float] = {}
         self.request_count = 0
+        self._archive = (week, source_id) if week and source_id else None
 
     @staticmethod
     def _origin(url: str) -> str:
@@ -173,6 +185,7 @@ class Session:
                 self._wait()
                 resp = self.session.get(robots_url, timeout=TIMEOUT)
                 self._mark()
+                self._archive_robots(origin, resp)
                 if resp.status_code == 200:
                     rp.parse(resp.text.splitlines())
                     log.info("robots.txt 확인: %s (%d바이트)", robots_url, len(resp.content))
@@ -187,6 +200,25 @@ class Session:
                 raise RobotsDisallowed(f"robots.txt를 읽을 수 없다: {robots_url} ({exc})") from exc
             self._robots[origin] = rp
         return self._robots[origin]
+
+    def _archive_robots(self, origin: str, resp: requests.Response) -> None:
+        """받은 robots.txt를 원본으로 남긴다 (2.5, ADR-0017 결정 3).
+
+        호스트를 파일 이름에 넣는 이유: 한 소스가 호스트를 둘 이상 상대할 수 있고
+        (이미지 CDN 등), 그때 서로 덮어쓰면 무엇을 보고 판단했는지 다시 잃는다.
+
+        ⚠️ **보관 실패가 수집을 멈추게 하지 않는다.** 근거를 남기는 일이지
+        수집의 조건이 아니다. 다만 삼키지는 않는다 — 2.4가 금지하는 것은
+        `except: pass`이지 기록한 뒤 계속 가는 것이 아니다.
+        """
+        if self._archive is None:
+            return
+        week, source_id = self._archive
+        host = urlsplit(origin).netloc.replace(":", "_")
+        try:
+            save_raw(week, source_id, f"robots_{host}", resp.text, "txt")
+        except OSError as exc:
+            log.warning("robots.txt 원본을 남기지 못했다: %s (%s)", origin, exc)
 
     def _apply_limits(self, origin: str, rp: urllib.robotparser.RobotFileParser,
                       text: str) -> None:

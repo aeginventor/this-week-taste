@@ -65,3 +65,36 @@ def test_카테고리_이름이_유일하다(source_id):
 def test_모르는_소스는_막는다():
     with pytest.raises(ValueError, match="모르는 소스"):
         sources.meta("nonexistent")
+
+
+# ── 실행 묶음 (ADR-0014, ADR-0017) ───────────────────────────────
+
+def test_모든_소스가_정확히_한_묶음에_든다():
+    """어느 묶음에도 안 들면 **그 소스는 조용히 수집에서 빠진다.**
+
+    자동화는 묶음 단위로 돈다. 표에 소스를 더하면서 `collector`나 `windowed`를
+    잘못 적으면 예외가 아니라 "그 소스만 없는 발행"이 나온다 — 2.4가 가장 나쁘다고
+    적어둔 결과다. 반대로 두 묶음에 들면 같은 주에 두 번 긁어 소스에 실례가 된다.
+
+    묶음 이름을 여기 나열하지 않는 이유는 위 테스트들과 같다. 표를 순회한다.
+    """
+    seen: dict[str, list[str]] = {s: [] for s in sources.known()}
+    for name in sources.GROUPS:
+        for source_id in sources.group(name):
+            seen[source_id].append(name)
+
+    빠진것 = [s for s, gs in seen.items() if not gs]
+    겹친것 = {s: gs for s, gs in seen.items() if len(gs) > 1}
+    assert not 빠진것, f"어느 묶음에도 없다: {빠진것}"
+    assert not 겹친것, f"두 묶음에 걸쳤다: {겹친것}"
+
+
+@pytest.mark.parametrize("source_id", sources.known())
+def test_수집_주체가_둘_중_하나다(source_id):
+    """오타가 나면 그 소스는 어느 묶음에도 안 들어 위 테스트가 잡는다. 여기서 먼저 말해준다."""
+    assert sources.collector(source_id) in {"actions", "local"}
+
+
+def test_모르는_묶음은_막는다():
+    with pytest.raises(ValueError, match="모르는 묶음"):
+        sources.group("nonexistent")

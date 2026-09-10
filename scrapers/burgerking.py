@@ -248,7 +248,7 @@ def fetch(*, week: str | None = None, categories: list[str] | None = None) -> li
     """
     week = week or weeks.current_week()
     scraped_at = weeks.scraped_at()
-    session = base.Session()
+    session = base.Session(week=week, source_id=SOURCE_ID)
 
     text = request_tr(session, LIST_TR, {"menuKeywordList": []},
                       week=week, request_id=LIST_TR)
