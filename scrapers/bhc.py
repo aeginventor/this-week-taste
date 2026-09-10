@@ -201,7 +201,7 @@ def fetch(*, week: str | None = None, categories: list[str] | None = None) -> li
     week = week or weeks.current_week()
     codes = categories or list(CATEGORIES)
     scraped_at = weeks.scraped_at()
-    session = base.Session()
+    session = base.Session(week=week, source_id=SOURCE_ID)
 
     raw: list[dict] = []
     for code in codes:

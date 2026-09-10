@@ -246,7 +246,7 @@ def fetch(*, week: str | None = None, categories: list[str] | None = None) -> li
     """
     week = week or weeks.current_week()
     scraped_at = weeks.scraped_at()
-    session = base.Session()
+    session = base.Session(week=week, source_id=SOURCE_ID)
 
     # 앞선 탭에서 먼저 잡힌 항목이 그 분류를 갖는다. 지금은 탭끼리 겹치지 않지만,
     # 겹치기 시작하면 `all`이 이긴다 — 판촉 탭보다 정규 분류가 낫다(버거킹 주의 2번).

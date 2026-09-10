@@ -144,3 +144,84 @@ def test_짧은_crawl_delay가_우리_하한을_내리지_않는다(session):
     sess = session("User-agent: *\nCrawl-delay: 0.1\n")
     sess._robots_for("https://fast.example/list")
     assert sess._intervals == {}
+
+
+# ── robots.txt 원본 보관 (ADR-0017 결정 3) ────────────────────────
+#
+# 2026-08-31에 러너에서 parisbaguette가 `RobotsDisallowed`로 막혔는데, 같은 파일을
+# 로컬에서 받아 같은 파서에 넣으면 **허용**이 나왔다. 러너가 다른 robots.txt를 받은
+# 것인데 **그것을 증명할 방법이 없었다** — 2.5의 원본 보관이 robots까지는 닿지 않았다.
+#
+# 보관이 조용히 안 되는 것이 이 코드의 위험이다. 수집은 성공하고 근거만 없다.
+
+
+@pytest.fixture
+def archiving(monkeypatch, tmp_path):
+    """robots.txt만 가짜로 물려주고, 원본은 임시 디렉토리에 남긴다."""
+    monkeypatch.setattr(base, "RAW_DIR", tmp_path)
+
+    def make(robots_text, **kwargs):
+        # min_interval=0: 이 파일은 보관을 재는 것이지 간격을 재는 것이 아니다.
+        # 간격은 위쪽 테스트들이 본다.
+        kwargs.setdefault("min_interval", 0)
+        sess = base.Session(week="2026-W36", source_id="예시소스", **kwargs)
+        monkeypatch.setattr(sess.session, "get",
+                            lambda url, **kw: _Response(robots_text))
+        return sess
+    return make
+
+
+def test_받은_robots를_원본으로_남긴다(archiving, tmp_path):
+    sess = archiving(GS25_ROBOTS)
+    sess._robots_for("http://gs25.example/gscvs/ko/products/x")
+    saved = tmp_path / "2026-W36" / "예시소스" / "robots_gs25.example.txt"
+    assert saved.read_text(encoding="utf-8") == GS25_ROBOTS
+
+
+def test_호스트마다_따로_남는다(archiving, tmp_path):
+    """한 소스가 호스트를 둘 이상 상대하면 서로 덮어쓰지 않아야 한다."""
+    sess = archiving(GS25_ROBOTS)
+    sess._robots_for("http://a.example/x")
+    sess._robots_for("http://b.example/y")
+    남은것 = sorted(p.name for p in (tmp_path / "2026-W36" / "예시소스").iterdir())
+    assert 남은것 == ["robots_a.example.txt", "robots_b.example.txt"]
+
+
+def test_주차나_소스를_모르면_남기지_않는다(monkeypatch, tmp_path):
+    """`enrich.py`·`imagecheck.py`가 이 경우다. 그 주 robots는 수집이 이미 남겼다."""
+    monkeypatch.setattr(base, "RAW_DIR", tmp_path)
+    sess = base.Session()
+    monkeypatch.setattr(sess.session, "get", lambda url, **kw: _Response(GS25_ROBOTS))
+    sess._robots_for("http://gs25.example/x")
+    assert not list(tmp_path.iterdir())
+
+
+def test_보관에_실패해도_수집은_계속된다(archiving, monkeypatch, caplog):
+    """근거를 남기는 일이지 수집의 조건이 아니다.
+
+    다만 삼키지는 않는다 — 2.4가 금지하는 것은 `except: pass`다.
+    """
+    def 터진다(*args, **kwargs):
+        raise OSError("디스크가 가득 찼다")
+    monkeypatch.setattr(base, "save_raw", 터진다)
+
+    sess = archiving(GS25_ROBOTS)
+    with caplog.at_level("WARNING"):
+        sess._robots_for("http://gs25.example/x")
+
+    # 창 제약은 그대로 읽혔다 — 보관 실패가 파싱을 건드리지 않았다.
+    assert sess._visit_windows["http://gs25.example"] == (time(4, 0), time(8, 45))
+    assert "남기지 못했다" in caplog.text
+
+
+def test_robots가_없어도_받은_응답을_남긴다(archiving, tmp_path):
+    """404도 판정의 근거다. "파일이 없어서 허용했다"와 "못 받았다"는 다르다.
+
+    CU가 이 경우다(HTTP 404). 나중에 그 소스가 robots를 놓으면 그 주부터 내용이
+    달라지는데, 원본이 없으면 언제 바뀌었는지 말할 수 없다.
+    """
+    sess = archiving("<html>Not Found</html>")
+    sess.session.get = lambda url, **kw: _Response("<html>Not Found</html>", 404)
+    sess._robots_for("http://nofile.example/x")
+    saved = tmp_path / "2026-W36" / "예시소스" / "robots_nofile.example.txt"
+    assert saved.exists()

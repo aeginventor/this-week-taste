@@ -12,23 +12,48 @@
 #
 # **비공개 데이터 저장소에만 커밋한다.** 스냅샷은 소스의 전체 카탈로그라
 # 공개 저장소에 둘 수 없다 (ADR-0010).
+#
+# ## 여기서 돌지 않는 소스가 있다
+#
+# 러너 IP 에서만 막히는 소스 셋은 사람이 발행 전에 로컬로 돈다 (ADR-0017).
+# 어느 소스가 그런지는 pipeline/sources.py 의 `collector` 칸이 정한다.
+# 발행이 어차피 사람 손이므로 절차가 새로 늘지는 않는다.
 
 name: weekly
 
+# ## 왜 슬롯이 넷인가
+#
+# 2026-08-31에 **cron 두 슬롯이 모두 발화하지 않았다.** 워크플로는 active, 포크도
+# 아니고, 기본 브랜치에 cron 두 줄이 정상이었는데 실행이 생성되지 않았다.
+#
+# 안 돈 실행은 로그도 Issue도 남기지 않으므로 **2.4(실패는 시끄럽게)가 닿지 않는다.**
+# 감시로는 못 잡는다 — 감시할 대상 자체가 없다. 그래서 대책은 다중화다.
+#
+# 재실행이 싼 이유는 2.6이다. 이미 뜬 스냅샷은 다시 긁지 않는다(요청 0건, 0.07초 실측).
+# 앞선 슬롯이 성공했으면 뒤 슬롯은 사실상 공짜로 지나간다.
+
 on:
   schedule:
-    # UTC 01:00 = KST 10:00 월요일. 시각 제한이 없는 소스 전부.
-    #
     # ⚠️ **요일 숫자는 UTC 기준이다.** KST 09:00보다 이르게 옮기면 UTC로는 일요일이 되므로
     #    요일도 1 → 0으로 바꿔야 한다. 안 바꾸면 조용히 KST 화요일에 돈다.
     #    (예: KST 월 06:30 = `30 21 * * 0`)
     # ⚠️ 주차는 KST로 계산한다(pipeline/weeks.py). 일요일 밤에 돌리면 스냅샷이 지난주
     #    주차로 저장되어 **이미 발행한 주차를 건드린다.** KST 월요일 00:00이 하한선이다.
-    - cron: "0 1 * * 1"
-    # UTC 05:00 = KST 14:00 월요일. **robots.txt가 수집 시각을 제한하는 소스** (ADR-0014).
-    # gs25가 `Visit-time: 0400-0845`(UTC)를 걸어두었고 위 시각은 그 창 밖이다.
-    # 창은 `base.Session`이 강제한다 — 여기서 시각을 틀리면 그 소스는 수집되지 않고 실패한다.
-    - cron: "0 5 * * 1"
+    # ⚠️ 정각(`0분`)을 쓰지 않는다. 전 세계 스케줄이 정각에 몰려 그 시각이 가장 잘 밀린다.
+
+    # 시각 제한이 없는 소스 전부. 본 실행과 재시도.
+    - cron: "13 1 * * 1"   # KST 월 10:13
+    - cron: "13 3 * * 1"   # KST 월 12:13
+
+    # **robots.txt가 수집 시각을 제한하는 소스**(ADR-0014)를 위한 슬롯은 지금 없다.
+    # 그런 소스가 gs25 하나였는데 2026-08-31에 사이트 이전으로 빠졌다.
+    # 빈 묶음에 슬롯을 남기면 매주 그만큼 실패한다 — `collect-all`이 빈 선택을
+    # 성공으로 넘기지 않기 때문이다(2.4). 고칠 것이 없는 실패는 잡음일 뿐이다.
+    #
+    # 그런 소스가 다시 생기면 `windowed` 칸과 함께 슬롯도 돌아온다. 창 안 시각으로
+    # 잡고 아래 fromJSON 배열에 같이 넣는다 — 창은 `base.Session`이 강제하므로
+    # 여기서 시각을 틀리면 그 소스는 수집되지 않고 실패한다.
+    # tests/test_workflow_schedule.py 가 이 둘이 함께 움직이는지 지킨다.
   workflow_dispatch:
 
 # alert.py가 이상 상황에서 Issue를 만든다 (2.4). 그러려면 쓰기 권한이 필요하다.
@@ -72,16 +97,25 @@ jobs:
       # 이상 상황에서 비영 종료하는 것이 의도된 동작이다 (2.4).
       # 소스 하나가 실패해도 나머지는 계속 간다 — 그건 collect-all 안에서 처리된다 (2.3).
       #
-      # 어느 cron이 깨웠는지로 대상을 가른다. 손으로 돌리는 workflow_dispatch는
-      # 아무 때나 눌리므로 시각 창이 걸린 소스를 빼는 쪽으로 떨어뜨린다.
+      # 어느 cron이 깨웠는지로 묶음을 가른다. 손으로 돌리는 workflow_dispatch는
+      # 아무 때나 눌리므로 시각 창이 걸린 소스가 없는 쪽으로 떨어뜨린다.
+      #
+      # ⚠️ **아래 배열은 위 schedule 의 창 안 슬롯과 같아야 한다.** 한쪽만 고치면
+      #    새 슬롯이 조용히 actions-anytime 으로 떨어져 창이 걸린 소스가 영영 수집되지 않는다.
+      #    (예전 식은 cron 한 줄과 소스 id 하나를 동시에 박아 두어서, cron 을 늘리는
+      #     것만으로 같은 사고가 났다.)
+      #    tests/test_workflow_schedule.py 가 이 어긋남을 지킨다.
+      #
+      # 묶음에 **어느 소스가 들었는지는 여기서 알지 않는다.** pipeline/sources.py 의
+      # GROUPS 가 정한다 — 소스 id 가 워크플로에 새면 소스가 늘 때마다 여기를 고치게 된다.
       - name: 수집
         env:
           THIS_WEEK_TASTE_DATA_DIR: ${{ github.workspace }}/_data
           THIS_WEEK_TASTE_UA: ${{ vars.THIS_WEEK_TASTE_UA }}
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          SELECTION: ${{ github.event.schedule == '0 5 * * 1' && 'ONLY=gs25' || 'SKIP=gs25' }}
-        run: make collect-all PY=python $SELECTION
+          GROUP: ${{ contains(fromJSON('[]'), github.event.schedule) && 'actions-windowed' || 'actions-anytime' }}
+        run: make collect-all PY=python GROUP=$GROUP
 
       - name: 데이터 저장소에 커밋
         # 수집이 실패해도 성공한 소스의 결과는 남긴다 (2.3).

@@ -28,6 +28,24 @@ from types import ModuleType
 #   detail            상세 페이지를 긁을 값어치가 있는가. `enrich.py`가 본다.
 #   monotonic_key     단조 증가하는 정수 키의 `alt_ids` 이름. 없으면 None.
 #                     `publish.py`의 오탐 지표가 이 키가 있는 소스에만 실린다.
+#   collector         이 소스를 누가 수집하는가. "actions" | "local" (ADR-0017).
+#                     러너 IP에서만 막히는 소스가 있어서 생긴 칸이다.
+#   windowed          robots.txt가 수집 시각을 제한하는가 (ADR-0014).
+#                     워크플로의 cron 슬롯을 가른다.
+#
+# **뒤의 둘은 예외만 적는다.** 기본값은 `collector="actions"`, `windowed=False`이고
+# 19곳 중 16곳·18곳이 기본값이다. 전부 적으면 34줄이 늘면서 설명하는 것은 없다.
+# 앞의 넷과 성격이 다른 이유: 저 둘은 소스의 성질이라 값마다 사연이 있지만,
+# 이 둘은 **다수가 같고 소수가 다르다.** 다른 것에만 그 이유를 적는다.
+DEFAULT_COLLECTOR = "actions"
+
+# ⚠️ **소스가 사라지면 이 표에서 뺀다.** 파서와 골든 테스트는 남기되 표에서는 지운다.
+# 표에 남겨두면 매주 그 소스를 긁으려다 실패하고, 2.4가 그 실패를 이상 상황으로
+# 올려 사람을 부른다 — 고칠 수 있는 것이 없는데 부른다. 7장이 말한 대로 낡은 항목은
+# 낡는 것이 아니라 거짓말이 된다.
+# 2026-08-31에 gs25가 첫 사례다(사이트 이전으로 소비자 카탈로그가 공개 웹에서 사라졌다).
+# 이미 발행된 그 소스의 항목은 그대로 남는다 — `id`는 first_seen 주차에 확정된다(4장).
+
 SOURCES: dict[str, dict] = {
     "cu": {
         "brand": "CU",
@@ -63,6 +81,8 @@ SOURCES: dict[str, dict] = {
         # item_srl은 Rhymix의 문서 번호라 증가하지만, 메뉴 등록 순서인지
         # 확인하지 않았다. 확인되지 않은 소스는 넣지 않는다.
         "monotonic_key": None,
+        # 러너에서 403이 온다. 로컬에서는 205건이 정상 수집된다 (ADR-0017).
+        "collector": "local",
     },
     "baskinrobbins": {
         "brand": "배스킨라빈스",
@@ -120,6 +140,8 @@ SOURCES: dict[str, dict] = {
         # 목록이 설명문을 준다(66/66).
         "detail": False,
         "monotonic_key": None,
+        # 러너에서 robots.txt 요청이 15초 타임아웃된다. 로컬은 0.11초에 응답한다 (ADR-0017).
+        "collector": "local",
     },
     "bhc": {
         "brand": "bhc치킨",
@@ -137,14 +159,6 @@ SOURCES: dict[str, dict] = {
         # code_01은 RPZ422SL 같은 문자열이라 순서가 아니다.
         "monotonic_key": None,
     },
-    "gs25": {
-        "brand": "GS25",
-        "channel": "convenience",
-        # 목록에도 상세에도 설명문이 없다 → blurb는 항상 null이다.
-        "detail": False,
-        # attFileId가 증가하는 값으로 보이지만 등록 순서인지 확인하지 않았다.
-        "monotonic_key": None,
-    },
     "parisbaguette": {
         "brand": "파리바게뜨",
         "channel": "dessert",
@@ -152,6 +166,9 @@ SOURCES: dict[str, dict] = {
         "detail": True,
         # 슬러그가 키라 증가 순서가 아니다.
         "monotonic_key": None,
+        # 러너가 받은 robots.txt는 admin-ajax.php를 막는다. 로컬이 받은 것은 허용한다.
+        # 각 실행 환경은 자기가 받은 robots를 따른다 (ADR-0017 결정 2).
+        "collector": "local",
     },
     "burgerking": {
         "brand": "버거킹",
@@ -197,6 +214,61 @@ SOURCES: dict[str, dict] = {
 
 def known() -> list[str]:
     return list(SOURCES)
+
+
+def collector(source_id: str) -> str:
+    """이 소스를 누가 수집하는가. "actions" | "local" (ADR-0017)."""
+    return meta(source_id).get("collector", DEFAULT_COLLECTOR)
+
+
+def is_windowed(source_id: str) -> bool:
+    """robots.txt가 수집 시각을 제한하는 소스인가 (ADR-0014)."""
+    return bool(meta(source_id).get("windowed", False))
+
+
+def select(*, collector: str | None = None, windowed: bool | None = None) -> list[str]:
+    """조건에 맞는 소스 id 목록. 조건이 없으면 전부.
+
+    워크플로가 cron 문자열과 소스 id를 하드코딩하던 것을 대신한다. 예전 식은
+    `github.event.schedule == '0 5 * * 1' && 'ONLY=gs25' || 'SKIP=gs25'`였는데,
+    cron을 하나라도 늘리면 새 cron이 전부 `SKIP=gs25`로 떨어졌다. 소스가 늘거나
+    차단 상태가 바뀌어도 이제 고칠 곳은 위 표 한 줄이다.
+
+    ⚠️ 여기서 **빈 목록을 걸러내지 않는다.** 조건에 맞는 소스가 없는 것은 표가
+    그렇게 적혀 있다는 뜻이지 사고가 아니다. 판단은 부르는 쪽이 한다.
+    """
+    result = []
+    for source_id in SOURCES:
+        if collector is not None and meta(source_id).get(
+                "collector", DEFAULT_COLLECTOR) != collector:
+            continue
+        if windowed is not None and is_windowed(source_id) != windowed:
+            continue
+        result.append(source_id)
+    return result
+
+
+# 실행 묶음. 워크플로의 cron 슬롯과 사람이 손으로 도는 몫이 여기서 갈린다.
+#
+# 이름을 Makefile이나 워크플로에 흩어두지 않는 이유는 4장의 주차 포맷과 같다 —
+# 두 곳에 적으면 한 곳만 고치는 날이 온다.
+GROUPS: dict[str, dict] = {
+    # cron 슬롯 둘. 시각 제한이 없는 소스와 있는 소스를 가른다 (ADR-0014).
+    "actions-anytime": {"collector": "actions", "windowed": False},
+    "actions-windowed": {"collector": "actions", "windowed": True},
+    # 러너에서 막혀 사람이 발행 전에 로컬로 도는 몫 (ADR-0017).
+    "local": {"collector": "local"},
+}
+
+
+def group(name: str) -> list[str]:
+    try:
+        criteria = GROUPS[name]
+    except KeyError:
+        raise ValueError(
+            f"모르는 묶음: {name!r}. 정의된 묶음: {', '.join(GROUPS)}"
+        ) from None
+    return select(**criteria)
 
 
 def meta(source_id: str) -> dict:

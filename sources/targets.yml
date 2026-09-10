@@ -57,13 +57,25 @@ convenience:
     name: GS25
     company: GS리테일
     priority: P0
-    status: verified
+    status: blocked          # 2026-08-31 사이트 이전으로 소실. 아래 첫 문단
     method: xhr
     url: http://gs25.gsretail.com/gscvs/ko/products/youus-freshfoodDetail-search
     catalog: partial       # PB + 차별화만 받는다. 일반 매입 상품은 목록이 없다
     hint: >
-      ✅ 2026-08-25 붙였다 (`scrapers/gs25.py`). 아래는 그때 실측한 값이다.
-      **567건 / 4요청** (범위를 좁힌 뒤. 좁히기 전 795건).
+      ❌ **2026-08-31: 소비자 카탈로그가 공개 웹에서 사라졌다.** W36에서 빠졌고
+      `pipeline/sources.py`의 표에서도 내렸다. 실측한 것:
+      ① 옛 호스트 `gs25.gsretail.com`의 **모든** 경로가 `www.gsretail.com/brand/gs25`로
+         301된다(`/products/youus-freshfood`, `/products/event-goods`, `/main`, `/robots.txt`).
+      ② 그 브랜드 페이지는 **경영주 대상 기업 사이트**다. 상품 목록이 없다.
+         Vue SPA이고 자기 API가 `/api/homepage/...`인데 그 사이트 robots가 `Disallow: /api/`다.
+      ③ 소비자 경로는 우리동네GS 앱(`woodongs.com`)으로 옮겨갔다. robots는 전면 허용이나
+         데이터는 `b2c-apigw.woodongs.com`에서 오고, **CloudFront가 403으로 막고 앱 인증을
+         요구한다.** 로그인이 필요한 경로는 7장이 금지한다.
+      → 되살리려면 공개된 상품 목록 경로를 새로 찾아야 한다. 파서(`scrapers/gs25.py`)와
+        골든 테스트는 남겨 두었다. 이미 발행된 항목은 그대로 남는다(4장, `id`는 불변).
+
+      ── 아래는 2026-08-25 붙였을 때의 실측 기록이다 (경로가 살아 있을 때) ──
+      567건 / 4요청 (범위를 좁힌 뒤. 좁히기 전 795건).
       세션 + CSRF 토큰 필요. 첫 요청 403은 봇 차단이 아니라 CSRF 보호였다.
       1) GET /gscvs/ko/products/youus-freshfood → JSESSIONID + <input name="CSRFToken">
       2) POST <위 url>?CSRFToken=<토큰> (같은 쿠키 유지)
