@@ -27,6 +27,7 @@ PYTHONPATH=/absolute/code/repo /absolute/code/repo/.venv/bin/python -m scripts.e
 `freeze.json`에 맞는 W36 카탈로그는 비공개 데이터 커밋 `9f22daa`의 `snapshots/2026-W36/starbucks.json`이다.
 다른 주차로 바꾸면 코드가 거부해야 한다. 재생 성공은 원시 모델을 다시 호출해 같은 답을 얻었다는 뜻이 아니다.
 Ollama/Qwen을 다시 실행할 때는 출처·버전·취약점·노출 설정을 새로 확인한다.
+[이번 점검 결과](../../docs/local-model-audit-2026-09-10.md)는 서명 검사 환경 차이와 미확인 수정 범위를 함께 기록한다.
 
 ## 원래 이력
 

@@ -12,6 +12,14 @@ __pycache__/
 # 비밀값
 .env
 .env.local
+.env.*
+!.env.example
+*.pem
+*.key
+*.gguf
+*.safetensors
+research/**/runtime/
+research/**/models/
 
 # OS
 .DS_Store
@@ -32,7 +40,7 @@ learning/raw/
 #
 # 나머지는 뺀다. 이 저장소가 공개이기 때문이다 — 스냅샷은 소스의 전체 카탈로그이고
 # raw/ 는 응답 원본 그대로라, 여기 두면 7장이 금지한 "소스 데이터를 통째로 재배포"가 된다.
-# 7장은 *페이지*를 말했지만 공개 저장소도 배포다. (ADR-0011)
+# 7장은 *페이지*를 말했지만 공개 저장소도 배포다. (ADR-0010)
 #
 # 뺀 것들은 비공개 데이터 저장소에 있고, THIS_WEEK_TASTE_DATA_DIR 로 가리킨다.
 data/raw/
