@@ -17,9 +17,8 @@
 
 ## 단종은 발행하지 않는다 — 지표로만 남긴다
 
-지난주 발행본에 있던 항목이 이번 주 목록에서 사라진 것은 **제품 단종이라기보다
-지난주 `added`가 틀렸다는 신호**다. 일주일 만에 진짜로 단종되는 제품은 드물고,
-행사 종료·수량 소진·재입고 오탐이 훨씬 그럴듯하다.
+지난주 발행 항목의 목록 이탈은 조사할 신호다. 단종·재고·부분 노출을 구분할
+독립 정답이 없으므로 이 값만으로 오탐률을 계산하지 않는다 (ADR-0018).
 
 그래서 `status` 필드로 발행하지 않고 `report`의 `published_then_gone`으로만 남긴다.
 근거와 버린 대안은 [ADR-0015](../docs/adr/0015-discontinued-as-metric.md).
@@ -37,9 +36,10 @@ import json
 import logging
 import re
 import sys
+import uuid
 from pathlib import Path
 
-from pipeline import alert, curate, diff, discovery, enrich, snapshot, sources, weeks
+from pipeline import alert, curate, diff, discovery, enrich, provenance, snapshot, sources, weeks
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +69,14 @@ def week_path(week: str) -> Path:
 
 def load_week(week: str) -> dict | None:
     path = week_path(week)
-    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    if not path.exists():
+        return None
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("generation_id"):
+        report = json.loads(path.with_name(f"{week}.report.json").read_text(encoding="utf-8"))
+        if report.get("generation_id") != payload["generation_id"]:
+            raise provenance.InvalidEvidence(f"{week}: 주간 파일과 리포트 세대가 다르다 — 병합을 재실행한다")
+    return payload
 
 
 def make_id(source_id: str, external_id: str) -> str:
@@ -152,7 +159,10 @@ def run(source_id: str, week: str | None = None) -> Path | None:
             f"diff 결과가 없다: {diff_path}\n먼저 `python -m pipeline.diff`를 돌릴 것.")
     result = json.loads(diff_path.read_text(encoding="utf-8"))
 
-    if result.get("baseline"):
+    provenance.check_diff(result, source_id, week)
+    inputs = provenance.publication_inputs(source_id, week, result)
+    current = snapshot.load_snapshot(week, source_id)
+    if result.get("baseline") or not current or current.get("held_from"):
         log.warning("%s는 기준선(baseline)이라 발행하지 않는다. 다음 주부터 diff가 의미를 갖는다.",
                     week)
         return None
@@ -226,7 +236,9 @@ def run(source_id: str, week: str | None = None) -> Path | None:
     }
     path = part_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    if inputs != provenance.publication_inputs(source_id, week, result):
+        raise provenance.InvalidEvidence("발행 도중 입력이 달라졌다")
+    provenance.atomic_json(path, provenance.seal(payload, inputs))
 
     log.info("발행(부분): %s — 신상 %d / blurb %d",
              path, payload["counts"]["total"], payload["counts"]["with_blurb"])
@@ -240,7 +252,7 @@ def _counts(items: list[dict]) -> dict:
     }
 
 
-def merge(week: str) -> Path | None:
+def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
     """소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다.
 
     **한 소스가 실패해도 나머지로 합친다** (2.3). 여기서 멈추면 크롤러 하나가 깨졌을 때
@@ -252,39 +264,73 @@ def merge(week: str) -> Path | None:
     weeks.parse_week(week)
     part_dir = PUBLISHED_DIR / week
     parts = sorted(part_dir.glob("*.json")) if part_dir.exists() else []
-    if not parts:
-        log.warning("%s에 합칠 부분 산출물이 없다: %s", week, part_dir)
-        return None
-
     items: list[dict] = []
     by_source: dict[str, dict] = {}
+    statuses: dict[str, dict] = {}
+    checked: dict[str, str | None] = {}
+    failed = set(failed_sources or [])
     for part in parts:
-        payload = json.loads(part.read_text(encoding="utf-8"))
+        source_id = part.stem
+        try:
+            before = provenance.file_digest(part)
+            payload = json.loads(part.read_text(encoding="utf-8"))
+            provenance.check_part(payload, source_id, week)
+            _validate(payload["items"], week)
+            if payload.get("counts") != _counts(payload["items"]):
+                raise provenance.InvalidEvidence("항목 수와 집계가 다르다")
+            if provenance.file_digest(part) != before:
+                raise provenance.InvalidEvidence("검증 도중 부분 파일이 바뀌었다")
+        except (OSError, ValueError, KeyError, TypeError, alert.PipelineAnomaly) as exc:
+            log.error("%s %s 부분 파일을 병합에서 제외한다: %s", source_id, week, exc)
+            # 오류 전문에는 비공개 절대 경로가 있을 수 있어 공개 결과에는 분류만 남긴다.
+            statuses[source_id] = {"status": "excluded", "reason": "invalid_or_changed_inputs"}
+            continue
+        checked[source_id] = before
         items.extend(payload["items"])
-        by_source[payload["source_id"]] = payload["report"]
+        by_source[source_id] = payload["report"]
+        statuses[source_id] = {
+            "status": "reused" if source_id in failed else "verified",
+            "scraped_at": payload["report"].get("snapshot", {}).get("scraped_at"),
+            "generated_at": payload.get("generated_at"),
+        }
+    for source_id in sorted(failed - statuses.keys()):
+        statuses[source_id] = {"status": "excluded", "reason": "실행 실패; 이전 성공 부분 파일 없음"}
+    if not by_source:
+        raise provenance.InvalidEvidence(f"{week}: 검증된 부분 산출물이 없다. 기존 공개 파일을 보존한다")
+
+    for source_id, status in statuses.items():
+        status["brand"] = sources.meta(source_id)["brand"] if source_id in sources.known() else source_id
 
     _validate(items, week)
+    # 긴 병합 동안 다른 소스 처리나 파일 교체가 끼어들었는지도 마지막에 확인한다.
+    for source_id, checksum in checked.items():
+        path = part_path(week, source_id)
+        if provenance.file_digest(path) != checksum:
+            raise provenance.InvalidEvidence("병합 도중 부분 파일이 바뀌었다")
+        provenance.check_part(json.loads(path.read_text()), source_id, week)
 
     merged = {
         "week": week,
         "generated_at": weeks.scraped_at(),
+        "generation_id": uuid.uuid4().hex,
         "sources": sorted(by_source),
+        "source_statuses": statuses,
         "counts": _counts(items),
         "items": items,
     }
-    path = week_path(week)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8")
-
     report = {
         "week": week,
         "generated_at": merged["generated_at"],
+        "generation_id": merged["generation_id"],
         "sources": merged["sources"],
+        "source_statuses": statuses,
         "totals": merged["counts"],
         "by_source": by_source,
     }
-    (WEEKS_DIR / f"{week}.report.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    path = week_path(week)
+    # 주간 파일을 마지막에 교체한다. 웹은 항목과 상태가 함께 있는 이 파일만 읽는다.
+    provenance.atomic_json(WEEKS_DIR / f"{week}.report.json", report)
+    provenance.atomic_json(path, merged)
 
     log.info("병합: %s — 소스 %d개 / 신상 %d",
              path, len(by_source), merged["counts"]["total"])
@@ -350,21 +396,14 @@ def _published_then_gone(result: dict,
 def _source_report(week: str, source_id: str, result: dict, items: list[dict],
                    *, out_of_scope: list[dict] | None = None,
                    previous_published: dict[str, dict] | None = None) -> dict:
-    """2주 검증용 지표 (계획 5절). **added 건수가 아니라 오탐 비율을 본다.**
-
-    소스의 NEW 라벨은 판정에 쓰지 않지만(2.1) 검증 지표로는 쓴다. 라벨과의 교집합이
-    작으면 오탐을, NEW인데 added에 없으면 누락을 의심한다.
+    """목록 변화의 진단 지표. NEW와의 겹침은 출시 정확도 정답이 아니다.
     """
     control = {}
     control_path = snapshot.control_path(week, source_id)
     if control_path.exists():
         control = json.loads(control_path.read_text(encoding="utf-8"))
 
-    assessed = discovery.assess(source_id, week, result["added"])
-    added = assessed["items"]
-    if assessed["held"]:
-        log.warning("%s %s: 과거 관측/배치 중복과 겹치는 후보 %d건을 보류한다.",
-                    source_id, week, len(assessed["held"]))
+    added = result["added"]
     labelled_new = {k for k, v in control.items() if (v.get("labels") or {}).get("new")}
     added_ids = {i["external_id"] for i in added}
 
@@ -447,11 +486,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--merge", action="store_true",
                         help="소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다. "
                              "소스별 실행이 전부 끝난 뒤 한 번 부른다")
+    parser.add_argument("--failed-source", action="append", default=[],
+                        help="이번 실행에 실패한 소스; 검증되는 이전 성공본은 재사용으로 표시한다")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     if args.merge:
-        merge(args.week or weeks.current_week())
+        merge(args.week or weeks.current_week(), failed_sources=args.failed_source)
     else:
         run(args.source, args.week)
     return 0

@@ -33,7 +33,15 @@ export type Item = {
   launch_status?: "unverified";
 };
 
+export type SourceStatus = {
+  brand?: string;
+  status: "verified" | "reused" | "excluded";
+  scraped_at?: string | null;
+  generated_at?: string | null;
+};
+
 export type Week = {
+  source_statuses?: Record<string, SourceStatus>;
   week: string;
   generated_at: string;
   /** 이 주차에 발행된 소스들. 한 파일이 소스 여럿을 담는다. */

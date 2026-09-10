@@ -28,7 +28,7 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import alert, diff, paths, sources, weeks
+from pipeline import alert, diff, paths, provenance, sources, weeks
 from scrapers import base
 
 log = logging.getLogger(__name__)
@@ -51,15 +51,47 @@ def enriched_path(week: str, source_id: str) -> Path:
     return ENRICHED_DIR / week / f"{source_id}.json"
 
 
+def proof_path(week: str, source_id: str) -> Path:
+    return ENRICHED_DIR / week / f"{source_id}.provenance.json"
+
+
 def load_enriched(week: str, source_id: str) -> dict:
     path = enriched_path(week, source_id)
-    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    if not path.exists():
+        return {}
+    try:
+        record = json.loads(proof_path(week, source_id).read_text())
+        inputs = provenance.verify_seal(record)
+        current = provenance.file_digest(diff.DIFF_DIR / week / f"{source_id}.json")
+        if inputs != {"diff": current} or record.get("enriched") != provenance.file_digest(path):
+            raise provenance.InvalidEvidence("보강의 diff 또는 내용이 다르다")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or any(
+            not isinstance(v, dict)
+            or not (v.get("description") is None or isinstance(v.get("description"), str))
+            or not isinstance(v.get("tags", []), list)
+            or any(not isinstance(t, str) for t in v.get("tags", []))
+            for v in data.values()
+        ):
+            raise provenance.InvalidEvidence("보강 필드 형식이 잘못됐다")
+        return data
+    except (OSError, ValueError) as exc:
+        log.warning("%s %s 보강 근거를 검증하지 못해 사용하지 않는다: %s", source_id, week, exc)
+        return {}
 
 
-def _write(week: str, source_id: str, enriched: dict, *, failures: int, total: int) -> Path:
+def _write(week: str, source_id: str, enriched: dict, *, failures: int, total: int,
+           diff_hash: str | None = None) -> Path:
     path = enriched_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(enriched, ensure_ascii=False, indent=2), encoding="utf-8")
+    if diff_hash != provenance.file_digest(diff.DIFF_DIR / week / f"{source_id}.json"):
+        raise provenance.InvalidEvidence("보강 도중 diff가 달라졌다")
+    if diff_hash is not None:
+        result = json.loads((diff.DIFF_DIR / week / f"{source_id}.json").read_text())
+        provenance.check_diff(result, source_id, week)
+    provenance.atomic_json(path, enriched)
+    provenance.atomic_json(proof_path(week, source_id), provenance.seal(
+        {"enriched": provenance.file_digest(path)}, {"diff": diff_hash}))
 
     with_description = sum(1 for v in enriched.values() if v["description"])
     log.info("보강 완료: 신상 %d건 중 %d건 (설명문 확보 %d건, 실패 %d건) → %s",
@@ -79,7 +111,9 @@ def run(source_id: str, week: str | None = None) -> Path:
         raise FileNotFoundError(
             f"diff 결과가 없다: {diff_path}\n먼저 `python -m pipeline.diff`를 돌릴 것.")
 
+    diff_hash = provenance.file_digest(diff_path)
     result = json.loads(diff_path.read_text(encoding="utf-8"))
+    provenance.check_diff(result, source_id, week)
     added = result["added"]
     if not added:
         log.info("신상이 없어 보강할 것이 없다.")
@@ -97,7 +131,7 @@ def run(source_id: str, week: str | None = None) -> Path:
     total = len(added)
     added = [i for i in added if i["external_id"] not in enriched]
     if not added:
-        return _write(week, source_id, enriched, failures=0, total=total)
+        return _write(week, source_id, enriched, failures=0, total=total, diff_hash=diff_hash)
 
     fetch_detail = _detail_fetcher(source_id)
     if fetch_detail is None:
@@ -107,7 +141,7 @@ def run(source_id: str, week: str | None = None) -> Path:
         log.info("상세를 긁지 않는 소스다(sources.py의 detail=False). "
                  "설명문 없이 남는 항목 %d/%d건 — blurb는 null로 발행된다.",
                  len(added), total)
-        return _write(week, source_id, enriched, failures=0, total=total)
+        return _write(week, source_id, enriched, failures=0, total=total, diff_hash=diff_hash)
 
     # ⚠️ 잘라서 일부만 긁지 않는다. 그러면 "왜 어떤 건 blurb가 있고 어떤 건 없나"가
     # 설명이 안 되는 발행물이 나간다. 조용히 절반만 하느니 시끄럽게 멈춘다(2.4).
@@ -156,7 +190,7 @@ def run(source_id: str, week: str | None = None) -> Path:
         log.info("  [%d/%d] %s — 설명 %s / 태그 %d개", index, len(added), item["name"],
                  "있음" if detail["description"] else "없음", len(tags))
 
-    return _write(week, source_id, enriched, failures=failures, total=total)
+    return _write(week, source_id, enriched, failures=failures, total=total, diff_hash=diff_hash)
 
 
 def main(argv: list[str] | None = None) -> int:

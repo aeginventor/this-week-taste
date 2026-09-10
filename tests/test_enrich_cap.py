@@ -4,11 +4,13 @@ import json
 
 import pytest
 
-from pipeline import alert, diff, enrich
+from pipeline import alert, diff, enrich, provenance, snapshot, paths
 
 
 @pytest.fixture
 def dirs(tmp_path, monkeypatch):
+    monkeypatch.setattr(snapshot, "SNAPSHOT_DIR", tmp_path / "snapshots")
+    monkeypatch.setattr(paths, "RAW_DIR", tmp_path / "raw")
     monkeypatch.setattr(diff, "DIFF_DIR", tmp_path / "diffs")
     monkeypatch.setattr(enrich, "ENRICHED_DIR", tmp_path / "enriched")
     return tmp_path
@@ -20,7 +22,9 @@ def _write_diff(dirs, source_id, n):
     path.parent.mkdir(parents=True, exist_ok=True)
     added = [{"external_id": str(i), "name": f"제품{i}", "description": None}
              for i in range(n)]
-    path.write_text(json.dumps({"added": added}, ensure_ascii=False), encoding="utf-8")
+    provenance.atomic_json(path, provenance.seal(
+        {"added": added, "week": "2026-W35", "source_id": source_id},
+        provenance.observation_inputs(source_id, "2026-W35")))
 
 
 def test_상한을_넘으면_긁지_않고_멈춘다(dirs, monkeypatch):

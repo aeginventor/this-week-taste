@@ -35,7 +35,7 @@ import logging
 import sys
 from pathlib import Path
 
-from pipeline import alert, normalize, paths, snapshot, weeks
+from pipeline import provenance, alert, normalize, paths, snapshot, weeks
 
 log = logging.getLogger(__name__)
 
@@ -250,6 +250,7 @@ MAX_LOOKBACK_WEEKS = snapshot.MAX_LOOKBACK_WEEKS
 def run(source_id: str, week: str | None = None) -> Path:
     week = week or weeks.current_week()
 
+    inputs = provenance.observation_inputs(source_id, week)
     current = snapshot.load_snapshot(week, source_id)
     if current is None:
         raise FileNotFoundError(
@@ -261,7 +262,7 @@ def run(source_id: str, week: str | None = None) -> Path:
         log.warning("%s의 직전 주 스냅샷이 없어 %s와 비교한다. "
                     "이번 주 신상이 아니라 여러 주치가 한 번에 잡힌다.",
                     source_id, previous_week)
-    if previous is None:
+    if previous is None or current.get("held_from"):
         # 첫 주는 발행하지 않는다. 전량을 신상으로 내보내는 일은 어떤 경우에도 하지 않는다.
         log.warning("%s 이전 %d주 안에 스냅샷이 없다. %s는 기준선(baseline)으로만 쓰고 "
                     "발행하지 않는다.", source_id, MAX_LOOKBACK_WEEKS, week)
@@ -282,7 +283,8 @@ def run(source_id: str, week: str | None = None) -> Path:
 
     path = DIFF_DIR / week / f"{source_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    provenance.check_observations(inputs, provenance.observation_inputs(source_id, week))
+    provenance.atomic_json(path, provenance.seal(result, inputs))
 
     counts = result["counts"]
     log.info("diff %s %s → %s: 신상 %d / 단종후보 %d / 변경 %d / 보류 %d (매칭 %d, 키충돌 %d)",

@@ -18,7 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from pipeline import alert, paths, sources, weeks
+from pipeline import alert, paths, provenance, sources, weeks
 
 log = logging.getLogger(__name__)
 
@@ -50,15 +50,14 @@ MAX_LOOKBACK_WEEKS = 4
 
 
 def previous_available(source_id: str, week: str) -> tuple[str | None, dict | None]:
-    """있는 것 중 **가장 최근 이전 주차** 스냅샷. 없으면 (None, None).
+    """**최근 실제 성공** 스냅샷. 없으면 (None, None).
 
-    검증·이월·diff가 모두 "지난주"를 필요로 하는데, 그 지난주가 늘 직전 주는 아니다.
-    셋이 서로 다른 주차를 보면 안 되므로 여기 하나로 모은다.
+    이월 사본은 새 관측이 아니다. 4주 한도도 실제 성공 주차로 센다.
     """
     for back in range(1, MAX_LOOKBACK_WEEKS + 1):
         candidate = weeks.shift(week, -back)
         found = load_snapshot(candidate, source_id)
-        if found is not None:
+        if found is not None and not found.get("held_from"):
             return candidate, found
     return None, None
 
@@ -201,6 +200,14 @@ def _hold_previous(week: str, source_id: str) -> bool:
 
     previous_week, previous = previous_available(source_id, week)
     if not previous:
+        # 비교 한도를 넘긴 이월본은 표시용으로만 유지한다. diff 기준으로 쓰지 않는다.
+        for back in range(1, MAX_LOOKBACK_WEEKS + 1):
+            candidate = weeks.shift(week, -back)
+            found = load_snapshot(candidate, source_id)
+            if found:
+                previous_week, previous = candidate, found
+                break
+    if not previous:
         log.error("이월할 지난주 스냅샷도 없다. %s %s는 이번 주 데이터가 없다.", source_id, week)
         return False
 
@@ -208,7 +215,7 @@ def _hold_previous(week: str, source_id: str) -> bool:
     previous["held_from"] = previous.get("held_from") or previous_week
     path = snapshot_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8")
+    provenance.atomic_json(path, previous)
 
     src_control = control_path(previous_week, source_id)
     if src_control.exists():
@@ -273,9 +280,8 @@ def take(source_id: str, week: str | None = None, *, refresh: bool = False) -> P
     }
     path = snapshot_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    control_path(week, source_id).write_text(
-        json.dumps(control, ensure_ascii=False, indent=2), encoding="utf-8")
+    provenance.atomic_json(control_path(week, source_id), control)
+    provenance.atomic_json(path, payload)
 
     log.info("저장: %s (%d건)", path, len(clean))
     return path
