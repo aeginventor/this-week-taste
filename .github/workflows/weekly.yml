@@ -1,4 +1,4 @@
-# 매주 수집 (CLAUDE.md 8장 5단계)
+# 매주 수집 (AGENTS.md 8장)
 #
 # ## 왜 수집만 하는가
 #
@@ -23,11 +23,11 @@ name: weekly
 
 # ## 왜 시각 제한 없는 묶음에 슬롯을 둘 두는가
 #
-# 2026-08-31에 **cron 두 슬롯이 모두 발화하지 않았다.** 워크플로는 active, 포크도
-# 아니고, 기본 브랜치에 cron 두 줄이 정상이었는데 실행이 생성되지 않았다.
+# 2026-08-31 당시 확인 시점에는 cron 실행이 보이지 않았다. 이후 지연 실행과
+# 2026-09-07의 실제 소스 실패를 확인했다 (docs/DEPLOY.md). 예약 시각은 실행 보장이 아니다.
 #
 # 안 돈 실행은 로그도 Issue도 남기지 않으므로 **2.4(실패는 시끄럽게)가 닿지 않는다.**
-# 누락 실행을 별도로 감시하는 기능은 아직 없다. 현재 선택은 슬롯 다중화다.
+# 이 workflow 안에서는 실행 자체의 누락을 감지하지 못한다. 외부 후속 확인과 구분한다.
 #
 # 재실행이 싼 이유는 2.6이다. 이미 뜬 스냅샷은 다시 긁지 않는다(요청 0건, 0.07초 실측).
 # 앞선 슬롯이 성공했으면 뒤 슬롯은 사실상 공짜로 지나간다.
@@ -116,6 +116,13 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GROUP: ${{ contains(fromJSON('[]'), github.event.schedule) && 'actions-windowed' || 'actions-anytime' }}
         run: make collect-all PY=python GROUP=$GROUP
+
+      - name: 소스별 실제 수집 주차와 상태 확인
+        if: always()
+        env:
+          THIS_WEEK_TASTE_DATA_DIR: ${{ github.workspace }}/_data
+          GROUP: ${{ contains(fromJSON('[]'), github.event.schedule) && 'actions-windowed' || 'actions-anytime' }}
+        run: python -m scripts.collection_status --group "$GROUP" --markdown >> "$GITHUB_STEP_SUMMARY"
 
       - name: 데이터 저장소에 커밋
         # 수집이 실패해도 성공한 소스의 결과는 남긴다 (2.3).

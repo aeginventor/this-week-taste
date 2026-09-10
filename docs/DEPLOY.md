@@ -124,76 +124,32 @@ GitHub Pages를 쓴다면 Actions에서 `web/out`을 아티팩트로 올리면 �
 
 ## 3. 주간 자동화 (8장 5단계)
 
-사람 손을 매주 타지 않으려면 이게 필요하다. 형태는 이렇게 된다:
+2026-09-10 확인한 현재 경계다. 작업 브랜치의 예약 수정은 **main 반영 전에는 실행되지 않는다**.
 
-### 무엇을 자동화하고 무엇을 안 하는가
+| 단계 | 자동 실행 범위 | 필요한 사람의 작업 |
+|---|---|---|
+| Actions 수집 | 등록된 18개 카탈로그 중 러너에서 가능한 15개, snapshot → diff → 비공개 데이터 main push | 실패·이월 원인 판단, 필요 시 재시도 |
+| 로컬 수집 | 정기 실행 장치 없음 | 컴포즈·맘스터치·파리바게뜨 3개를 로컬에서 실행 |
+| 보강·LLM 편집 | Actions에서 실행하지 않음 | 인증된 로컬 CLI 또는 별도 API 환경에서 실행 |
+| 콘텐츠 후보 | 정기 수집기 없음 | 상품 사실·출처·날짜·과거 관측 대조 후 비공개 후보 파일 작성 |
+| 병합·발행 | 검토 후보와 유효한 부분 산출물을 로컬 명령으로 병합 | 결과·이미지·웹 빌드 확인, 공개 발행 파일 커밋 |
+| 사이트 배포 | 코드 main push에 연결 | 이번 변경은 미리보기 확인 후 main 반영 승인 |
 
-**수집(snapshot → diff)만 자동으로 돌린다. 발행(enrich → curate → publish)은 사람이 돌린다.**
+작업 브랜치의 `.github/workflows/weekly.yml`은 월요일 KST 10:13·12:13 두 번 수집한다.
+이미 성공한 같은 주차는 재사용하고, 소스별 실제 관측 주차·이월·누락·형식을 실행 요약에 남긴다.
+파일이 있다는 것만으로 성공으로 세지 않는다. 상태 검사는 실패해도 실행하고, 성공한 소스의 데이터 커밋은 유지한다.
 
-이유는 LLM 편집 경로다. 지금 `curate.py`를 `claude -p`(구독 인증)로 돌리고 있는데
-**CI에서는 그게 안 된다** — 바이너리도 없고 구독 인증도 못 쓴다. API 키 없이 자동 발행하면
-전량이 `blurb: null`로 나간다. 발행 품질보다 발행 자체가 우선이라는 6장 원칙에 어긋나지는
-않지만, 사이트가 말끔하지 않아진다.
-
-그래서 경계를 이렇게 둔다.
-
-```
-Actions (매주 자동)     snapshot → diff        → 비공개 데이터 저장소에 커밋
-사람 (주 1회, 몇 분)     enrich → curate → publish → merge → 공개 저장소에 커밋 → 호스트 재빌드
-```
-
-이 경계는 [ADR-0009](adr/0009-weekly-effort-goal.md)와 맞는다 — 자동으로 할 수 있는 수집은
-자동으로 하고, 사람은 발행 결과를 보고 판단하는 자리에만 들어간다.
-
-실제 파일은 `.github/workflows/weekly.yml`이다. 뼈대는 이렇다:
-
-```yaml
-on:
-  schedule:
-    - cron: "0 1 * * 1"     # 매주 월요일 KST 10:00
-  workflow_dispatch:
-jobs:
-  collect:
-    steps:
-      - uses: actions/checkout@v4              # 코드 저장소
-      - uses: actions/checkout@v4              # 비공개 데이터 저장소
-        with:
-          repository: <owner>/this-week-taste-data
-          token: ${{ secrets.DATA_REPO_TOKEN }}
-          path: _data
-      - run: make setup
-      - run: |
-          for s in $(sources); do
-            python -m pipeline.snapshot --source $s || failed="$failed $s"
-            python -m pipeline.diff --source $s || failed="$failed $s"
-          done
-        env:
-          THIS_WEEK_TASTE_DATA_DIR: ${{ github.workspace }}/_data
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          THIS_WEEK_TASTE_UA: "ThisWeekTaste/1.0 (+https://<도메인>/about)"
-      - run: |                                  # 데이터 저장소에만 커밋한다
-          cd _data
-          git config user.name "github-actions[bot]"
-          git commit -am "data: $(date +%G-W%V) 스냅샷"
-          git push
+```bash
+THIS_WEEK_TASTE_DATA_DIR=/path/to/private-data .venv/bin/python -m scripts.collection_status --week 2026-W37
 ```
 
-**작성 전에 확인할 것:**
-- 각 단계는 이상 상황에서 **비영 종료**한다(2.4). Actions가 실패로 표시하고 Issue가 생긴다 —
-  의도된 동작이므로 `continue-on-error`를 붙이지 말 것
-- 소스 하나가 실패해도 나머지는 계속 가야 한다(2.3). `&&`로 잇지 말 것
-- **사람이 발행하기 전에 데이터 저장소를 `git pull` 해야 한다.** Actions가 거기에 커밋하므로.
-  2.6 이후로는 선택이 아니라 전제다 — 로컬에 스냅샷이 없으면 발행이 카탈로그를 직접 긁고,
-  그러면 봇이 뜬 것과 **다른 근거로 발행된다**
-- **발행은 봇이 뜬 스냅샷을 그대로 쓴다. 다시 긁지 않는다**(2.6, [ADR-0011](adr/0011-snapshot-once-per-week.md)).
-  `make week-all`을 몇 번 돌려도 소스 서버에 요청이 나가지 않는다. 일부러 다시 뜨려면 `REFRESH=1`.
-  발행 리포트의 `by_source.<소스>.snapshot`에 무엇을 보고 발행했는지가 남는다
-- GS25를 붙이면 cron 시각이 **KST 13:00~17:45**로 제약된다(robots.txt `Visit-time`).
-  지금의 KST 10:00도 그 창 밖이라, 그 소스는 시각을 옮기든 안 옮기든 워크플로를 갈라야 한다
-- ⚠️ cron의 **요일 숫자는 UTC 기준이다.** KST 09:00보다 이르게 옮기면 요일도 1 → 0으로
-  바꿔야 한다(KST 월 06:30 = `30 21 * * 0`). 그리고 주차는 KST로 계산하므로
-  **KST 월요일 00:00이 하한선이다** — 일요일 밤에 돌리면 지난주 주차에 저장된다
+이 명령은 읽기 전용이며 하나라도 미수집·이월·잘못된 관측이면 비영 종료한다.
+반면 **Actions 자체가 시작되지 않은 경우는 이 workflow 내부에서 발견할 수 없다**.
+별도 후속 확인에서 실제 run·소스별 결과·원격 산출물 주차를 대조한다. cron 존재를 실행 성공으로 보고하지 않는다.
+
+발행 전에는 비공개 데이터 원격을 확인하고 새 성공본을 가져온다. 성공 스냅샷을 이유 없이 refresh하지 않는다.
+홈플러스처럼 이월된 관측은 성공한 이번 주 수집과 구분한다. GS25는 서비스 대상이며 현재 이 카탈로그 묶음에만 없다.
+새 GS25 콘텐츠 정기 수집을 과거 카탈로그 승인으로 대신하지 않는다.
 
 ### 필요한 secret
 
