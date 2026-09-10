@@ -10,12 +10,10 @@ export function ItemCard({ item }: { item: Item }) {
   const price = formatPrice(item.price);
   return (
     <article className="card">
-      {item.image_url ? (
+      {item.image_url && (
         // CLAUDE.md 7장: 이미지를 복제 저장하지 않고 원본 URL을 참조한다.
         // eslint-disable-next-line @next/next/no-img-element
         <img src={item.image_url} alt="" className="thumb" loading="lazy" />
-      ) : (
-        <div className="thumb thumb-empty" aria-hidden="true" />
       )}
       <div className="card-body">
         <h3 className="name">{item.name}</h3>

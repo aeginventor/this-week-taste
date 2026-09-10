@@ -144,6 +144,13 @@ export function FilteredItems({ items }: { items: Item[] }) {
         {active > 0 && ` / 전체 ${items.length}건`}
       </p>
 
+      {shownActive.some((item) => item.release_status === "upcoming") && (
+        <nav className="archive" aria-label="소개 묶음">
+          {shownActive.some((item) => item.release_status !== "upcoming") && <a href="#released">이번 주 신상</a>}
+          <a href="#upcoming">출시 예정</a>
+        </nav>
+      )}
+
       {shownActive.length === 0 ? (
         // 빈 그리드를 조용히 내보내지 않는다 (2.4의 정신).
         <p className="empty">
@@ -156,7 +163,7 @@ export function FilteredItems({ items }: { items: Item[] }) {
           {(["released", "upcoming"] as const).map((status) => {
             const group = shownActive.filter((item) => (item.release_status ?? "released") === status);
             return group.length > 0 && (
-              <section key={status} aria-label={status === "upcoming" ? "출시 예정" : "이번 주 신상"}>
+              <section key={status} id={status} aria-label={status === "upcoming" ? "출시 예정" : "이번 주 신상"}>
                 <h2>{status === "upcoming" ? "출시 예정" : "이번 주 신상"} <small>{group.length}건</small></h2>
                 <div className="grid">
                   {group.map((item) => <ItemCard key={item.id} item={item} />)}

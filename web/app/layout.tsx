@@ -24,8 +24,8 @@ export default function RootLayout({
         <main>{children}</main>
         <footer className="footer">
           <p>
-            제품 정보와 이미지는 각 브랜드 공식 사이트에서 가져왔습니다. 자세한
-            내용은 각 항목의 원문 링크를 확인하세요.
+            상품 정보는 각 항목에 연결된 출처를 바탕으로 소개합니다.
+            자세한 내용과 최신 판매 정보는 원문 링크를 확인하세요.
           </p>
           <p>
             {/* 크롤러 UA가 이 경로를 가리킨다. 링크가 없으면 아무도 못 찾는다. */}
