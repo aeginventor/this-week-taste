@@ -39,7 +39,7 @@ API 계약은 로컬 모델의 요청 설정·JSON 응답·실제 토큰·종료
 프롬프트는 사건과 근거를 요청하는 계약으로 사용했지만, 그 지시만으로 날짜 오류를 막지는 못했다.
 단일 HTTP 호출과 파일 재현으로 충분해 LangChain 구조를 추가하지 않았다.
 
-관련 [작업 기록](../sessions/2026-09-10-로컬모델-출시근거-자동화.md), [구현](https://github.com/aeginventor/this-week-taste/blob/10865a188e631a4810dfe223ce9b98f488e31aa2/scripts/launch_claims.py), [회귀 테스트](../../tests/test_newsroom_study.py).
+관련 [작업 기록](../sessions/2026-09-10-로컬모델-출시근거-자동화.md), [당시 구현](https://github.com/aeginventor/this-week-taste/blob/10865a188e631a4810dfe223ce9b98f488e31aa2/scripts/launch_claims.py), [내용을 그대로 옮긴 회귀 테스트](../../research/launch-study-20260910/tests/test_newsroom_study.py).
 
 ## 새 문서에서 확인된 반대쪽 실패
 
