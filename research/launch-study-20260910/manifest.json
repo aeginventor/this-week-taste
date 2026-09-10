@@ -1,0 +1,51 @@
+{
+  "original_commit": "10865a188e631a4810dfe223ce9b98f488e31aa2",
+  "kept": {
+    "scripts/evaluate_launch_study.py": {
+      "path": "research/launch-study-20260910/scripts/evaluate_launch_study.py",
+      "sha256": "e060475c11043e0fc1749ba4dfe1c36c5c97179b7833026d2f09859310087a2a"
+    },
+    "scripts/evaluate_newsroom_period.py": {
+      "path": "research/launch-study-20260910/scripts/evaluate_newsroom_period.py",
+      "sha256": "792f069043ba1435ebfbaa6b239baca1572c10b682b0561e124926177a6d30b1"
+    },
+    "scripts/launch_claims.py": {
+      "path": "research/launch-study-20260910/scripts/launch_claims.py",
+      "sha256": "5b087ab5aa0d66b1c8231a24575d2fd5f308dfa7aa28dfb35e83046647afd449"
+    },
+    "scripts/newsroom_study.py": {
+      "path": "research/launch-study-20260910/scripts/newsroom_study.py",
+      "sha256": "c458deafd0d901b7d4248634f1ebe63719cab610e5e169937e723cb960da08b2"
+    },
+    "scripts/probe_launch_dates.py": {
+      "path": "research/launch-study-20260910/scripts/probe_launch_dates.py",
+      "sha256": "3e267458c14adea5187b723ced191588389455b51bdc0361b7ee67fb2e8ed46d"
+    },
+    "tests/test_newsroom_study.py": {
+      "path": "research/launch-study-20260910/tests/test_newsroom_study.py",
+      "sha256": "78e8f9b67d5db7a2970f746a43a4d91bdb124ecb663e6d40b8fe27eb732e050a"
+    },
+    "tests/fixtures/newsroom_study_synthetic.json": {
+      "path": "research/launch-study-20260910/tests/fixtures/newsroom_study_synthetic.json",
+      "sha256": "1c134423141919cb58e1c166b8bc359327a791465e82237c0ef6de5a1509e985"
+    },
+    "tests/fixtures/launch_date_boundaries.json": {
+      "path": "research/launch-study-20260910/tests/fixtures/launch_date_boundaries.json",
+      "sha256": "3ed92fa7aecf68272239c4e286f796075e73601fad12aff180a4240b490c48b5"
+    }
+  },
+  "retired": {
+    "scripts/compare_data_routes.py": {
+      "sha256": "25ebc10ab85e893791eaf80862c81c1b0d74b0317974e094ab412d980a7f781e",
+      "url": "https://github.com/aeginventor/this-week-taste/blob/10865a188e631a4810dfe223ce9b98f488e31aa2/scripts/compare_data_routes.py"
+    },
+    "scripts/link_launch_evidence.py": {
+      "sha256": "818f15d57a828a2e4c65ab2cbc01f754534e61c466d202f0ab49e22cdf9de848",
+      "url": "https://github.com/aeginventor/this-week-taste/blob/10865a188e631a4810dfe223ce9b98f488e31aa2/scripts/link_launch_evidence.py"
+    },
+    "tests/test_launch_evidence_experiment.py": {
+      "sha256": "29a7f260aae51f16dd44970b6d2826bd6548c62da6c7edbaaba447c08059e0ff",
+      "url": "https://github.com/aeginventor/this-week-taste/blob/10865a188e631a4810dfe223ce9b98f488e31aa2/tests/test_launch_evidence_experiment.py"
+    }
+  }
+}

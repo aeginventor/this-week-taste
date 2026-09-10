@@ -1,0 +1,46 @@
+{
+  "origin": "AI-authored synthetic date controls; not real announcement accuracy",
+  "documents": [
+    {
+      "document_id": "different_dates", "title": "서로 다른 날 출시하는 두 음료", "published_on": "2026-08-20",
+      "paragraphs": [
+        {"number": 1, "text": "스타벅스는 신제품 ‘구운 쌀 라떼’를 8월 21일, 신제품 ‘검은깨 티 라떼’를 8월 25일 각각 매장에 출시한다."},
+        {"number": 2, "text": "구운 쌀 라떼에는 구운 쌀을, 검은깨 티 라떼에는 검은깨를 넣었다. 두 음료의 할인 행사는 8월 29일부터 시작한다."}
+      ],
+      "expected": [{"name": "구운 쌀 라떼", "kind": "new_launch", "date": "2026-08-21"}, {"name": "검은깨 티 라떼", "kind": "new_launch", "date": "2026-08-25"}]
+    },
+    {
+      "document_id": "next_month", "title": "다음 달 신규 음료", "published_on": "2026-08-30",
+      "paragraphs": [{"number": 1, "text": "스타벅스는 오는 2일 신제품 ‘오트 티 라떼’를 매장에 출시한다. 오트와 호지차를 넣은 음료다."}],
+      "expected": [{"name": "오트 티 라떼", "kind": "new_launch", "date": "2026-09-02"}]
+    },
+    {
+      "document_id": "next_year_day", "title": "새해 신제품", "published_on": "2026-12-30",
+      "paragraphs": [{"number": 1, "text": "스타벅스는 오는 2일 신제품 ‘검은깨 오트 라떼’를 매장에 출시한다. 검은깨와 오트로 만든 음료다."}],
+      "expected": [{"name": "검은깨 오트 라떼", "kind": "new_launch", "date": "2027-01-02"}]
+    },
+    {
+      "document_id": "next_year_month_day", "title": "새해 첫 음료 출시", "published_on": "2026-12-30",
+      "paragraphs": [{"number": 1, "text": "스타벅스는 새해를 맞아 오는 1월 2일 신제품 ‘오트 호지 라떼’를 매장에 출시한다. 오트와 호지차로 만든 음료다."}],
+      "expected": [{"name": "오트 호지 라떼", "kind": "new_launch", "date": "2027-01-02"}]
+    },
+    {
+      "document_id": "historical_and_return", "title": "가을 메뉴 복귀", "published_on": "2026-08-20",
+      "paragraphs": [
+        {"number": 1, "text": "스타벅스가 2019년 8월 25일 처음 출시한 ‘검은깨 라떼’는 매년 가을 돌아오는 음료다."},
+        {"number": 2, "text": "올해는 8월 28일 검은깨 라떼를 재출시한다. 검은깨와 글레이즈드 폼으로 만든 음료이며 할인 행사는 9월 1일부터 진행한다."}
+      ],
+      "expected": [{"name": "검은깨 라떼", "kind": "seasonal_return", "date": "2026-08-28"}]
+    },
+    {
+      "document_id": "unsupported_business_day", "title": "일정이 아직 확정되지 않은 음료", "published_on": "2026-08-20",
+      "paragraphs": [{"number": 1, "text": "스타벅스는 신제품 ‘구운 쌀 티 라떼’를 다음 분기의 첫 영업일에 매장에 출시할 예정이다. 영업일 기준과 정확한 날짜는 추후 안내한다. 구운 쌀과 호지차로 만든 음료다."}],
+      "expected": [{"name": "구운 쌀 티 라떼", "kind": "new_launch", "date": null}]
+    },
+    {
+      "document_id": "lunar_calendar", "title": "음력 일정의 신규 음료", "published_on": "2026-08-20",
+      "paragraphs": [{"number": 1, "text": "스타벅스는 신제품 ‘쌀 오트 라떼’를 음력 9월 9일 매장에 출시할 예정이다. 양력 날짜는 발표하지 않았다. 구운 쌀과 오트로 만든 음료다."}],
+      "expected": [{"name": "쌀 오트 라떼", "kind": "new_launch", "date": null}]
+    }
+  ]
+}
