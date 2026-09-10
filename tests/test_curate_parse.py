@@ -187,3 +187,36 @@ def test_판정한_이름이_로그에_남는다(caplog):
     with caplog.at_level("INFO"):
         curate._apply(_item(), edit, None)
     assert "테스트과자" in caplog.text
+
+# 아래는 2026-09-09 합성 회귀 사례다. 실제 모델 발생 빈도는 측정하지 않았다.
+@pytest.mark.parametrize("field,value", [
+    ("out_of_scope", "false"), ("out_of_scope", "true"), ("out_of_scope", 1),
+    ("blurb", 42), ("blurb", ["설명"]), ("category", ["과자"]),
+])
+def test_형식이_잘못된_판정은_상품을_제외하거나_발행을_중단하지_않는다(field, value):
+    edit = {"name": "테스트과자", "category": "과자", "blurb": None, "out_of_scope": True}
+    edit[field] = value
+    result = curate._apply(_item(), edit, {"description": "원문", "tags": ["원문 태그"]})
+    assert result["out_of_scope"] is False
+    assert result["blurb"] is None
+    assert result["tags"] == ["원문 태그"]
+    assert result["edit_status"] == "rejected"
+
+
+def test_중복_ref는_뒤의_판정을_조용히_선택하지_않는다():
+    entries = [{"ref": "r0", "out_of_scope": True}, {"ref": "r0", "out_of_scope": False}]
+    assert curate._entries(entries) is None
+    assert curate._entries(list(reversed(entries))) is None
+
+
+def test_모르는_ref만_있으면_실패로_재시도한다():
+    bad = json.dumps([{"ref": "r99", "name": "제품A"}])
+    good = json.dumps([{"ref": "r0", "name": "제품A"}])
+    assert list(curate._curate_batch(_responder(bad, good), BATCH, {})) == ["a"]
+
+
+def test_채널에_없는_자체분류는_원본으로_돌린다():
+    result = curate._apply(_item(), {"name": "테스트과자", "category": "지어낸분류"},
+                           None, channel="convenience")
+    assert result["category"] == "과자류"
+    assert result["edit_status"] == "rejected"

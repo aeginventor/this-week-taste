@@ -4,7 +4,7 @@
 > 코드/폴더/변수명에 서비스명을 하드코딩하지 말 것.
 > 표시용 이름은 `web/config/site.ts` 한 곳에서만 관리한다.
 
-> 이 파일은 Claude Code가 매 세션 자동으로 읽습니다.
+> 이 파일은 Codex가 매 세션 자동으로 읽습니다.
 > 여기 적힌 규칙은 개별 요청보다 우선합니다. 규칙을 어겨야 할 이유가 생기면
 > 코드를 고치기 전에 먼저 이 파일 수정을 제안하세요.
 
@@ -135,7 +135,7 @@
 
 ```
 .
-├─ CLAUDE.md
+├─ AGENTS.md
 ├─ sources/targets.yml        # 타깃 브랜드 정의 (단일 진실 공급원)
 ├─ scrapers/
 │   ├─ base.py                # 공통 HTTP 세션, 재시도, 레이트리밋
@@ -148,7 +148,7 @@
 │   ├─ snapshot.py            # 전체 카탈로그 수집 → data/snapshots/
 │   ├─ diff.py                # 지난주 대비 차집합 계산
 │   ├─ enrich.py              # diff 결과(신상)만 상세 페이지 보강
-│   ├─ curate.py              # Claude API로 정제/분류/한 줄 설명
+│   ├─ curate.py              # Codex API로 정제/분류/한 줄 설명
 │   └─ publish.py             # data/weeks/<YYYY-Www>.json 생성
 ├─ data/                      # 여기까지가 파일의 세계 (2.2)
 │   ├─ published/             # 소스별 부분 산출물. merge의 입력. 커밋하지 않는다
@@ -168,10 +168,10 @@
 ├─ web/                       # Next.js
 │   └─ app/about/             # 크롤러 UA가 가리키는 페이지. 없으면 UA가 거짓말이 된다
 ├─ .github/workflows/weekly.yml   # 매주 수집만 한다. 발행은 사람이
-└─ .claude/                       # 작업 도구 설정. **공개 저장소에 둔다**
+└─ .Codex/                       # 작업 도구 설정. **공개 저장소에 둔다**
 ```
 
-**`.claude/`도 규칙 표면이다.** 공개 저장소에 있으므로 CLAUDE.md나 ADR이 바뀌면
+**`.Codex/`도 규칙 표면이다.** 공개 저장소에 있으므로 AGENTS.md나 ADR이 바뀌면
 `skills/`를 **같은 커밋에서** 고친다. 어긋난 채로 두면 낡는 것이 아니라 거짓말이 된다
 (ADR-0013이 그 사례다 — 되돌린 규칙이 거기 살아 있었다).
 훅에는 **테스트 실행 이상의 것을 넣지 않는다.** 저장소를 클론한 사람의 기계에서
@@ -477,7 +477,7 @@ make check-images  # 발행물 이미지가 실제로 열리는지 표본 검사
 ```
 
 **자동화 경계**: Actions는 `make collect-all`(스냅샷 → diff)까지만 돌리고
-**발행은 사람이 한다.** `curate.py`를 구독 인증(`claude -p`)으로 돌리고 있어 CI에서는
+**발행은 사람이 한다.** `curate.py`를 구독 인증(`Codex -p`)으로 돌리고 있어 CI에서는
 안 되기 때문이다. 자동 발행하면 전량이 blurb 없이 나간다.
 사람이 발행하기 전에 **비공개 데이터 저장소를 `git pull` 해야 한다.**
 2.6 이후로 이건 선택이 아니라 전제다 — 로컬에 스냅샷이 없으면 발행이 카탈로그를
@@ -651,7 +651,7 @@ cu 5,082/4,754(131요청), homeplus 2,966/2,861(130요청)이었다. W33·W35 �
 
 ```
 ANTHROPIC_API_KEY    # curate 단계용. 없으면 LLM 없이 원본 그대로 발행한다(6장)
-THIS_WEEK_TASTE_LLM  # api(기본) | cli | off. cli는 `claude -p`로 구독 인증을 쓴다.
+THIS_WEEK_TASTE_LLM  # api(기본) | cli | off. cli는 `Codex -p`로 구독 인증을 쓴다.
                      # cli는 로컬 전용이라 Actions에서 안 되고, 구독 사용량을 소모한다.
                      # 자동으로 cli로 넘어가지 않는다 — 명시적으로 켜야 한다
 GH_TOKEN             # 실패 시 Issue 생성용 (Actions 기본 토큰으로 대체 가능)
@@ -674,7 +674,7 @@ DATA_REPO_TOKEN      # (Actions secret) 비공개 데이터 저장소 push 권�
 > ⚠️ **저장소 변수 `vars.THIS_WEEK_TASTE_UA`는 정의되어 있지 않다.** 워크플로가 그것을
 > 넘기므로 CI에서는 빈 문자열이 가고, 위의 `or` 폴백이 기본값으로 되돌린다 —
 > 실제로 나가는 UA는 기본값이다(2026-08-31 확인).
-> 이 문자열에 `Claude`를 넣지 말 것 — 일부 사이트(bhc 등)가 `ClaudeBot`을 차단하고 있어
+> 이 문자열에 `Codex`를 넣지 말 것 — 일부 사이트(bhc 등)가 `ClaudeBot`을 차단하고 있어
 > 넣는 순간 금지 대상이 된다. `base.Session`이 이를 강제한다.
 
 ## 11. 아직 검증되지 않은 것 (믿지 말 것)

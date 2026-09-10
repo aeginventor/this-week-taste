@@ -67,7 +67,7 @@ def test_renamed_product_is_changed_not_added_and_removed(base_week):
     assert result["counts"]["added"] == 0
     assert result["counts"]["removed"] == 0
     assert result["counts"]["changed"] == 1
-    assert result["changed"][0]["matched_by"] == "barcode"
+    assert result["changed"][0]["matched_by"] == "external_id"
     assert result["changed"][0]["fields"]["name"] == {
         "from": "샐)오리지널닭가슴살샐러", "to": "샐)오리지날닭가슴살샐러"}
 
@@ -269,7 +269,7 @@ def test_이름이_바뀌어도_키로_이어진다():
 
     assert result["counts"]["added"] == 0        # 신상 아님
     assert result["counts"]["removed"] == 0      # 단종도 아님
-    assert result["changed"][0]["matched_by"] == "goodsno"
+    assert result["changed"][0]["matched_by"] == "external_id"
     assert result["changed"][0]["fields"]["name"] == {"from": "오뜨", "to": "오뜨 애플파이"}
 
 

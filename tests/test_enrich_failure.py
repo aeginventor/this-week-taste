@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-from pipeline import diff, enrich
+from pipeline import diff, enrich, provenance, snapshot, paths
 from scrapers import base
 
 WEEK = "2026-W35"
@@ -23,6 +23,8 @@ WEEK = "2026-W35"
 
 @pytest.fixture
 def dirs(tmp_path, monkeypatch):
+    monkeypatch.setattr(snapshot, "SNAPSHOT_DIR", tmp_path / "snapshots")
+    monkeypatch.setattr(paths, "RAW_DIR", tmp_path / "raw")
     monkeypatch.setattr(diff, "DIFF_DIR", tmp_path / "diffs")
     monkeypatch.setattr(enrich, "ENRICHED_DIR", tmp_path / "enriched")
     monkeypatch.setattr(base, "Session", lambda *a, **k: object())
@@ -32,7 +34,9 @@ def dirs(tmp_path, monkeypatch):
 def _write_diff(dirs, source_id, added):
     path = diff.DIFF_DIR / WEEK / f"{source_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({"added": added}, ensure_ascii=False), encoding="utf-8")
+    provenance.atomic_json(path, provenance.seal(
+        {"added": added, "week": WEEK, "source_id": source_id},
+        provenance.observation_inputs(source_id, WEEK)))
 
 
 def _items(n, **extra):

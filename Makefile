@@ -86,25 +86,29 @@ check-images:  ## 발행물 이미지가 실제로 열리는지 표본 검사 (�
 	$(PY) -m pipeline.imagecheck $(WEEK_ARG)
 
 merge:  ## 소스별 부분 산출물을 사이트가 읽는 파일 하나로 합친다
-	$(PY) -m pipeline.publish --merge $(WEEK_ARG)
+	$(PY) -m pipeline.publish --merge $(WEEK_ARG) $(foreach s,$(FAILED_SOURCES),--failed-source $(s))
 
 publish:
 	$(PY) -m pipeline.publish --source $(SOURCE) $(WEEK_ARG)
 
 # 전 구간. snapshot이 이상을 감지하면 여기서 멈춘다 (2.4).
-week: snapshot diff enrich publish
+week:
+	$(MAKE) --no-print-directory collect SOURCE=$(SOURCE) WEEK=$(WEEK) REFRESH=$(REFRESH)
+	$(MAKE) --no-print-directory enrich SOURCE=$(SOURCE) WEEK=$(WEEK)
+	$(MAKE) --no-print-directory publish SOURCE=$(SOURCE) WEEK=$(WEEK)
 
 # 소스 격리 (2.3): 크롤러 하나가 실패해도 나머지는 정상 발행되어야 한다.
 # 그래서 `week`를 소스별로 따로 부르고, 실패는 모아서 끝에 한 번에 알린다.
 # 여기서 `&&`로 이으면 첫 실패에서 전부 멈춰 격리가 무의미해진다.
 week-all:
+	@test -n "$(strip $(SELECTED))" || { echo "고른 소스가 없다" >&2; exit 1; }
 	@failed=""; \
 	for s in $(SELECTED); do \
 		echo "════════ $$s ════════"; \
 		$(MAKE) --no-print-directory week SOURCE=$$s WEEK=$(WEEK) REFRESH=$(REFRESH) || failed="$$failed $$s"; \
 	done; \
 	echo "════════ 병합 ════════"; \
-	$(MAKE) --no-print-directory merge WEEK=$(WEEK); \
+	$(MAKE) --no-print-directory merge WEEK=$(WEEK) FAILED_SOURCES="$$failed" || exit $$?; \
 	if [ -n "$$failed" ]; then \
 		echo "‼️  실패한 소스:$$failed (나머지는 병합됨)" >&2; exit 1; \
 	fi; \
