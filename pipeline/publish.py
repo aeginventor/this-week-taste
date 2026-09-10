@@ -218,6 +218,12 @@ def run(source_id: str, week: str | None = None) -> Path | None:
         "eligible": len(assessed["items"]),
         "launch_verification": "not_performed",
     }
+    payload["report"]["editor"] = {
+        "accepted": sum(v.get("edit_status") == "accepted" for v in curated.values()),
+        "rejected": sum(v.get("edit_status") == "rejected" for v in curated.values()),
+        "unavailable": sum(v.get("edit_status") == "unavailable" for v in curated.values()),
+        "quality_evaluation": "not_performed",
+    }
     path = part_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

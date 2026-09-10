@@ -10,8 +10,9 @@
   - 설명문이 없으면 `blurb`는 `null`이다. 이름만 보고 쓰게 하지 않는다.
   - 태그는 소스가 준 것을 그대로 쓴다. LLM에게 만들게 하지 않는다. 소스가 안 주면 빈 목록이다.
 
-6장의 나머지 두 역할(신제품 vs 리뉴얼 구분, 중복 병합)은 v1 범위 밖이다.
-`diff.py`가 소스의 상품 키로 동일성을 이미 판정하므로 LLM이 다시 할 일이 없다.
+출시·재등장·중복 판정은 이 편집 단계의 결과가 아니다 (ADR-0018).
+`diff.py`의 항목 매칭과 `discovery.py`의 과거 관측 대조를 별도로 수행한다.
+편집에 성공해도 출시가 확인되는 것은 아니다.
 
 **API 키가 없거나 실패하면 LLM 없이 원본 그대로 발행한다.** 편집 품질보다 발행이 우선이다.
 
@@ -369,6 +370,9 @@ def _entries(parsed: object) -> dict[str, dict] | None:
     entries = {}
     for entry in parsed:
         if isinstance(entry, dict) and isinstance(entry.get("ref"), str):
+            if entry["ref"] in entries:
+                log.error("LLM 응답의 ref가 중복됐다: %s", entry["ref"])
+                return None
             entries[entry["ref"]] = entry
     return entries
 
@@ -414,6 +418,9 @@ def _curate_batch(complete, batch: list[dict], enriched: dict) -> dict[str, dict
             if _ref(index) in entries
         }
 
+        if not by_external:
+            log.warning("입력과 대응하는 ref가 없다 (%d/%d). 재시도한다.", attempt, MAX_ATTEMPTS)
+            continue
         missing = len(batch) - len(by_external)
         if missing:
             log.warning("응답에서 %d건이 빠졌다. 이 항목들은 원본을 쓴다: %s",
@@ -428,16 +435,28 @@ def _curate_batch(complete, batch: list[dict], enriched: dict) -> dict[str, dict
     return {}
 
 
-def _apply(item: dict, edit: dict | None, enriched_entry: dict | None) -> dict:
+def _apply(item: dict, edit: dict | None, enriched_entry: dict | None,
+           *, channel: str | None = None) -> dict:
     """LLM 결과를 항목에 반영한다. 검증에 걸리면 원본을 유지한다."""
     tags = list((enriched_entry or {}).get("tags") or [])
     description = (enriched_entry or {}).get("description")
     # out_of_scope의 기본값은 False다. **LLM이 실패하면 포함하는 쪽으로 넘어진다** —
     # 빠뜨리는 것보다 한 건 더 실리는 쪽이 눈에 띄고 되돌리기 쉽다 (2.4와 같은 방향).
     curated = {"category": item.get("category_raw"), "tags": tags, "blurb": None,
-               "out_of_scope": False}
+               "out_of_scope": False, "edit_status": "unavailable"}
 
     if not edit:
+        return curated
+
+    curated["edit_status"] = "rejected"
+    if (not isinstance(edit, dict)
+            or ("out_of_scope" in edit and type(edit["out_of_scope"]) is not bool)
+            or (edit.get("blurb") is not None and not isinstance(edit["blurb"], str))
+            or (edit.get("category") is not None and not isinstance(edit["category"], str))):
+        log.error("LLM 필드 형식이 잘못됐다 (%s). 원본을 쓴다.", item["name"])
+        return curated
+    if channel and edit.get("category") not in CATEGORIES_BY_CHANNEL.get(channel, ()):
+        log.error("LLM 분류가 채널 목록에 없다 (%s): %r", item["name"], edit.get("category"))
         return curated
 
     # name은 LLM이 건드리는 필드가 아니다 (6장). 다르면 이 항목의 결과를 통째로 버린다.
@@ -446,12 +465,13 @@ def _apply(item: dict, edit: dict | None, enriched_entry: dict | None) -> dict:
                   item["name"], edit.get("name"))
         return curated
 
+    curated["edit_status"] = "accepted"
     if edit.get("category"):
         curated["category"] = edit["category"]
 
     # 항목을 **없애는** 판정이라 앞의 셋과 성격이 다르다(6장). 근거가 남도록
     # 여기서 이름을 찍고, publish가 건수를 리포트에 싣는다.
-    if edit.get("out_of_scope"):
+    if edit.get("out_of_scope") is True:
         log.info("범위 밖으로 판정: %s (%s)", item["name"], item.get("category_raw"))
         curated["out_of_scope"] = True
 
@@ -499,7 +519,7 @@ def curate(items: list[dict], enriched: dict, *, channel: str) -> dict[str, dict
 
     result = {
         item["external_id"]: _apply(item, edits.get(item["external_id"]),
-                                    enriched.get(item["external_id"]))
+                                    enriched.get(item["external_id"]), channel=channel)
         for item in items
     }
     with_blurb = sum(1 for v in result.values() if v["blurb"])
