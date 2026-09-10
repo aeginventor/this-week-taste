@@ -1,0 +1,1047 @@
+{
+  "week": "2026-W37",
+  "generated_at": "2026-09-10T15:26:28+09:00",
+  "generation_id": "1bb4386b80304f6ebdaa653c20e67f5c",
+  "sources": [
+    "baskinrobbins",
+    "bbq",
+    "bhc",
+    "burgerking",
+    "compose",
+    "crown",
+    "cu",
+    "dominos",
+    "dunkin",
+    "emart24",
+    "gs25",
+    "kyochon",
+    "mcdonalds",
+    "momstouch",
+    "orion",
+    "parisbaguette",
+    "pizzahut",
+    "starbucks"
+  ],
+  "source_statuses": {
+    "baskinrobbins": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:44:09+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "배스킨라빈스"
+    },
+    "bbq": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:44:54+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "BBQ"
+    },
+    "bhc": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:46:30+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "bhc치킨"
+    },
+    "burgerking": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:46:43+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "버거킹"
+    },
+    "compose": {
+      "status": "verified",
+      "scraped_at": "2026-09-10T14:48:45+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "컴포즈커피"
+    },
+    "crown": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:48:18+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "크라운제과"
+    },
+    "cu": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:40:25+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "CU"
+    },
+    "dominos": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:46:37+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "도미노피자"
+    },
+    "dunkin": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:44:18+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "던킨"
+    },
+    "emart24": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:45:02+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "이마트24"
+    },
+    "kyochon": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:44:48+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "교촌치킨"
+    },
+    "mcdonalds": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:46:04+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "맥도날드"
+    },
+    "momstouch": {
+      "status": "verified",
+      "scraped_at": "2026-09-10T14:49:02+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "맘스터치"
+    },
+    "orion": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:43:13+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "오리온"
+    },
+    "parisbaguette": {
+      "status": "verified",
+      "scraped_at": "2026-09-10T14:49:08+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "파리바게뜨"
+    },
+    "pizzahut": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:48:28+09:00",
+      "generated_at": "2026-09-10T15:26:28+09:00",
+      "brand": "피자헛"
+    },
+    "starbucks": {
+      "status": "verified",
+      "scraped_at": "2026-09-07T14:43:36+09:00",
+      "generated_at": "2026-09-10T15:26:27+09:00",
+      "brand": "스타벅스"
+    },
+    "homeplus": {
+      "status": "excluded",
+      "reason": "실행 실패; 이전 성공 부분 파일 없음",
+      "brand": "홈플러스"
+    }
+  },
+  "totals": {
+    "total": 121,
+    "with_blurb": 4
+  },
+  "by_source": {
+    "baskinrobbins": {
+      "week": "2026-W37",
+      "source_id": "baskinrobbins",
+      "diff_counts": {
+        "previous": 126,
+        "current": 128,
+        "matched": 121,
+        "added": 7,
+        "removed": 5,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:44:09+09:00",
+        "count": 128,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:03:19+09:00"
+      },
+      "added": 7,
+      "source_new_label": {
+        "labelled_total": 1,
+        "labelled_and_added": 0,
+        "labelled_not_added": 1,
+        "added_not_labelled": 7
+      },
+      "published": {
+        "total": 7,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 7,
+        "held": [],
+        "eligible": 7,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 7,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "bbq": {
+      "week": "2026-W37",
+      "source_id": "bbq",
+      "diff_counts": {
+        "previous": 105,
+        "current": 105,
+        "matched": 105,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:44:54+09:00",
+        "count": 105,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:04:03+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 8,
+        "labelled_and_added": 0,
+        "labelled_not_added": 8,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "bhc": {
+      "week": "2026-W37",
+      "source_id": "bhc",
+      "diff_counts": {
+        "previous": 113,
+        "current": 113,
+        "matched": 113,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:46:30+09:00",
+        "count": 113,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:05:36+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 19,
+        "labelled_and_added": 0,
+        "labelled_not_added": 19,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "burgerking": {
+      "week": "2026-W37",
+      "source_id": "burgerking",
+      "diff_counts": {
+        "previous": 192,
+        "current": 192,
+        "matched": 189,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 3,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:46:43+09:00",
+        "count": 192,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:05:48+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 46,
+        "labelled_and_added": 0,
+        "labelled_not_added": 46,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "compose": {
+      "week": "2026-W37",
+      "source_id": "compose",
+      "diff_counts": {
+        "previous": 205,
+        "current": 205,
+        "matched": 205,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-10T14:48:45+09:00",
+        "count": 205,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:28:36+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 0,
+        "labelled_and_added": 0,
+        "labelled_not_added": 0,
+        "added_not_labelled": 0
+      },
+      "published_then_gone": {
+        "previous_published": 9,
+        "gone": 0,
+        "names": []
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "crown": {
+      "week": "2026-W37",
+      "source_id": "crown",
+      "diff_counts": {
+        "previous": 45,
+        "current": 45,
+        "matched": 45,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:48:18+09:00",
+        "count": 45,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:07:30+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 3,
+        "labelled_and_added": 0,
+        "labelled_not_added": 3,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "cu": {
+      "week": "2026-W37",
+      "source_id": "cu",
+      "diff_counts": {
+        "previous": 4062,
+        "current": 4065,
+        "matched": 3995,
+        "added": 70,
+        "removed": 67,
+        "changed": 226,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:40:25+09:00",
+        "count": 4065,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T11:59:35+09:00"
+      },
+      "added": 70,
+      "source_new_label": {
+        "labelled_total": 575,
+        "labelled_and_added": 59,
+        "labelled_not_added": 516,
+        "added_not_labelled": 11
+      },
+      "monotonic_id": {
+        "key": "gd_idx",
+        "previous_max": 28150,
+        "added_above_previous_max": 59,
+        "added_below_previous_max": 11
+      },
+      "published_then_gone": {
+        "previous_published": 56,
+        "gone": 1,
+        "names": [
+          "서울의밤매실하이볼500ml"
+        ]
+      },
+      "published": {
+        "total": 70,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W33",
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 70,
+        "held": [],
+        "eligible": 70,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 70,
+        "quality_evaluation": "not_performed"
+      },
+      "review_excluded": {
+        "count": 5,
+        "names": [
+          "데일리)알알이샤인300g",
+          "데일리)추희자두450g",
+          "해성)거봉샤인2입(박스)",
+          "데일리)캠벨포도500g(팩)",
+          "데일리)골드스위트(1입)"
+        ]
+      }
+    },
+    "dominos": {
+      "week": "2026-W37",
+      "source_id": "dominos",
+      "diff_counts": {
+        "previous": 50,
+        "current": 50,
+        "matched": 50,
+        "added": 0,
+        "removed": 0,
+        "changed": 1,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:46:37+09:00",
+        "count": 50,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:05:43+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 6,
+        "labelled_and_added": 0,
+        "labelled_not_added": 6,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "dunkin": {
+      "week": "2026-W37",
+      "source_id": "dunkin",
+      "diff_counts": {
+        "previous": 212,
+        "current": 217,
+        "matched": 198,
+        "added": 19,
+        "removed": 14,
+        "changed": 1,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:44:18+09:00",
+        "count": 217,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:03:28+09:00"
+      },
+      "added": 19,
+      "source_new_label": {
+        "labelled_total": 3,
+        "labelled_and_added": 3,
+        "labelled_not_added": 0,
+        "added_not_labelled": 16
+      },
+      "published": {
+        "total": 19,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 19,
+        "held": [],
+        "eligible": 19,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 19,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "emart24": {
+      "week": "2026-W37",
+      "source_id": "emart24",
+      "diff_counts": {
+        "previous": 577,
+        "current": 581,
+        "matched": 570,
+        "added": 11,
+        "removed": 7,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:45:02+09:00",
+        "count": 581,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:04:11+09:00"
+      },
+      "added": 11,
+      "source_new_label": {
+        "labelled_total": 8,
+        "labelled_and_added": 0,
+        "labelled_not_added": 8,
+        "added_not_labelled": 11
+      },
+      "published_then_gone": {
+        "previous_published": 11,
+        "gone": 0,
+        "names": []
+      },
+      "published": {
+        "total": 11,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 11,
+        "held": [],
+        "eligible": 11,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 11,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "kyochon": {
+      "week": "2026-W37",
+      "source_id": "kyochon",
+      "diff_counts": {
+        "previous": 111,
+        "current": 111,
+        "matched": 111,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:44:48+09:00",
+        "count": 111,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:03:57+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 0,
+        "labelled_and_added": 0,
+        "labelled_not_added": 0,
+        "added_not_labelled": 0
+      },
+      "published_then_gone": {
+        "previous_published": 10,
+        "gone": 0,
+        "names": []
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "mcdonalds": {
+      "week": "2026-W37",
+      "source_id": "mcdonalds",
+      "diff_counts": {
+        "previous": 100,
+        "current": 100,
+        "matched": 100,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:46:04+09:00",
+        "count": 100,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:05:10+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 0,
+        "labelled_and_added": 0,
+        "labelled_not_added": 0,
+        "added_not_labelled": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "momstouch": {
+      "week": "2026-W37",
+      "source_id": "momstouch",
+      "diff_counts": {
+        "previous": 66,
+        "current": 66,
+        "matched": 59,
+        "added": 7,
+        "removed": 7,
+        "changed": 1,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-10T14:49:02+09:00",
+        "count": 66,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:28:52+09:00"
+      },
+      "added": 7,
+      "source_new_label": {
+        "labelled_total": 11,
+        "labelled_and_added": 5,
+        "labelled_not_added": 6,
+        "added_not_labelled": 2
+      },
+      "published": {
+        "total": 7,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 7,
+        "held": [],
+        "eligible": 7,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 7,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "orion": {
+      "week": "2026-W37",
+      "source_id": "orion",
+      "diff_counts": {
+        "previous": 114,
+        "current": 116,
+        "matched": 114,
+        "added": 2,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:43:13+09:00",
+        "count": 116,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:02:25+09:00"
+      },
+      "added": 2,
+      "source_new_label": {
+        "labelled_total": 8,
+        "labelled_and_added": 0,
+        "labelled_not_added": 8,
+        "added_not_labelled": 2
+      },
+      "published": {
+        "total": 2,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W33",
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 2,
+        "held": [],
+        "eligible": 2,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 2,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "parisbaguette": {
+      "week": "2026-W37",
+      "source_id": "parisbaguette",
+      "diff_counts": {
+        "previous": 519,
+        "current": 522,
+        "matched": 517,
+        "added": 5,
+        "removed": 2,
+        "changed": 2,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-10T14:49:08+09:00",
+        "count": 522,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:28:59+09:00"
+      },
+      "added": 5,
+      "source_new_label": {
+        "labelled_total": 0,
+        "labelled_and_added": 0,
+        "labelled_not_added": 0,
+        "added_not_labelled": 5
+      },
+      "published_then_gone": {
+        "previous_published": 4,
+        "gone": 0,
+        "names": []
+      },
+      "published": {
+        "total": 5,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 5,
+        "held": [],
+        "eligible": 5,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 5,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "pizzahut": {
+      "week": "2026-W37",
+      "source_id": "pizzahut",
+      "diff_counts": {
+        "previous": 25,
+        "current": 25,
+        "matched": 25,
+        "added": 0,
+        "removed": 0,
+        "changed": 0,
+        "review": 0,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:48:28+09:00",
+        "count": 25,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:07:40+09:00"
+      },
+      "added": 0,
+      "source_new_label": {
+        "labelled_total": 2,
+        "labelled_and_added": 0,
+        "labelled_not_added": 2,
+        "added_not_labelled": 0
+      },
+      "monotonic_id": {
+        "key": "rpst_seq",
+        "previous_max": 2275,
+        "added_above_previous_max": 0,
+        "added_below_previous_max": 0
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 0,
+        "held": [],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    },
+    "starbucks": {
+      "week": "2026-W37",
+      "source_id": "starbucks",
+      "diff_counts": {
+        "previous": 330,
+        "current": 325,
+        "matched": 323,
+        "added": 1,
+        "removed": 6,
+        "changed": 0,
+        "review": 1,
+        "conflicts": 0
+      },
+      "gap_weeks": 1,
+      "compared_with": "2026-W36",
+      "snapshot": {
+        "scraped_at": "2026-09-07T14:43:36+09:00",
+        "count": 325,
+        "previous_week": "2026-W36",
+        "previous_scraped_at": "2026-08-31T12:02:47+09:00"
+      },
+      "added": 1,
+      "source_new_label": {
+        "labelled_total": 26,
+        "labelled_and_added": 0,
+        "labelled_not_added": 26,
+        "added_not_labelled": 1
+      },
+      "published_then_gone": {
+        "previous_published": 15,
+        "gone": 0,
+        "names": []
+      },
+      "published": {
+        "total": 0,
+        "with_blurb": 0
+      },
+      "discovery": {
+        "history_weeks": [
+          "2026-W33",
+          "2026-W35",
+          "2026-W36"
+        ],
+        "candidates": 1,
+        "held": [
+          {
+            "external_id": "9300000006466",
+            "name": "베이스볼 팝콘&프레첼",
+            "reason": "previously_observed_entry",
+            "evidence": {
+              "week": "2026-W33",
+              "external_id": "9300000006466"
+            }
+          }
+        ],
+        "eligible": 0,
+        "launch_verification": "not_performed"
+      },
+      "editor": {
+        "accepted": 0,
+        "rejected": 0,
+        "unavailable": 0,
+        "quality_evaluation": "not_performed"
+      }
+    }
+  },
+  "content": {
+    "reviewed_at": "2026-09-10T15:17:46+09:00",
+    "included": 5,
+    "held": 7,
+    "catalog_matches": 0,
+    "catalog_excluded": 5
+  }
+}
