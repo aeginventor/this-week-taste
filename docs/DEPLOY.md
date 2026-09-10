@@ -1,5 +1,9 @@
 # 배포 / 확인 방법
 
+Git 자동 배포는 `main`에만 허용한다. 나머지 브랜치는 이름과 무관하게 차단한다.
+`vercel.json`은 `**: false`, `main: true`를 사용한다. [Vercel 공식 규칙](https://vercel.com/docs/project-configuration/git-configuration)에 따라 여러 패턴 중 true가 우선한다(2026-09-10 확인).
+`main` push는 배포를 일으킬 수 있으므로 정리 결과 확인 전에는 하지 않는다.
+
 **배포됨: https://this-week-taste.vercel.app** (2026-08-24)
 
 `web/`은 순수 정적 사이트다(`output: "export"`). 서버 런타임이 없어서 아무 정적 호스팅에나
