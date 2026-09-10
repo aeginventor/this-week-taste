@@ -140,7 +140,7 @@ export function FilteredItems({ items }: { items: Item[] }) {
       </section>
 
       <p className="counts" aria-live="polite">
-        신상 {shownActive.length}건
+        발견 기록 {shownActive.length}건
         {active > 0 && ` / 전체 ${items.length}건`}
       </p>
 

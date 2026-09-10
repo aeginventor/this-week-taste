@@ -14,7 +14,7 @@ export function WeekView({ data, weeks }: { data: Week; weeks: string[] }) {
   return (
     <div className="week">
       <div className="week-head">
-        <h1>{formatWeek(data.week)} 신상</h1>
+        <h1>{formatWeek(data.week)} 발견 기록</h1>
         {weeks.length > 1 && (
           <nav className="archive">
             {weeks.map((w) => (
@@ -27,6 +27,10 @@ export function WeekView({ data, weeks }: { data: Week; weeks: string[] }) {
         )}
       </div>
 
+      <p className="note">
+        제품 목록에서 새로 관측한 항목입니다. 발견한 주와 실제 출시 시점은 다를 수 있습니다.
+        현재 기록의 공식 출시 사실과 시점은 확인되지 않았습니다.
+      </p>
       <FilteredItems items={data.items} />
 
       <p className="channels">

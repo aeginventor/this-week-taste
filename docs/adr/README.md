@@ -53,3 +53,5 @@
 | [0015](0015-discontinued-as-metric.md) | 단종을 발행하지 않고 오탐 지표로 쓴다 | 채택 |
 | [0016](0016-press-feed-sources.md) | 보도자료 소스를 기사 차집합 + 추출로 다룬다 | **제안** |
 | [0017](0017-collector-identity.md) | 수집 주체에 따라 소스가 다르게 응답한다 | **제안** |
+
+| [0018](0018-discovery-and-launch.md) | 새 발견과 공식 출시 확인을 구분한다 | 채택 |

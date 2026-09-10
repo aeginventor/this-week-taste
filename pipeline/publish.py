@@ -39,7 +39,7 @@ import re
 import sys
 from pathlib import Path
 
-from pipeline import alert, curate, diff, enrich, snapshot, sources, weeks
+from pipeline import alert, curate, diff, discovery, enrich, snapshot, sources, weeks
 
 log = logging.getLogger(__name__)
 
@@ -114,6 +114,9 @@ def _publish_item(item: dict, *, week: str, source_id: str, curated: dict,
         "alt_ids": item.get("alt_ids") or {},
         "first_seen": (previous or {}).get("first_seen") or week,
         "last_seen": week,
+        # 최초 관측은 출시 증거가 아니다. 공식 출시 수집기가 검증되기 전에는
+        # 어떤 NEW 배지나 LLM 편집도 이 값을 출시 확인으로 승격하지 않는다.
+        "launch_status": "unverified",
     }
 
 
@@ -155,7 +158,11 @@ def run(source_id: str, week: str | None = None) -> Path | None:
         return None
 
     enriched = enrich.load_enriched(week, source_id)
-    added = result["added"]
+    assessed = discovery.assess(source_id, week, result["added"])
+    added = assessed["items"]
+    if assessed["held"]:
+        log.warning("%s %s: 과거 관측/배치 중복과 겹치는 후보 %d건을 보류한다.",
+                    source_id, week, len(assessed["held"]))
     # 자체 분류 목록은 채널마다 다르다 (curate.CATEGORIES_BY_CHANNEL).
     curated = curate.curate(added, enriched, channel=sources.meta(source_id)["channel"])
 
@@ -203,6 +210,13 @@ def run(source_id: str, week: str | None = None) -> Path | None:
                                  out_of_scope=out_of_scope,
                                  previous_published=previous_by_external),
         "items": items,
+    }
+    payload["report"]["discovery"] = {
+        "history_weeks": assessed["history_weeks"],
+        "candidates": len(result["added"]),
+        "held": assessed["held"],
+        "eligible": len(assessed["items"]),
+        "launch_verification": "not_performed",
     }
     path = part_path(week, source_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -340,7 +354,11 @@ def _source_report(week: str, source_id: str, result: dict, items: list[dict],
     if control_path.exists():
         control = json.loads(control_path.read_text(encoding="utf-8"))
 
-    added = result["added"]
+    assessed = discovery.assess(source_id, week, result["added"])
+    added = assessed["items"]
+    if assessed["held"]:
+        log.warning("%s %s: 과거 관측/배치 중복과 겹치는 후보 %d건을 보류한다.",
+                    source_id, week, len(assessed["held"]))
     labelled_new = {k for k, v in control.items() if (v.get("labels") or {}).get("new")}
     added_ids = {i["external_id"] for i in added}
 

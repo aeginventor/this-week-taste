@@ -19,6 +19,7 @@ export function ItemCard({ item }: { item: Item }) {
       )}
       <div className="card-body">
         <h3 className="name">{item.name}</h3>
+        <p className="blurb">출시 미확인</p>
         {item.blurb && <p className="blurb">{item.blurb}</p>}
         <p className="meta">
           <span className="brand">{item.brand}</span>
