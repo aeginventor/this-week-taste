@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/redesign-evaluation-20260910": false
+    }
+  },
   "framework": null,
   "installCommand": "cd web && npm ci",
   "buildCommand": "cd web && npm run build",
