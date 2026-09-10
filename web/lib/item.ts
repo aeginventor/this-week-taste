@@ -29,8 +29,11 @@ export type Item = {
   external_id: string;
   first_seen: string;
   last_seen: string;
-  /** 기존 발행 파일은 이 필드가 없다. 없으면 출시 미확인으로 표시한다. */
+  /** 이전 발행 파일과의 호환용 내부 값. 화면에 노출하지 않는다. */
   launch_status?: "unverified";
+  release_status?: "released" | "upcoming";
+  release_date?: string;
+  source_name?: string;
 };
 
 export type SourceStatus = {

@@ -19,7 +19,12 @@ export function ItemCard({ item }: { item: Item }) {
       )}
       <div className="card-body">
         <h3 className="name">{item.name}</h3>
-        <p className="blurb">출시 미확인</p>
+        {item.release_date && (
+          <p className="blurb">
+            <time dateTime={item.release_date}>{item.release_date.replaceAll("-", ".")}</time>
+            {item.release_status === "upcoming" ? " 출시 예정" : " 출시"}
+          </p>
+        )}
         {item.blurb && <p className="blurb">{item.blurb}</p>}
         <p className="meta">
           <span className="brand">{item.brand}</span>
@@ -39,7 +44,7 @@ export function ItemCard({ item }: { item: Item }) {
         {item.source_url && (
           <a className="source" href={item.source_url} rel="nofollow noopener"
              target="_blank">
-            원문 보기 ↗
+            {item.source_name ? `${item.source_name}에서 보기` : "원문 보기"} ↗
           </a>
         )}
       </div>

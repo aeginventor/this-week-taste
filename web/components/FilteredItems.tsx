@@ -140,7 +140,7 @@ export function FilteredItems({ items }: { items: Item[] }) {
       </section>
 
       <p className="counts" aria-live="polite">
-        발견 기록 {shownActive.length}건
+        신상 {shownActive.length}건
         {active > 0 && ` / 전체 ${items.length}건`}
       </p>
 
@@ -152,11 +152,19 @@ export function FilteredItems({ items }: { items: Item[] }) {
             : "이번 주에 새로 확인된 제품이 없습니다."}
         </p>
       ) : (
-        <section className="grid">
-          {shownActive.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-        </section>
+        <>
+          {(["released", "upcoming"] as const).map((status) => {
+            const group = shownActive.filter((item) => (item.release_status ?? "released") === status);
+            return group.length > 0 && (
+              <section key={status} aria-label={status === "upcoming" ? "출시 예정" : "이번 주 신상"}>
+                <h2>{status === "upcoming" ? "출시 예정" : "이번 주 신상"} <small>{group.length}건</small></h2>
+                <div className="grid">
+                  {group.map((item) => <ItemCard key={item.id} item={item} />)}
+                </div>
+              </section>
+            );
+          })}
+        </>
       )}
     </>
   );

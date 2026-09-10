@@ -57,12 +57,20 @@ convenience:
     name: GS25
     company: GS리테일
     priority: P0
-    status: blocked          # 2026-08-31 사이트 이전으로 소실. 아래 첫 문단
+    status: blocked          # 기존 카탈로그 수집 경로 상태. 브랜드 서비스 제외가 아님
+    service_scope: included
+    candidate_routes:
+      - https://www.gsretail.com/news/press-releases
+      - https://www.instagram.com/gs25_official/
+      - https://www.youtube.com/@official_GS25
     method: xhr
     url: http://gs25.gsretail.com/gscvs/ko/products/youus-freshfoodDetail-search
     catalog: partial       # PB + 차별화만 받는다. 일반 매입 상품은 목록이 없다
     hint: >
-      ❌ **2026-08-31: 소비자 카탈로그가 공개 웹에서 사라졌다.** W36에서 빠졌고
+      2026-09-10 사용자 결정: GS25는 신상 소개 대상에 유지한다. 카탈로그 재개를 기다리지 않고
+      공식 안내·SNS·구체적인 공개 콘텐츠의 상품 후보를 별도 검토한다(ADR-0020).
+      아래는 2026-08-31 당시 기존 카탈로그 경로 조사이며 브랜드 전체의 제공 불가를 뜻하지 않는다.
+      **2026-08-31: 소비자 카탈로그를 공개 웹에서 찾지 못했다.** W36에서 빠졌고
       `pipeline/sources.py`의 표에서도 내렸다. 실측한 것:
       ① 옛 호스트 `gs25.gsretail.com`의 **모든** 경로가 `www.gsretail.com/brand/gs25`로
          301된다(`/products/youus-freshfood`, `/products/event-goods`, `/main`, `/robots.txt`).
@@ -71,7 +79,7 @@ convenience:
       ③ 소비자 경로는 우리동네GS 앱(`woodongs.com`)으로 옮겨갔다. robots는 전면 허용이나
          데이터는 `b2c-apigw.woodongs.com`에서 오고, **CloudFront가 403으로 막고 앱 인증을
          요구한다.** 로그인이 필요한 경로는 7장이 금지한다.
-      → 되살리려면 공개된 상품 목록 경로를 새로 찾아야 한다. 파서(`scrapers/gs25.py`)와
+      → 카탈로그 수집을 재개하려면 공개된 상품 목록 경로가 필요하다. 파서(`scrapers/gs25.py`)와
         골든 테스트는 남겨 두었다. 이미 발행된 항목은 그대로 남는다(4장, `id`는 불변).
 
       ── 아래는 2026-08-25 붙였을 때의 실측 기록이다 (경로가 살아 있을 때) ──
