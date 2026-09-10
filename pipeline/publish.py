@@ -39,7 +39,7 @@ import sys
 import uuid
 from pathlib import Path
 
-from pipeline import alert, curate, diff, discovery, enrich, provenance, snapshot, sources, weeks
+from pipeline import alert, content, curate, diff, discovery, enrich, provenance, snapshot, sources, weeks
 
 log = logging.getLogger(__name__)
 
@@ -295,7 +295,22 @@ def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
         }
     for source_id in sorted(failed - statuses.keys()):
         statuses[source_id] = {"status": "excluded", "reason": "실행 실패; 이전 성공 부분 파일 없음"}
-    if not by_source:
+    candidate_file = content.candidate_path(week)
+    candidate_hash = provenance.file_digest(candidate_file)
+    additions, content_report = content.load(week, items)
+    for previous_file in sorted(WEEKS_DIR.glob("????-W??.json"), reverse=True):
+        if previous_file.stem >= week:
+            continue
+        previous_items = {i["id"]: i for i in json.loads(previous_file.read_text())["items"]}
+        for item in additions:
+            if item["id"] in previous_items:
+                item["first_seen"] = min(item["first_seen"], previous_items[item["id"]]["first_seen"])
+    # 명시적으로 연결된 후보만 기존 카탈로그 항목을 보강한다. 새 ID 충돌은 아래에서 거부한다.
+    replacements = {i["id"]: i for i in additions if i["id"] in {old["id"] for old in items}}
+    if len(replacements) != content_report.get("catalog_matches", 0):
+        raise provenance.InvalidEvidence("콘텐츠 후보 ID가 명시적 연결 없이 기존 항목과 겹친다")
+    items = [replacements.get(i["id"], i) for i in items] + [i for i in additions if i["id"] not in replacements]
+    if not by_source and not additions:
         raise provenance.InvalidEvidence(f"{week}: 검증된 부분 산출물이 없다. 기존 공개 파일을 보존한다")
 
     for source_id, status in statuses.items():
@@ -308,12 +323,14 @@ def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
         if provenance.file_digest(path) != checksum:
             raise provenance.InvalidEvidence("병합 도중 부분 파일이 바뀌었다")
         provenance.check_part(json.loads(path.read_text()), source_id, week)
+    if provenance.file_digest(candidate_file) != candidate_hash:
+        raise provenance.InvalidEvidence("병합 도중 콘텐츠 후보가 바뀌었다")
 
     merged = {
         "week": week,
         "generated_at": weeks.scraped_at(),
         "generation_id": uuid.uuid4().hex,
-        "sources": sorted(by_source),
+        "sources": sorted(set(by_source) | {i["source_id"] for i in additions}),
         "source_statuses": statuses,
         "counts": _counts(items),
         "items": items,
@@ -326,6 +343,7 @@ def merge(week: str, *, failed_sources: list[str] | None = None) -> Path:
         "source_statuses": statuses,
         "totals": merged["counts"],
         "by_source": by_source,
+        **({"content": content_report} if content_report else {}),
     }
     path = week_path(week)
     # 주간 파일을 마지막에 교체한다. 웹은 항목과 상태가 함께 있는 이 파일만 읽는다.

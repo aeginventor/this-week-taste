@@ -226,3 +226,15 @@ robots.txt는 크롤러 지침이지 브라우저 지침이 아니지만, `/abou
 **세 값이 어긋나면 안 된다**: `web/config/site.ts`의 `url` /
 `web/app/about/page.tsx`의 존재 / `THIS_WEEK_TASTE_UA`.
 UA가 없는 페이지를 가리키면 그건 연락 가능한 식별자가 아니다.
+
+## 검토한 콘텐츠 후보를 발행에 연결하기 (ADR-0020)
+
+비공개 데이터 디렉터리의 `candidates/<week>.json`을 사용한다. `version: 1`, `week`, 시간대가 있는
+`reviewed_at`, `entries` 목록을 둔다. 각 후보는 고유 `id`, `review`의 include/hold·이유,
+포함 후보의 과거 관측 대조·검토 주체, `evidence`의 URL·읽은 범위·원자료 묶음·확인 사실,
+`product`의 상품 필드를 기록한다. `tests/test_content_candidates.py`가 최소 입력과 거부 반례를 보여준다.
+
+기존 `make merge WEEK=...`가 포함 후보를 함께 읽는다. 콘텐츠만으로도 발행할 수 있으며 카탈로그
+snapshot·diff를 가짜로 만들지 않는다. 명시적인 `catalog_id` 연결만 기존 항목을 보강한다.
+출시 예정은 `release_status: upcoming`, 확인 가능한 날짜만 `release_date`에 넣는다.
+검토 이유·본문·증거 목록은 공개 상품에 복사하지 않는다. 이 파일을 만드는 정기 수집기는 아직 없다.
