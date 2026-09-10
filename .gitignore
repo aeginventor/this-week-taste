@@ -16,7 +16,7 @@ __pycache__/
 # OS
 .DS_Store
 
-# 작업 도구 설정: 공용 설정(.claude/settings.json)은 커밋하고 개인 설정은 하지 않는다.
+# 개인 작업 도구 설정은 커밋하지 않는다.
 .claude/settings.local.json
 
 # 정찰 단계 원본 응답 (180개 / 16MB). 조사 *결론*은 docs/RECON*.md 로 커밋하고
@@ -45,3 +45,6 @@ data/published/
 
 # 자동화가 비공개 데이터 저장소를 여기에 체크아웃한다 (.github/workflows/weekly.yml)
 _data/
+
+# 개인 훅과 실행 상태
+.codex/
