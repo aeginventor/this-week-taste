@@ -88,13 +88,14 @@ def parse_listing(html, url):
     return records
 
 
-def collect(root, start, end):
+def collect(root, start, end, reuse_root=None):
     from scrapers.base import Session
     if (root / "inventory.json").exists():
         raise ValueError("collection already exists; use saved inputs, no implicit refresh")
-    if root.exists() and any(root.iterdir()):
-        raise ValueError("collection directory must be empty; preserve incomplete attempts")
     root.mkdir(parents=True, exist_ok=True)
+    save(root / "collection-plan.json", {"start": start, "end": end, "max_pages": 5, "max_articles": 40,
+                                        "reuse_root": str(reuse_root) if reuse_root else None})
+    reusable = {d["url"]: d for d in verify_inventory(reuse_root)["documents"]} if reuse_root else {}
     class ResearchSession(Session):
         def _archive_robots(self, origin, response):
             raw = response.content
@@ -102,20 +103,49 @@ def collect(root, start, end):
             save(root / "robots-meta.json", {"url": origin + "/robots.txt", "sha256": digest(raw),
                  "status_code": response.status_code, "observed_at": datetime.now(timezone.utc).isoformat()})
     session = ResearchSession()
+    if (root / "robots-meta.json").exists():
+        # 동일한 일회 수집의 파서 수정/중단 복구는 받은 robots와 응답을 재사용한다.
+        from urllib.robotparser import RobotFileParser
+        meta = json.loads((root / "robots-meta.json").read_text())
+        raw = (root / "robots.txt").read_bytes()
+        if digest(raw) != meta["sha256"] or meta["status_code"] != 200:
+            raise ValueError("saved robots cannot be verified")
+        rp = RobotFileParser(); rp.parse(raw.decode().splitlines())
+        session._robots[f"https://{HOST}"] = rp
+        session._apply_limits(f"https://{HOST}", rp, raw.decode())
+
+    def acquire(url, filename):
+        path = root / filename
+        meta_path = root / (filename + ".http.json")
+        if path.exists():
+            meta = json.loads(meta_path.read_text())
+            if meta["url"] != url or meta["sha256"] != digest(path.read_bytes()):
+                raise ValueError("saved response changed")
+            return path.read_bytes(), meta
+        if url in reusable:
+            doc = reusable[url]
+            raw = (reuse_root / doc["raw_file"]).read_bytes()
+            meta = {"url": url, "sha256": digest(raw), "observed_at": doc["observed_at"], "reused": True}
+        else:
+            response = session.get(url, allow_redirects=False)
+            raw = response.content
+            meta = {"url": url, "sha256": digest(raw), "observed_at": datetime.now(timezone.utc).isoformat(),
+                    "reused": False, "status_code": response.status_code}
+        path.write_bytes(raw)
+        save(meta_path, meta)
+        if meta.get("status_code", 200) != 200:
+            raise ValueError(f"HTTP {meta['status_code']}")
+        return raw, meta
     begin = time.monotonic()
     fetched, urls, failures = [], {}, []
     boundary = False
     for page in range(1, 6):
         url = START_URL if page == 1 else urljoin(START_URL, f"page/{page}/")
-        response = session.get(url, allow_redirects=False)
-        if response.status_code != 200:
-            raise ValueError(f"listing HTTP {response.status_code}")
-        raw = response.content
+        raw, meta = acquire(url, f"listing-{page}.html")
         path = root / f"listing-{page}.html"
-        path.write_bytes(raw)
         records = parse_listing(raw, url)
         fetched.append({"url": url, "file": path.name, "sha256": digest(raw), "records": len(records),
-                        "observed_at": datetime.now(timezone.utc).isoformat()})
+                        "observed_at": meta["observed_at"]})
         for row in records:
             if start <= row["published_on"] <= end:
                 urls[row["url"]] = row
@@ -127,16 +157,12 @@ def collect(root, start, end):
     docs, bodies = [], {}
     for n, row in enumerate(sorted(urls.values(), key=lambda r: (r["published_on"], r["url"])), 1):
         try:
-            response = session.get(row["url"], allow_redirects=False)
-            if response.status_code != 200:
-                raise ValueError(f"article HTTP {response.status_code}")
-            raw = response.content
             filename = f"article-{n:02}.html"
-            (root / filename).write_bytes(raw)
+            raw, meta = acquire(row["url"], filename)
             doc = parse_article(raw, row["url"])
             if doc["published_on"] != row["published_on"]:
                 raise ValueError("listing/article date mismatch")
-            doc.update(raw_file=filename, raw_sha256=digest(raw), observed_at=datetime.now(timezone.utc).isoformat())
+            doc.update(raw_file=filename, raw_sha256=digest(raw), observed_at=meta["observed_at"], reused=meta["reused"])
             body = doc["body_sha256"]
             doc["duplicate_of"] = bodies.get(body)
             bodies.setdefault(body, doc["document_id"])
@@ -313,6 +339,7 @@ def main():
     p.add_argument("action", choices=["collect", "extract", "replay"])
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--approved-once", action="store_true")
+    p.add_argument("--reuse-root", type=Path)
     p.add_argument("--start", default="2026-08-01")
     p.add_argument("--end", default="2026-09-08")
     p.add_argument("--run", default="rules-v1")
@@ -328,7 +355,7 @@ def main():
     if a.action == "collect":
         if not a.approved_once:
             p.error("one-time source review approval is required")
-        r = collect(a.root, a.start, a.end)
+        r = collect(a.root, a.start, a.end, a.reuse_root)
         print(json.dumps({k: v for k, v in r.items() if k != "documents"}, ensure_ascii=False, indent=2))
     elif a.action == "extract":
         extract(a.root, a.run, a.engine, a.split, a.live)

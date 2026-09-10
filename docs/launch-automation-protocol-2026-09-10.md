@@ -3,7 +3,9 @@
 작성일 2026-09-10. 사용자 요청의 비공개 실험이며 공개 발행·배포·정기 수집을 포함하지 않는다.
 선행: [자료 경로 비교](data-route-study-2026-09-09.md), ADR [0016](adr/0016-press-feed-sources.md)·[0018](adr/0018-discovery-and-launch.md)·[0019](adr/0019-publication-input-integrity.md).
 
-## 수집 검토안 (승인 대기)
+## 수집 검토안 (2026-09-10 사용자 승인)
+
+사용자가 목록 최대 5페이지·본문 최대 40개·순차 최소 1초 간격의 일회성 비공개 확보를 승인했다. 기존 자료를 재사용하며 정기 수집·공개 재배포·상업 이용 허가·배포는 포함하지 않는다. 아래 과거 개발 기록의 승인 대기는 당시 상태다.
 
 - 소스: 신세계그룹 뉴스룸의 SCK COMPANY 공식 분류.
 - 시작 경로: `https://www.shinsegaegroupnewsroom.com/family/sckcompany/`, 해당 분류의 페이지 링크와 그 목록에서 발견된 같은 호스트의 기사 URL만 따라간다. 내부 WordPress JSON은 사용하지 않는다.
@@ -47,6 +49,8 @@
 상세 결과·재현·한계는 [작업 기록](../learning/sessions/2026-09-10-로컬모델-출시근거-자동화.md)에 연결한다. 추가 자료를 확보해 평가하기 전 운영 모델 채택이나 ADR의 유지할 설계 결정으로 승격하지 않는다.
 
 ### 로컬 실행 공식 근거 (확인 2026-09-10)
+
+후속: [승인 후 기간 수집·동결 평가·GitHub 보존 결과](../learning/sessions/2026-09-10-동결평가와-GitHub-보존.md). 실제 평가 11편을 처리했으나 유용한 연결은 0건이었다. 위 개발 실행 상태는 당시 기록으로 보존한다.
 
 - [Ollama macOS](https://docs.ollama.com/macos): 실행 파일 설치 경로와 지원 환경.
 - [Ollama 공식 0.33.3 배포](https://github.com/ollama/ollama/releases/tag/v0.33.3): 다운로드 tgz의 SHA-256 `342db03df80bb9db84ff64246031bd5f70c09b59ff52fa5cc9aaae3476cc4a9d` 일치 확인.

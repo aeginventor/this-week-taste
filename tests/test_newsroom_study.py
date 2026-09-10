@@ -186,3 +186,44 @@ def test_changed_document_and_failed_extraction(tmp_path):
     (tmp_path / "article.html").write_bytes(raw + b"changed")
     with pytest.raises(ValueError, match="document changed"):
         replay(tmp_path, "run", catalog)
+
+
+def test_collection_reuses_prior_body_and_refuses_completed_collection(tmp_path, monkeypatch):
+    from scripts.newsroom_study import collect
+    from scrapers import base
+    old = tmp_path / "old"; old.mkdir()
+    raw = HTML.encode(); (old / "article.html").write_bytes(raw)
+    d = {**document(), "raw_file": "article.html", "raw_sha256": digest(raw), "observed_at": "2026-08-20T00:00:00Z"}
+    (old / "inventory.json").write_text(json.dumps({"listing_pages": [], "documents": [d]}))
+    requested = []
+    class FakeSession:
+        def __init__(self):
+            self.request_count = 0
+        def get(self, url, **kwargs):
+            requested.append(url); self.request_count += 1
+            assert "/family/sckcompany/" in url  # 기사 본문을 다시 요청하면 실패한다.
+            day = "2026.07.31" if "page/2" in url else "2026.08.20"
+            class Response:
+                status_code = 200
+                content = f'<article class="item"><span class="date">{day}</span><a href="{d["url"]}">글</a></article>'.encode()
+            return Response()
+    monkeypatch.setattr(base, "Session", FakeSession)
+    root = tmp_path / "new"
+    result = collect(root, "2026-08-01", "2026-09-08", old)
+    assert len(requested) == 2
+    assert result["documents"][0]["reused"] is True
+    assert (root / result["documents"][0]["raw_file"]).read_bytes() == raw
+    with pytest.raises(ValueError, match="collection already exists"):
+        collect(root, "2026-08-01", "2026-09-08", old)
+    assert len(requested) == 2
+
+
+def test_unknown_launch_subtype_does_not_hide_missing_dated_facts():
+    from scripts.evaluate_newsroom_period import dated_facts
+    reference = {"documents": [{"document_id": "a", "expected_events": [],
+        "dated_launch_unspecified": [{"name": "호지 라떼", "date": "2026-08-25"}]}]}
+    # 날짜가 같아도 행사를 출시 사실을 추출한 것으로 세지 않는다.
+    docs = [{"document_id": "a", "claims": [{**claim(), "kind": "promotion"}]}]
+    assert dated_facts(docs, reference)["matched"] == 0
+    docs[0]["claims"][0]["kind"] = "uncertain"
+    assert dated_facts(docs, reference)["matched"] == 1
