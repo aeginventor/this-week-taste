@@ -450,6 +450,10 @@ pipeline/sources.py            표에 한 줄: brand·channel·detail·monotonic
 
 ### 운영 명령과 실제 상태 확인
 
+2026-09-28 사용자 지시에 따른 정기 수집 중단은 [ADR-0021](docs/adr/0021-pause-recurring-collection.md)을 따른다.
+GitHub `weekly`의 비활성화를 유지하고 사용자 재개 승인 없이 활성화하지 않는다.
+아래 예약 시각은 준비된 설정으로만 취급하고 실제 실행 여부는 원격 workflow 상태로 확인한다.
+의도한 중단을 수집 누락으로 알리지 않고 예기치 않은 활성화·새 실행은 확인한다.
 발행 전에 비공개 데이터 저장소의 원격 변경과 로컬 변경을 확인하고 동기화한다.
 Actions에서는 `make collect-all`로 수집·diff까지만 수행하고 발행은 로컬에서 수행한다.
 수집 주체·묶음은 `pipeline/sources.py`에서 확인한다.

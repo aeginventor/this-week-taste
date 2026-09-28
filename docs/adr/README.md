@@ -62,3 +62,5 @@
 | [0017](0017-collector-identity.md) | 수집 주체에 따라 소스가 다르게 응답한다 | 채택 |
 | [0018](0018-discovery-and-launch.md) | 새 발견과 공식 출시 확인을 구분한다 | 채택 |
 | [0019](0019-publication-input-integrity.md) | 같은 주의 이전 성공본을 입력 지문으로 검증한다 | 채택 |
+| [0020](0020-new-products-and-upcoming.md) | 신상·출시 예정 소개와 콘텐츠 후보 검토를 분리한다 | 채택 |
+| [0021](0021-pause-recurring-collection.md) | 복구를 확인하지 못한 주간 수집을 중단한다 | 채택 |

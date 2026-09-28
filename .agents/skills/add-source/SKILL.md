@@ -48,6 +48,9 @@ description: 새 식음료 카탈로그 소스를 붙일 때 대상 정의, 스�
 
 ## 실행 묶음
 
+2026-09-28 정기 수집 중단은 [ADR-0021](../../../docs/adr/0021-pause-recurring-collection.md)을 따른다.
+새 소스를 등록하거나 cron을 수정하는 것만으로 중단된 workflow를 활성화하지 않는다.
+
 로컬·Actions 차이는 [ADR-0017](../../../docs/adr/0017-collector-identity.md)을 따른다.
 robots의 수집 창은 [ADR-0014](../../../docs/adr/0014-collection-time-window.md)을 따른다.
 collector·windowed 값, 실제 cron과 선택 배열을 함께 검사한다. 시각 제한 묶음이 비면 슬롯도 없어야 한다.
